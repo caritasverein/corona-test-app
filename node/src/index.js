@@ -7,12 +7,15 @@ process.on('uncaughtException', error => {
   process.exit(-1);
 });
 
-const express = require('express');
+import express from 'express';
+import helmet from 'helmet';
 
-const {db} = require('./db.js');
+import {db} from './db.js';
 
 const app = express();
+app.use(helmet());
 app.use(express.urlencoded({extended: false}));
+app.use(express.json());
 
 app.use('/a', ()=>{});
 
