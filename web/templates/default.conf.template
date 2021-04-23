@@ -1,0 +1,21 @@
+server {
+  listen         ${WEB_PORT};
+  listen    [::]:${WEB_PORT};
+  server_name _;
+
+  charset utf-8;
+  root /var/www/html/;
+  index index.html;
+
+  location /api/ {
+    proxy_pass http://node:${NODE_PORT};
+    rewrite ^/api(.*)$ $1 break;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+
+    add_header Last-Modified $date_gmt;
+    add_header Cache-Control 'no-store, no-cache';
+  }
+}

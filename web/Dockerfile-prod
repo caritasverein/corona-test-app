@@ -1,0 +1,17 @@
+FROM node:14 AS builder
+
+RUN mkdir /app
+WORKDIR /app
+COPY ./package* ./
+RUN npm i
+
+COPY ./public ./public
+COPY ./src ./src
+
+RUN npm run build
+
+
+FROM nginx
+
+COPY --from=builder /app/build /var/www/html
+COPY ./templates/* /etc/nginx/templates/

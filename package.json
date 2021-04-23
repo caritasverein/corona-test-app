@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "cra-build-watch": "^3.4.0"
+  }
+}

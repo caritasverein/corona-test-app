@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  node:
+    build: ./node
+    restart: unless-stopped
+    volumes:
+      - ./node:/app
+    env_file:
+      - ./env/common.env
+      - ./env/node.env
+      - ./env/mariadb.env
+    environment:
+      - NODE_ENV=development
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile-dev-web
+    restart: unless-stopped
+    volumes:
+      - ./web/build:/var/www/html
+    ports:
+      - "8080:80"
+    env_file:
+      - ./env/common.env
+      - ./env/nginx.env
+
+  build-web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile-dev-build
+    restart: unless-stopped
+    volumes:
+      - ./web:/app
+    env_file:
+      - ./env/common.env
+    environment:
+      - NODE_ENV=development
+
+  db:
+    image: mariadb
+    restart: unless-stopped
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./env/common.env
+      - ./env/mariadb.env
+
+volumes:
+  buildwebcache: {}

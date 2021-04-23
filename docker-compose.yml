@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  node:
+    build: ./node
+    restart: unless-stopped
+    env_file:
+      - ./env/common.env
+      - ./env/node.env
+      - ./env/mariadb.env
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile-prod
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    env_file:
+      - ./env/common.env
+      - ./env/nginx.env
+
+  db:
+    image: mariadb
+    restart: unless-stopped
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - mariadb:/var/lib/mysql
+    env_file:
+      - ./env/common.env
+      - ./env/mariadb.env
+
+volumes:
+  mariadb: {}
