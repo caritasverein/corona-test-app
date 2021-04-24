@@ -9,13 +9,36 @@ process.on('uncaughtException', (error) => {
 
 import express from 'express';
 import helmet from 'helmet';
-import {validateUuidParam, validateBodySubset} from './schema.js';
+import oidc from 'express-openid-connect';
+const {auth, requiresAuth} = oidc;
+
+import {
+  validateUuidParam,
+  validateBodySubset,
+  handleValidationError,
+} from './schema.js';
 
 const app = express();
 app.use(helmet());
 app.use(express.json());
+app.use(auth({
+  authRequired: false,
+  errorOnRequiredAuth: true,
+  routes: {
+    login: false,
+    logout: false,
+  },
+}));
 
-app.get('/:uuid',
+app.get('/login', (req, res) => res.oidc.login({returnTo: '/admin/'}));
+app.get('/me', requiresAuth(), (req, res)=>{
+  res.send(req.oidc.user);
+});
+app.get('/', (req, res)=>{
+  res.send('hello');
+});
+
+app.get('/appointments/:uuid',
   validateUuidParam(),
   (req, res)=>{
 
@@ -23,7 +46,7 @@ app.get('/:uuid',
 );
 
 app.patch(
-  '/:uuid',
+  '/appointments/:uuid',
   validateUuidParam(),
   validateBodySubset([
     'nameGiven',
@@ -43,12 +66,6 @@ app.patch(
 /**
  * Error handler middleware for validation errors.
  */
-app.use((error, req, res, next) => {
-  if (error instanceof ValidationError) {
-    res.status(400).send(error.validationErrors);
-    return next();
-  }
-  next(error);
-});
+app.use(handleValidationError);
 
-app.listen(process.env.NODE_PORT);
+app.listen(8080);

@@ -1,8 +1,8 @@
 limit_req_zone $binary_remote_addr zone=apiratelimit:10m rate=10r/s;
 
 server {
-  listen         ${WEB_PORT};
-  listen    [::]:${WEB_PORT};
+  listen         80;
+  listen    [::]:80;
   server_name _;
 
   charset utf-8;
@@ -11,7 +11,7 @@ server {
   location /api/ {
     limit_req zone=apiratelimit burst=20 nodelay;
 
-    proxy_pass http://node:${NODE_PORT};
+    proxy_pass http://api:8080;
     rewrite ^/api(.*)$ $1 break;
   }
 

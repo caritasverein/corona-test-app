@@ -1,5 +1,5 @@
 
-import {Validator} from 'express-json-validator-middleware';
+import {Validator, ValidationError} from 'express-json-validator-middleware';
 
 const {validate} = new Validator();
 
@@ -90,4 +90,11 @@ export function validateBodySubset(properties) {
 }
 export function validateUuidParam() {
   return validate({params: subsetSchema(['uuid'])});
+}
+export function handleValidationError(error, req, res, next) {
+  if (error instanceof ValidationError) {
+    res.status(400).send(error.validationErrors);
+    return next();
+  }
+  next(error);
 }

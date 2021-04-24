@@ -1,17 +1,21 @@
 version: '3.8'
 
 services:
-  node:
-    build: ./node
+  api:
+    build: ./api
     restart: unless-stopped
     volumes:
-      - ./node:/app
-    env_file:
-      - ./env/common.env
-      - ./env/node.env
-      - ./env/mariadb.env
+      - ./api:/app
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
+      MYSQL_USER: ${MYSQL_USER:-coronatests}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD:-true}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-coronatests}
+      ISSUER_BASE_URL: ${ISSUER_BASE_URL}
+      CLIENT_ID: ${ISSUER_BASE_URL}
+      BASE_URL: ${ISSUER_BASE_URL}
+      SECRET: ${ISSUER_BASE_URL}
 
   web:
     build:
@@ -23,10 +27,7 @@ services:
       - ./web/adminfrontend/build:/var/www/html/admin
       - ./web/templates:/etc/nginx/templates
     ports:
-      - "8080:80"
-    env_file:
-      - ./env/common.env
-      - ./env/nginx.env
+      - "${WEB_PORT:-80}:80"
 
   build-admin:
     build:
@@ -35,10 +36,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./web/adminfrontend:/app
-    env_file:
-      - ./env/common.env
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
+
   build-user:
     build:
       context: ./web
@@ -46,10 +46,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./web/userfrontend:/app
-    env_file:
-      - ./env/common.env
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
 
   db:
     image: mariadb
@@ -58,9 +56,8 @@ services:
       - ./db:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
-    env_file:
-      - ./env/common.env
-      - ./env/mariadb.env
-
-volumes:
-  buildwebcache: {}
+    environment:
+      MYSQL_USER: ${MYSQL_USER:-coronatests}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD:-true}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-coronatests}
