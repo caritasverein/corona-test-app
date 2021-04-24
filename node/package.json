@@ -6,14 +6,21 @@
   "type": "module",
   "scripts": {
     "start": "bash -c 'if [[ \"$NODE_ENV\" == \"development\" ]]; then nodemon ./src/index.js; else node --unhandled-rejections=strict ./src/index.js; fi'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "eslint": "^7.25.0",
+    "eslint-config-google": "^0.14.0",
     "express": "^5.0.0-alpha.8",
+    "express-json-validator-middleware": "^2.1.1",
     "helmet": "^4.5.0",
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.7"
+  },
+  "devDependencies": {
+    "eslint-plugin-security": "^1.4.0"
   }
 }
