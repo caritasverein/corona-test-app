@@ -3,9 +3,7 @@ FROM node:14
 RUN mkdir /app && chown 1000:1000 /app
 WORKDIR /app
 USER 1000
-COPY ./package* ./
-RUN npm i
 
-COPY ./ ./
+ENV PUBLIC_URL=/admin
 
-CMD npm run watch
+CMD npm i && npm run watch

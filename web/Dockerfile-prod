@@ -1,17 +1,32 @@
-FROM node:14 AS builder
+FROM node:14 AS userbuilder
 
 RUN mkdir /app
 WORKDIR /app
-COPY ./package* ./
+COPY ./userfrontend/package* ./
 RUN npm i
 
-COPY ./public ./public
-COPY ./src ./src
+ENV PUBLIC_URL=/
+COPY ./userfrontend/public ./public
+COPY ./userfrontend/src ./src
+
+RUN npm run build
+
+FROM node:14 AS adminbuilder
+
+RUN mkdir /app
+WORKDIR /app
+COPY ./adminfrontend/package* ./
+RUN npm i
+
+ENV PUBLIC_URL=/admin
+COPY ./adminfrontend/public ./public
+COPY ./adminfrontend/src ./src
 
 RUN npm run build
 
 
 FROM nginx
 
-COPY --from=builder /app/build /var/www/html
+COPY --from=userbuilder /app/build /var/www/html/userfrontend
+COPY --from=adminbuilder /app/build /var/www/html/adminfrontend
 COPY ./templates/* /etc/nginx/templates/
