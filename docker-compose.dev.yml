@@ -54,6 +54,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+      - mariadb:/var/lib/mysql
     ports:
       - "3306:3306"
     environment:
@@ -61,3 +62,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD:-true}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-coronatests}
+
+volumes:
+  mariadb: {}
