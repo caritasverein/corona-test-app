@@ -77,8 +77,11 @@ export const windowSchema = {
   '$schema': 'http://json-schema.org/draft-07/schema#',
   'type': 'object',
   'properties': {
+    'id': {'type': 'number'},
     'start': {'type': 'string', 'format': 'date-time'},
     'end': {'type': 'string', 'format': 'date-time'},
+    'numQueues': {'type': 'number'},
+    'appointmentDuration': {'type': 'number'},
     'times': {
       'type': 'array',
       'items': {
@@ -92,7 +95,7 @@ export const windowSchema = {
       },
     },
   },
-  'required': ['start', 'end', 'times'],
+  'required': ['id', 'start', 'end', 'times'],
   'additionalProperties': false,
 };
 
@@ -108,11 +111,24 @@ export function subsetSchema(properties=[], schema=appointmentSchema) {
   };
 }
 
+export function validateProperties(key='body', properties={}) {
+  return validate({[key]: {
+    '$schema': 'http://json-schema.org/draft-07/schema#',
+    'type': 'object',
+    'properties': properties,
+    'required': Object.keys(properties),
+    'additionalProperties': false,
+  }});
+}
+
 export function validateBodySubset(properties=[], schema=appointmentSchema) {
   return validate({body: subsetSchema(properties, schema)});
 }
-export function validateUuidParam() {
-  return validate({params: subsetSchema(['uuid'], appointmentSchema)});
+export function validateParamSubset(params, schema=appointmentSchema) {
+  return validate({params: subsetSchema(params, schema)});
+}
+export function validateQuerySubset(params, schema=appointmentSchema) {
+  return validate({query: subsetSchema(params, schema)});
 }
 export function handleValidationError(error, req, res, next) {
   if (error instanceof ValidationError) {

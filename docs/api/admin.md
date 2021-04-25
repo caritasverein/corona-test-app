@@ -6,9 +6,10 @@ Please refer to [schema.md](./schema.md) to check the format of individual prope
 ## `POST /windows`
 ```
 {
-  id,
   start,
   end,
+  numQueues,
+  appointmentDuration,
 }
 ```
 ```

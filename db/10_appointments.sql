@@ -14,6 +14,6 @@ CREATE TABLE `appointments` (
   `testStartedAt` datetime,
   `testId` INT UNSIGNED,
   `testResult` ENUM('negative', 'positive', 'invalid'),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`uuid`),
+  UNIQUE KEY `uuid_UNIQUE` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
