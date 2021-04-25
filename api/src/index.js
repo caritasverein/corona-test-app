@@ -12,11 +12,10 @@ import helmet from 'helmet';
 import oidc from 'express-openid-connect';
 const {auth, requiresAuth} = oidc;
 
-import {
-  validateUuidParam,
-  validateBodySubset,
-  handleValidationError,
-} from './schema.js';
+import {handleValidationError} from './schema.js';
+
+import {appointmentRouter} from './appointments.js';
+import {windowsRouter} from './windows.js';
 
 const app = express();
 app.use(helmet());
@@ -38,29 +37,8 @@ app.get('/', (req, res)=>{
   res.send('hello');
 });
 
-app.get('/appointments/:uuid',
-  validateUuidParam(),
-  (req, res)=>{
-
-  },
-);
-
-app.patch(
-  '/appointments/:uuid',
-  validateUuidParam(),
-  validateBodySubset([
-    'nameGiven',
-    'nameFamily',
-    'address',
-    'dateOfBirth',
-    'email',
-    'phoneMobile',
-    'phoneLandline',
-  ]),
-  (req, res)=>{
-
-  },
-);
+app.use('/appointments', appointmentRouter);
+app.use('/windows', windowsRouter);
 
 
 /**
