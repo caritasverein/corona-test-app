@@ -4,6 +4,6 @@ RUN mkdir /app && chown 1000:1000 /app
 WORKDIR /app
 USER 1000
 
-ENV PUBLIC_URL=/
+ENV PUBLIC_URL=
 
 CMD npm i && npm run watch

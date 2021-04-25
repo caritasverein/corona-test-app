@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ./userfrontend/package* ./
 RUN npm i
 
-ENV PUBLIC_URL=/
+ENV PUBLIC_URL=
 COPY ./userfrontend/public ./public
 COPY ./userfrontend/src ./src
 
