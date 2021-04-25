@@ -4,11 +4,11 @@ module.exports = {
     'es2021': true,
     'node': true,
   },
-  'plugins': ['security'],
+  'plugins': ['mocha'],
   'extends': [
     'eslint:recommended',
     'google',
-    'plugin:security/recommended',
+    'plugin:mocha/recommended'
   ],
   'parserOptions': {
     'ecmaVersion': 12,

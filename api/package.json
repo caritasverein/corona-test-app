@@ -6,23 +6,29 @@
   "type": "module",
   "scripts": {
     "start": "bash -c 'if [[ \"$NODE_ENV\" == \"development\" ]]; then nodemon ./src/index.js; else node --unhandled-rejections=strict ./src/index.js; fi'",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "eslint": "^7.25.0",
-    "eslint-config-google": "^0.14.0",
     "express": "^4.17.1",
     "express-json-validator-middleware": "^2.1.1",
     "express-openid-connect": "^2.3.1",
     "express-promise-router": "^4.1.0",
     "helmet": "^4.5.0",
     "mysql2": "^2.2.5",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "eslint-plugin-security": "^1.4.0"
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "chai-json-schema": "^1.5.1",
+    "eslint": "^7.25.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-mocha": "^8.1.0",
+    "eslint-plugin-security": "^1.4.0",
+    "mocha": "^8.3.2"
   }
 }

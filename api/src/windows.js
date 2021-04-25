@@ -9,18 +9,20 @@ const router = new Router();
 export const windowsRouter = router;
 
 async function getWindows() {
-  const [windows] = await db.query(
+  const [windows] = await db.execute(
     'SELECT start, end FROM windows WHERE end > NOW();',
   );
   return windows;
 }
+
 async function getWindowsAt(date) {
-  const [windows] = await db.query(
-    'SELECT start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ?;',
+  const [windows] = await db.execute(
+    'SELECT start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ? AND end > NOW();',
     [date],
   );
   return windows;
 }
+
 async function getOccupiedTimeslots(window) {
   const [times] = await db.execute(`
     SELECT
@@ -40,9 +42,10 @@ async function getOccupiedTimeslots(window) {
 
   return times.filter((t)=>t.full);
 }
+
 function fillUnoccupiedTimeslots(window, occupied) {
   const occupationMap = Object.fromEntries(occupied.map(
-    (o)=>[o.time.toISOString(), o.full],
+    (o)=>[o.time.toISOString(), !!o.full],
   ));
 
   const start = new Date(window.start).getTime() / 1000;
@@ -57,7 +60,7 @@ function fillUnoccupiedTimeslots(window, occupied) {
       const time = new Date(timeslot*1000).toISOString();
       // object-injection not possible for ISO-formatted datetime
       // eslint-disable-next-line security/detect-object-injection
-      return {time, full: occupationMap[time] || 0};
+      return {time, full: occupationMap[time] || false};
     });
 }
 

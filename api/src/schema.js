@@ -54,7 +54,7 @@ export const appointmentSchema = {
     },
     'testResult': {
       'type': ['string', 'null'],
-      'enum': ['positive', 'negative', 'invalid'],
+      'enum': ['positive', 'negative', 'invalid', null],
     },
   },
   'required': [
@@ -100,6 +100,10 @@ export const windowSchema = {
 };
 
 export function subsetSchema(properties=[], schema=appointmentSchema) {
+  if (properties.find((p)=>!(p in schema.properties))) {
+    throw new Error('Required request property does not exist in this schema');
+  }
+
   return {
     ...schema,
     properties: Object.fromEntries(

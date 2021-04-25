@@ -25,6 +25,13 @@ Start dev env using
 ```shell
 ./dev.sh
 ```
+### Running tests during development
+Tests are automatically run after starting the dev env.
+
+To manually restart them run:
+```shell
+./test.sh
+```
 
 ## production
 Deploy production service using
