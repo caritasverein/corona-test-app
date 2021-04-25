@@ -7,7 +7,6 @@ import chaiSchema from 'chai-json-schema';
 chai.use(chaiSchema);
 
 const server = 'http://api:8080';
-const today = new Date().toISOString().split('T')[0];
 const tomorrowDate = new Date();
 tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 const tomorrow = tomorrowDate.toISOString().split('T')[0];

@@ -28,7 +28,7 @@ async function getOccupiedTimeslots(window) {
     SELECT
       from_unixtime(UNIX_TIMESTAMP(time) - UNIX_TIMESTAMP(time) MOD ?) as time,
       count(*) >= ? as full
-    FROM appointments
+    FROM appointments_valid
     WHERE time >= ? AND time <= ?
     GROUP BY
       UNIX_TIMESTAMP(time) DIV ?
