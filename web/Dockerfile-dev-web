@@ -1,5 +1,1 @@
 FROM nginx
-
-COPY ./userfrontend/build/ /var/www/html/
-COPY ./adminfrontend/build/ /var/www/html/admin/
-COPY ./templates /etc/nginx/templates

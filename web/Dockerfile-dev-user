@@ -6,4 +6,4 @@ USER 1000
 
 ENV PUBLIC_URL=
 
-CMD npm i && npm run watch
+CMD npm i && npm start

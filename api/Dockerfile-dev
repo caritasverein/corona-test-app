@@ -4,4 +4,4 @@ RUN mkdir /app && chown 1000:1000 /app
 WORKDIR /app
 USER 1000
 
-CMD npm run test
+CMD npm i && npm start
