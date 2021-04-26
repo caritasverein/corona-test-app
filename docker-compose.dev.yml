@@ -35,7 +35,7 @@ services:
       BASE_URL: ${BASE_URL}
       SECRET: ${SECRET}
 
-  api-test:
+  oidc-mock:
     build:
       context: ./oidc-mock
       dockerfile: Dockerfile
