@@ -20,8 +20,7 @@ export function useApi(method, path, body, init = undefined, error = false) {
   const [value, setValue] = useState(init);
 
   useEffect(() => {
-    const url = new URL('./'+path, apiBaseURL);
-    const promise = apiFetch(method, url, body);
+    const promise = apiFetch(method, path, body);
     promise.then(setValue);
     if (error) promise.catch(setValue);
   }, [method, path, body, error]);
