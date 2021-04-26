@@ -14,6 +14,7 @@ const {auth, requiresAuth} = oidc;
 
 import {handleValidationError} from './schema.js';
 
+import {adminRouter} from './admin.js';
 import {userRouter} from './user.js';
 
 const app = express();
@@ -37,6 +38,7 @@ app.get('/', (req, res)=>{
 });
 
 app.use(userRouter);
+app.use('/admin', requiresAuth(), adminRouter);
 
 app.all('*', function(req, res, next) {
   next({status: 404, message: 'Not Found'});

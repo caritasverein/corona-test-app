@@ -33,7 +33,7 @@ async function checkValidNewAppoitment(date) {
   return true;
 }
 
-async function getAppointment(uuid) {
+export async function getAppointment(uuid) {
   const [[appointment]] = await db.execute(`
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
@@ -114,8 +114,8 @@ router.patch(
     ]);
 
     const appointment = await getAppointment(req.params.uuid);
-
     if (!appointment) return res.sendStatus(404);
+
     res.send(appointment);
   },
 );
@@ -129,9 +129,7 @@ router.delete(
       SET
         invalidatedAt = NOW()
       WHERE uuid = ?
-    `, [
-      req.params.uuid,
-    ]);
+    `, [req.params.uuid]);
 
     return res.sendStatus(204);
   },

@@ -138,7 +138,7 @@ describe('user-api', function() {
       );
     });
 
-    it('should show set FULL which appointment', async function() {
+    it('should set FULL on timeslots', async function() {
       const appointment = await chai.request(server)
         .post('/appointments')
         .send({time: new Date(tomorrow+'T14:20:00Z').toISOString()});

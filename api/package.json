@@ -5,8 +5,8 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "start": "bash -c 'if [[ \"$NODE_ENV\" == \"development\" ]]; then nodemon ./src/index.js; else node --unhandled-rejections=strict ./src/index.js; fi'",
-    "test": "mocha",
+    "start": "bash -c 'if [[ \"$NODE_ENV\" == \"development\" ]]; then nodemon --ignore *.test.js ./src/index.js; else node --unhandled-rejections=strict ./src/index.js; fi'",
+    "test": "nodemon --exec \"sleep 3; mocha\"",
     "lint": "eslint ."
   },
   "author": "",

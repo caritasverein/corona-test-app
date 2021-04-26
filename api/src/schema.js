@@ -1,7 +1,7 @@
 
 import {Validator, ValidationError} from 'express-json-validator-middleware';
 
-const {validate} = new Validator();
+export const {validate} = new Validator();
 
 export const appointmentSchema = {
   '$schema': 'http://json-schema.org/draft-07/schema#',
@@ -69,6 +69,26 @@ export const appointmentSchema = {
     'phoneLandline',
     'testStartedAt',
     'testResult',
+  ],
+  'additionalProperties': false,
+};
+
+export const appointmentTestSchema = {
+  '$schema': 'http://json-schema.org/draft-07/schema#',
+  'type': 'object',
+  'properties': {
+    'testStartedAt': {
+      'type': ['string', 'null'],
+      'format': 'date-time',
+    },
+    'testResult': {
+      'type': ['string', 'null'],
+      'enum': ['positive', 'negative', 'invalid', null],
+    },
+  },
+  'anyOf': [
+    {'required': ['testStartedAt']},
+    {'required': ['testResult']},
   ],
   'additionalProperties': false,
 };

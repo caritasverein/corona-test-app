@@ -39,22 +39,6 @@ Please refer to [schema.md](./schema.md) to check the format of individual prope
 }
 ```
 
-## `GET /admin/appointments/:uuid`
-```
-200 {
-  time,
-  nameGiven,
-  nameFamily,
-  address,
-  dateOfBirth,
-  email,
-  phoneMobile,
-  phoneLandline,
-  testStartedAt,
-  testResult,
-}
-```
-
 ## `PATCH /admin/appointments/:uuid`
 ```
 {
@@ -75,11 +59,6 @@ Please refer to [schema.md](./schema.md) to check the format of individual prope
   testStartedAt,
   testResult,
 }
-```
-
-## `DELETE /admin/appointments/:uuid`
-```
-204
 ```
 
 ## `GET /admin/appointments?start&end`
