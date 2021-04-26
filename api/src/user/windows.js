@@ -2,22 +2,22 @@ import Router from 'express-promise-router';
 
 import {
   validateProperties,
-} from './schema.js';
-import db from './db.js';
+} from '../schema.js';
+import db from '../db.js';
 
 const router = new Router();
 export const windowsRouter = router;
 
 async function getWindows() {
   const [windows] = await db.execute(
-    'SELECT start, end FROM windows WHERE end > NOW();',
+    'SELECT id, start, end FROM windows WHERE end > NOW();',
   );
   return windows;
 }
 
 async function getWindowsAt(date) {
   const [windows] = await db.execute(
-    'SELECT start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ? AND end > NOW();',
+    'SELECT id, start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ? AND end > NOW();',
     [date],
   );
   return windows;
@@ -85,6 +85,7 @@ router.get(
         const times = fillUnoccupiedTimeslots(window, occupied);
 
         return {
+          id: window.id,
           start: window.start,
           end: window.end,
           times,

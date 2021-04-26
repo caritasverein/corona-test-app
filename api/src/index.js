@@ -14,8 +14,7 @@ const {auth, requiresAuth} = oidc;
 
 import {handleValidationError} from './schema.js';
 
-import {appointmentRouter} from './appointments.js';
-import {windowsRouter} from './windows.js';
+import {userRouter} from './user.js';
 
 const app = express();
 app.use(helmet());
@@ -29,7 +28,7 @@ app.use(auth({
   },
 }));
 
-app.get('/login', (req, res) => res.oidc.login({returnTo: '/admin/'}));
+app.get('/login', (req, res) => res.oidc.login({returnTo: '/admin/index.html'}));
 app.get('/me', requiresAuth(), (req, res)=>{
   res.send(req.oidc.user);
 });
@@ -37,13 +36,23 @@ app.get('/', (req, res)=>{
   res.send('hello');
 });
 
-app.use('/appointments', appointmentRouter);
-app.use('/windows', windowsRouter);
+app.use(userRouter);
 
+app.all('*', function(req, res, next) {
+  next({status: 404, message: 'Not Found'});
+});
 
 /**
  * Error handler middleware for validation errors.
  */
 app.use(handleValidationError);
+
+app.use((error, req, res, next) => {
+  if (error.status) {
+    return res.status(error.status).json(error);
+  }
+  res.status(500).json({status: 500, message: error.message});
+  next();
+});
 
 app.listen(8080);

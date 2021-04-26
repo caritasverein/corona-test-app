@@ -80,8 +80,8 @@ export const windowSchema = {
     'id': {'type': 'number'},
     'start': {'type': 'string', 'format': 'date-time'},
     'end': {'type': 'string', 'format': 'date-time'},
-    'numQueues': {'type': 'number'},
-    'appointmentDuration': {'type': 'number'},
+    'numQueues': {'type': 'integer', 'min': 1},
+    'appointmentDuration': {'type': 'integer', 'min': 60},
     'times': {
       'type': 'array',
       'items': {
@@ -136,8 +136,7 @@ export function validateQuerySubset(params, schema=appointmentSchema) {
 }
 export function handleValidationError(error, req, res, next) {
   if (error instanceof ValidationError) {
-    res.status(400).send(error.validationErrors);
-    return next();
+    return next({status: 400, message: 'Bad Request', detail: error.validationErrors});
   }
   next(error);
 }

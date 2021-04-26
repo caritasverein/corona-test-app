@@ -4,8 +4,8 @@ import {v4 as uuidv4} from 'uuid';
 import {
   validateParamSubset,
   validateBodySubset,
-} from './schema.js';
-import db from './db.js';
+} from '../schema.js';
+import db from '../db.js';
 
 const router = new Router();
 export const appointmentRouter = router;

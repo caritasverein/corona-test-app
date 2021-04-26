@@ -8,14 +8,3 @@ export const db = mysql.createPool({
   timezone: 'Z',
 });
 export default db;
-
-/*
-SELECT
-    timestamp,  -- not sure about that
-    name,
-    count(b.name)
-FROM time a, id
-WHERE …
-GROUP BY
-UNIX_TIMESTAMP(timestamp) DIV 300, name
-*/
