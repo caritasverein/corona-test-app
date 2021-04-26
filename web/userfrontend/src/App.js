@@ -53,6 +53,14 @@ const ShowAppointment = ({uuid})=>{
         }}
       >Speichern</Button>
     </form>
+
+    <Button
+      variant='contained'
+      color='#BB0000'
+      onClick={(e)=>{
+        apiFetch('DELETE','appointments/'+uuid).then(()=>window.location.pathname = '/');
+      }}
+    >Löschen</Button>
     <pre>{JSON.stringify(appointment, null, 4)}</pre>
   </>
 }

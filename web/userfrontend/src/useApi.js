@@ -21,15 +21,8 @@ export function useApi(method, path, body, init = undefined, error = false) {
 
   useEffect(() => {
     const url = new URL('./'+path, apiBaseURL);
-    const promise = fetch(url, {
-      method,
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: (body && JSON.stringify(body)) || undefined
-    })
-      .then(res=>res.ok?res.json():res.text())
-      .then(setValue);
+    const promise = apiFetch(method, url, body);
+    promise.then(setValue);
     if (error) promise.catch(setValue);
   }, [method, path, body, error]);
 
@@ -44,5 +37,9 @@ export const apiFetch = (method, path, body)=>{
       'content-type': 'application/json',
     },
     body: (body && JSON.stringify(body)) || undefined
-  }).then(res=>res.ok?res.json():res.text())
+  }).then(async res=>{
+    if (res.status === 204) return res;
+    if (!res.ok) throw await res.json();
+    return res.json()
+  });
 }
