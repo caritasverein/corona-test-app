@@ -3,7 +3,7 @@ These Endpoints all require prior authentication and authorization.
 
 Please refer to [schema.md](./schema.md) to check the format of individual properties.
 
-## `POST /windows`
+## `POST /admin/windows`
 ```
 {
   start,

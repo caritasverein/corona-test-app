@@ -78,6 +78,8 @@
   "properties": {
     "start": {"type": "string", "format": "date-time"},
     "end": {"type": "string", "format": "date-time"},
+    "numQueues": {"type": "integer", "min": 1},
+    "appointmentDuration": {"type": "integer", "min": 60},
     "times": {
       "type": "array",
       "items": {
@@ -91,7 +93,7 @@
       }
     }
   },
-  "required": ["start", "end", "times"],
+  "required": ["start", "end", "times", "numQueues", "appointmentDuration"],
   "additionalProperties": false,
 }
 ```
