@@ -46,10 +46,10 @@ app.get('/.well-known/openid-configuration', (req, res)=>{
 
 app.get('/auth', async (req, res)=>{
   const url = req.protocol + '://' + req.get('host');
-  console.log(req.query);
+  //console.log(req.query);
   const params = new URLSearchParams();
   const [key] = keyStore.all({ use: 'sig' });
-  console.log(key);
+  //console.log(key);
 
   const opt = { compact: true, jwk: key, fields: { typ: 'jwt' } }
   const payload = JSON.stringify({
@@ -79,12 +79,13 @@ app.get('/auth', async (req, res)=>{
     default:
       redirect += '#' + params.toString();
   }
-  console.log(redirect);
+  //console.log(redirect);
   res.redirect(redirect);
 });
 
 app.get('/token', (req, res)=>{
   console.error('aaaaaaaaa');
+  res.sendStatus(501);
 });
 
 app.get('/jwks', (req, res)=>{
