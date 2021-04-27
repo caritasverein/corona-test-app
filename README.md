@@ -6,12 +6,12 @@ It must contain contain the following entries, according to your deployments nee
 
 ```shell
 MYSQL_PASSWORD= # e.g. openssl rand -hex 32
-OIDC_CLIENT_ID= # e.g. azure application client id
 OIDC_APP_SECRET= # e.g. openssl rand -hex 32
 
 # Required in production
 OIDC_ISSUER_BASE_URL= # https://login.microsoftonline.com/TENNANT_ID
 OIDC_APP_BASE_URL= # https://corona-tests/api   (note /api as the path)
+OIDC_CLIENT_ID= # e.g. azure application client id
 ```
 
 It may also contain these additional entries:
@@ -27,6 +27,7 @@ MYSQL_PORT=3306
 OIDC_PORT=9090
 OIDC_ISSUER_BASE_URL=http://oidc-mock:9090/
 OIDC_APP_BASE_URL=http://api:8080
+OIDC_CLIENT_ID=coronatests
 ```
 
 ## Development
