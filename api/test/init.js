@@ -18,6 +18,7 @@ const generateApointments = async (numbers) => {
 
   for (let i = 0; i <= numbers; i++) {
     const time = new Date();
+    time.setHours(0);
     time.setMinutes(times[i]);
     tests.push({
       uuid: uuidv4(),
