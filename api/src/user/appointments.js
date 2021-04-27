@@ -1,5 +1,6 @@
 import Router from 'express-promise-router';
 import {v4 as uuidv4} from 'uuid';
+import fsSync, {promises as fs} from 'fs';
 
 import {
   validateParamSubset,
@@ -75,6 +76,22 @@ router.get(
 
     if (!appointment) return res.sendStatus(404);
     res.send(appointment);
+  },
+);
+
+router.get(
+  '/:uuid/pdf',
+  validateParamSubset(['uuid']),
+  async (req, res)=>{
+    const appointment = await getAppointment(req.params.uuid);
+    if (!appointment.testResult) return res.sendStatus(423);
+
+    const stat = await fs.stat('./res/testResult.pdf');
+    const file = fsSync.createReadStream('./res/testResult.pdf');
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=quote.pdf');
+    file.pipe(res);
   },
 );
 

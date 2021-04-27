@@ -31,7 +31,7 @@ router.post(
       ],
     );
 
-    res.send(201, {id: ins.insertId});
+    res.status(201).send({id: ins.insertId});
   },
 );
 
