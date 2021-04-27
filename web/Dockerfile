@@ -14,6 +14,7 @@ RUN npm run build
 
 FROM node:14 AS adminbuilder
 
+ARG FONTAWESOME_KEY
 RUN mkdir /app
 WORKDIR /app
 COPY ./adminfrontend/package* ./
@@ -21,6 +22,7 @@ COPY ./adminfrontend/.npmrc ./
 RUN npm i
 
 ENV PUBLIC_URL=/admin
+ENV FONTAWESOME_KEY=$FONTAWESOME_KEY
 COPY ./adminfrontend/ ./
 
 RUN npm run build
