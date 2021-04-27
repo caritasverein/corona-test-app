@@ -5,6 +5,7 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 import chaiSchema from 'chai-json-schema';
 chai.use(chaiSchema);
+import './init.js';
 
 const server = 'http://api:8080';
 const tomorrowDate = new Date();
@@ -13,26 +14,9 @@ const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
 const debug = false;
 
-import db from '../src/db.js';
 import {windowSchema, appointmentSchema, subsetSchema} from '../src/schema.js';
 
 describe('user-api', function() {
-  before(async function() {
-    await db.execute('TRUNCATE TABLE windows');
-    await db.execute('TRUNCATE TABLE appointments');
-
-    await db.execute(`
-      INSERT INTO windows
-        (start, end, numQueues, appointmentDuration)
-      VALUES
-        (?, ?, 2, 300),
-        (?, ?, 1, 300)
-    `, [
-      tomorrow + ' 09:00:00', tomorrow + ' 12:00:00',
-      tomorrow + ' 13:00:00', tomorrow + ' 16:00:00',
-    ]);
-  });
-
   let appointmentUuid;
   describe('appointments', function() {
     it('should create new appointments', async function() {

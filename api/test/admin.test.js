@@ -5,6 +5,7 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 import chaiSchema from 'chai-json-schema';
 chai.use(chaiSchema);
+import './init.js';
 
 const server = 'http://api:8080';
 const agent = chai.request.agent(server);
@@ -14,34 +15,28 @@ const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
 const debug = false;
 
-import db from '../src/db.js';
 import {appointmentSchema, subsetSchema} from '../src/schema.js';
 
+
+async function login() {
+  const callbackLocation = await agent
+    .get('/login')
+    .redirects(1)
+    .then((e)=>e.res.headers.location);
+
+  const callback = new URL(callbackLocation);
+  await agent
+    .get('/callback'+callback.search+callback.hash);
+
+  const res = await agent.get('/admin/me');
+  if (debug) console.log(res.status, res.body);
+
+  expect(res.status).to.eq(200, JSON.stringify(res.body));
+}
+
 describe('admin-api', function() {
-  before(async function() {
-    await db.execute('TRUNCATE TABLE windows');
-    await db.execute('TRUNCATE TABLE appointments');
-
-    await db.execute(`
-      INSERT INTO windows
-        (start, end, numQueues, appointmentDuration)
-      VALUES
-        (?, ?, 2, 300),
-        (?, ?, 1, 300)
-    `, [
-      tomorrow + ' 09:00:00', tomorrow + ' 12:00:00',
-      tomorrow + ' 13:00:00', tomorrow + ' 16:00:00',
-    ]);
-  });
-
   describe('windows', function() {
-    it('should log in', async function() {
-      await agent.get('/login');
-      const res = await agent.get('/me');
-      if (debug) console.log(res.status, res.body);
-
-      expect(res.status).to.eq(200, JSON.stringify(res.body));
-    });
+    it('should log in', login);
 
     let idWindow;
     it('should create new windows', async function() {
@@ -75,13 +70,7 @@ describe('admin-api', function() {
   });
 
   describe('appointments', function() {
-    it('should log in', async function() {
-      await agent.get('/login');
-      const res = await agent.get('/me');
-      if (debug) console.log(res.status, res.body);
-
-      expect(res.status).to.eq(200, JSON.stringify(res.body));
-    });
+    it('should log in', login);
 
     let appointmentUuid;
     it('should create appointments at any time', async function() {

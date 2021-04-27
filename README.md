@@ -26,7 +26,7 @@ MYSQL_DATABASE=coronatests
 MYSQL_PORT=3306
 OIDC_PORT=9090
 OIDC_ISSUER_BASE_URL=http://oidc-mock:9090/
-OIDC_APP_BASE_URL=http://api:8080
+OIDC_APP_BASE_URL=http://localhost:8080/api # note /api as path
 OIDC_CLIENT_ID=coronatests
 ```
 
@@ -43,7 +43,6 @@ On Linux you can add the following line to your `/etc/hosts`:
 ```shell
 127.0.0.1   oidc-mock
 ```
-Additionally, after the login flow you are redirected to `${OIDC_APP_BASE_URL}/callback?`, which is only valid in the test environment. To fix this, simply change the url to `http://localhost:8080/api/callback?` to complete the procedure. You only need to login once, as the session is kept in your browser.
 
 ### Running tests during development
 Tests are automatically run after starting the dev env and upon filechange.

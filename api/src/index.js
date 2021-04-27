@@ -30,12 +30,9 @@ app.use(auth({
 }));
 
 app.get('/login', (req, res) => res.oidc.login({returnTo: '/admin/index.html'}));
-app.get('/me', requiresAuth(), (req, res)=>{
-  res.send(req.oidc.user);
-});
 
 app.get('/', (req, res)=>{
-  res.send('');
+  res.send('OK');
 });
 
 app.use(userRouter);

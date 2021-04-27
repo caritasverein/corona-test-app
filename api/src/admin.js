@@ -8,3 +8,7 @@ export const adminRouter = router;
 
 router.use('/appointments', appointmentRouter);
 router.use('/windows', windowsRouter);
+
+router.get('/me', (req, res)=>{
+  res.send(req.oidc.user);
+});
