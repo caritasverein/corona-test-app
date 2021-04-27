@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 import chaiSchema from 'chai-json-schema';
 chai.use(chaiSchema);
-import './init.js';
+import initPromise from './init.js';
 
 const server = 'http://api:8080';
 const agent = chai.request.agent(server);
@@ -35,6 +35,9 @@ async function login() {
 }
 
 describe('admin-api', function() {
+  before(async function() {
+    await initPromise;
+  });
   describe('windows', function() {
     it('should log in', login);
 
@@ -135,6 +138,16 @@ describe('admin-api', function() {
       expect(res.body).to.be.an('array');
       expect(res.body.length).to.be.at.least(1);
       res.body.forEach((a)=>expect(a).to.be.jsonSchema(appointmentSchema));
+    });
+
+    it('should generate appointment pdf', async function() {
+      const res = await agent
+        .get('/appointments/'+appointmentUuid+'/pdf');
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.headers.get('content-type')).to.eq('application/pdf');
+      expect(res.body).to.contain('negative');
     });
   });
 });

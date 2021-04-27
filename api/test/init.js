@@ -3,7 +3,7 @@ const tomorrowDate = new Date();
 tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
-(async function() {
+export default (async function() {
   await db.execute('TRUNCATE TABLE windows');
   await db.execute('TRUNCATE TABLE appointments');
 
