@@ -1,13 +1,10 @@
 FROM node:14
 
-ARG FONTAWESOME_KEY
-
 RUN mkdir /app && chown 1000:1000 /app
 WORKDIR /app
 USER 1000
 
 ENV PUBLIC_URL=/admin
 ENV WDS_SOCKET_PATH=/admin/sockjs-node
-ENV FONTAWESOME_KEY=$FONTAWESOME_KEY
 
 CMD npm i && npm start

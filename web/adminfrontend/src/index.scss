@@ -56,3 +56,14 @@ code {
     color: white;
   }
 }
+
+.flash  {
+  animation: flash 3s linear infinite;
+}
+
+@keyframes flash {
+  50% {
+    opacity: 0.5;
+    color: darkred;
+  }
+}

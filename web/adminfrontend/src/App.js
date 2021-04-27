@@ -10,10 +10,9 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlarmExclamation, faBirthdayCake, faCalendarTimes, faCheck, faClock, faComments, faEnvelope, faExclamationTriangle, faEye, faEyeSlash, faIdCard, faMapMarkerAlt, faMobile, faMobileAndroidAlt, faPhone, faPhoneRotary, faPrint, faSpinnerThird, faTimes, faVial } from "@fortawesome/pro-solid-svg-icons";
+import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPrint, faSpinner, faTimes, faVial } from "@fortawesome/free-solid-svg-icons";
+
 import printjs from 'print-js'
-
-
 
 const apiBaseURL = new URL(window.location);
 apiBaseURL.pathname = '/api/admin/';
@@ -84,7 +83,7 @@ const audioDing = new Audio('ding.mp3');
 
 function App() {
 
-    const defaultTime = 60 * 0.2;
+    const defaultTime = 60 * 15;
     const classes = useStyles();
 
     const [tests, setTests] = useState([]);
@@ -258,7 +257,7 @@ function App() {
 
         const stopTestButton = (timeLeft) => {
             return <Button disabled={timeLeft <= 0 || onUpdate} variant={'contained'} className={classes.warningButton} onClick={() => stopTest()}>
-                <FontAwesomeIcon fixedWidth spin icon={faSpinnerThird} className={'mr-2'} /> {timeLeft <= 0 ? 'Bitte warten' : Math.floor(timeLeft / 60) + ':' + ('' + timeLeft % 60).padStart(2, '0')}
+                <FontAwesomeIcon fixedWidth icon={faVial} className={'mr-2 flash'} /> {timeLeft <= 0 ? 'Bitte warten' : Math.floor(timeLeft / 60) + ':' + ('' + timeLeft % 60).padStart(2, '0')}
             </Button>
         }
 
@@ -350,8 +349,8 @@ function App() {
                 </div>
             </TableCell>
             <TableCell>
-                {props.test.phoneMobile && <div><FontAwesomeIcon fixedWidth icon={faMobileAndroidAlt} /> {props.test.phoneMobile}</div>}
-                {props.test.phoneLandline && <div><FontAwesomeIcon fixedWidth icon={faPhoneRotary} /> {props.test.phoneLandline}</div>}
+                {props.test.phoneMobile && <div><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</div>}
+                {props.test.phoneLandline && <div><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</div>}
                 {props.test.email && <div><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</div>}
             </TableCell>
             <TableCell>
@@ -367,8 +366,8 @@ function App() {
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
                     </Typography>
-                    {onUpdate && <div><FontAwesomeIcon spin icon={faSpinnerThird} size={'2x'} /></div>}
-                    {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faAlarmExclamation} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
+                    {onUpdate && <div><FontAwesomeIcon spin icon={faSpinner} size={'2x'} /></div>}
+                    {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
                 </Toolbar>
             </AppBar>
 
