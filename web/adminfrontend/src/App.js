@@ -10,7 +10,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarTimes, faCheck, faExclamationTriangle, faSpinnerThird, faTimes, faVial } from "@fortawesome/pro-solid-svg-icons";
+import { faAlarmExclamation, faBirthdayCake, faCalendarTimes, faCheck, faExclamationTriangle, faMapMarkerAlt, faPrint, faSpinnerThird, faTimes, faVial } from "@fortawesome/pro-solid-svg-icons";
+import printjs from 'print-js'
 
 let renderCount = 0;
 
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     table: {
         minWidth: 650,
     },
-    positivButton: {
+    positiveButton: {
         backgroundColor: red['500'],
         marginRight: '10px;',
         '&:hover': {
@@ -50,13 +51,13 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: yellow['900']
         }
     },
-    positiv: {
+    positive: {
         color: red['500']
     },
     invalid: {
         color: yellow['900']
     },
-    negativ: {
+    negative: {
         color: green['500']
     },
     errorAlert: {
@@ -84,10 +85,12 @@ function App() {
     const defaultTime = 60 * 0.2;
     const classes = useStyles();
 
-    const [tests, setTests] = useState({});
+    const [tests, setTests] = useState([]);
     const [openErrorWindow, setOpenErrorWindow] = useState(false);
     const [errorWindowMessage, setErrorWindowMessage] = useState('');
     const [onUpdate, setOnUpdate] = useState(false);
+    const [pendingTests, setPendingTests] = useState(0)
+    const [finishedTests, setFinishedTests] = useState([]);
 
     const fetchTests = useCallback(async (testsForComparison) => {
         const params = new URLSearchParams({ "start": startOfDay.toISOString(), "end": endOfDay.toISOString() });
@@ -108,24 +111,50 @@ function App() {
         return () => clearInterval(interval);
     }, [fetchTests, tests]);
 
-    useEffect(() => {
 
-    })
+    const getTestTimes = useCallback((test) => {
+        const now = Math.round((new Date()).getTime() / 1000);
+        const testUnixtime = test.testStartedAt ? Math.round((new Date(test.testStartedAt).getTime()) / 1000) : 0;
+        const secondsLeft = defaultTime - (testUnixtime > 0 ? now - testUnixtime : 0);
+        return { now, testUnixtime, secondsLeft }
+    }, [defaultTime])
+
+
+    useEffect(() => {
+        const _tests = tests.filter(test => {
+            const { now, testUnixtime } = getTestTimes(test);
+            return test.testResult === null && testUnixtime > 0 && now - defaultTime >= testUnixtime
+        });
+        const _finishedTests = [];
+        for(const test in _tests) {
+            if(finishedTests.indexOf(test.uuid) === -1) {
+                new Audio('ding.mp3');
+                _finishedTests.push(test.uuid);
+            }
+        }
+        setFinishedTests(_finishedTests);
+        setPendingTests(_tests.length)
+    }, [defaultTime, finishedTests, getTestTimes, tests])
 
     const errorWindowHandleClose = () => {
         setOpenErrorWindow(false);
     };
 
     const resultIcons = {
-        'positiv': <FontAwesomeIcon icon={faExclamationTriangle} fixedWidth />,
-        'negativ': <FontAwesomeIcon icon={faCheck} fixedWidth />,
+        'positive': <FontAwesomeIcon icon={faExclamationTriangle} fixedWidth />,
+        'negative': <FontAwesomeIcon icon={faCheck} fixedWidth />,
         'invalid': <FontAwesomeIcon icon={faTimes} fixedWidth />
     }
 
     const resultText = {
-        'positiv': 'Testergebnis positiv',
-        'negativ': 'Testergebnis negativ',
+        'positive': 'Testergebnis positiv',
+        'negative': 'Testergebnis negativ',
         'invalid': 'Testergebnis ungültig'
+    }
+
+    const printPDF = (uuid) => {
+        const url = new URL('../appointments/' + uuid + '/pdf', apiBaseURL);
+        printjs(url.toString())
     }
 
     const updateTest = (uuid, update) => {
@@ -160,19 +189,19 @@ function App() {
 
     }
 
-    const deleteFromServer = async (uuid, update) => {
+    const deleteFromServer = async (uuid) => {
         const handleError = (err) => {
             console.log(err)
             setErrorWindowMessage(err)
             setOpenErrorWindow(true);
         }
-        const url = new URL('./appointments/' + uuid, apiBaseURL);
+        const url = new URL('../appointments/' + uuid, apiBaseURL);
         const options = {
             method: 'DELETE',
         }
         const response = await fetch(url, options);
         if (response.ok) {
-            updateTest(uuid, {invalidatedAt: new Date()});
+            updateTest(uuid, { invalidatedAt: new Date() });
             return true
         } else {
             handleError(await response.text())
@@ -182,9 +211,7 @@ function App() {
 
     const TestHandler = (props) => {
 
-        const now = Math.round((new Date()).getTime() / 1000);
-        const testUnixtime = props.test.testStartedAt ? Math.round((new Date(props.test.testStartedAt).getTime()) / 1000) : 0;
-        const secondsLeft = defaultTime - (testUnixtime > 0 ? now - testUnixtime : 0);
+        const { now, testUnixtime, secondsLeft} = getTestTimes(props.test);
 
         // Counter for active test button
         const [counter, setCounter] = useState(secondsLeft);
@@ -196,11 +223,12 @@ function App() {
             return () => { clearInterval(timer); }
         }, [counter]);
 
+        const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} className={'ml-3 '} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPrint} />}>Zertifikat</Button>
         const cancelTestButton = <Button disabled={onUpdate} variant={'contained'} className={'ml-2'} onClick={() => cancelTest()}>Nicht erschienen</Button>
         const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'primary'} onClick={() => startTest()}>Test starten</Button>
         const resultButtons = <React.Fragment>
-            <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={classes.negativeButton} onClick={() => setResult('negativ')}>Negativ</Button>
-            <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={classes.positivButton} onClick={() => setResult('positiv')}>Positiv</Button>
+            <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={classes.negativeButton} onClick={() => setResult('negative')}>negative</Button>
+            <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={classes.positiveButton} onClick={() => setResult('positive')}>positive</Button>
             <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={classes.invalidButton} onClick={() => setResult('invalid')}>Ungültig</Button>
         </React.Fragment>
 
@@ -218,19 +246,19 @@ function App() {
 
         const startTest = async () => {
             setOnUpdate(true);
-            await updateServer(props.test.uuid, { ...props.test, testStartedAt: (new Date()).toISOString() })
+            await updateServer(props.test.uuid, { testStartedAt: (new Date()).toISOString() })
             setOnUpdate(false);
         }
 
         const stopTest = async () => {
             setOnUpdate(true);
-            await updateServer(props.test.uuid, { ...props.test, testStartedAt: null })
+            await updateServer(props.test.uuid, { testStartedAt: null })
             setOnUpdate(false);
         }
 
         const setResult = async (res) => {
             setOnUpdate(true);
-            await updateServer(props.test.uuid, { ...props.test, testResult: res })
+            await updateServer(props.test.uuid, { testResult: res })
             setOnUpdate(false);
         }
 
@@ -246,7 +274,8 @@ function App() {
 
         } else if (props.test.testResult !== null) {
             // Test is finished
-            handler = <div className={classes[props.test.testResult]}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}</div>
+            handler = <div className={classes[props.test.testResult]}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}
+                {props.test.testResult === 'negative' && printButton}</div>
 
         } else if (props.test.invalidatedAt) {
             handler = <div><FontAwesomeIcon icon={faCalendarTimes} fixedWidth /> Termin abgesagt.</div>
@@ -272,17 +301,25 @@ function App() {
 
         return <TableRow key={props.test.uuid}>
             <TableCell>
-                {props.test.nameFamily}, {props.test.nameGiven}<br />
-                <div className={'text-muted'}>{props.test.address}</div>
+
+                <div className="name-container">
+                    <div data-area="name">
+                        {props.test.nameFamily}, {props.test.nameGiven}
+                    </div>
+                    <div data-area="dateOfBirth" className="text-muted">
+                        <FontAwesomeIcon fixedWidth icon={faBirthdayCake} /> {(new Date(props.test.dateOfBirth)).toLocaleDateString('de-DE', options)}
+                    </div>
+                    <div data-area="address" className="text-muted">
+                        <FontAwesomeIcon fixedWidth icon={faMapMarkerAlt} /> {props.test.address}
+                    </div>
+                </div>
+
             </TableCell>
             <TableCell>
                 {[props.test.email, props.test.phoneNumber, props.test.phoneLandLine].map(c => {
                     if (c) return <div key={c}>{c}</div>;
                     else return ''
                 })}
-            </TableCell>
-            <TableCell align={'right'}>
-                {(new Date(props.test.dateOfBirth)).toLocaleDateString('de-DE', options)}
             </TableCell>
             <TableCell>
                 <TestHandler {...props} />
@@ -293,11 +330,12 @@ function App() {
 
     return (
         <div className="App">
-            <AppBar position="static">
+            <AppBar position="fixed">
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
                     </Typography>
+                    {pendingTests > 0 && <div className={'pending-tests'}><FontAwesomeIcon fixedWidth icon={faAlarmExclamation} /> {pendingTests} fertige Tests!</div>}
                     {onUpdate && <div><FontAwesomeIcon spin icon={faSpinnerThird} size={'2x'} /></div>}
                 </Toolbar>
             </AppBar>
@@ -315,7 +353,6 @@ function App() {
                             <TableRow>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Kontakt</TableCell>
-                                <TableCell align={'right'}>Geburtstag</TableCell>
                                 <TableCell><FontAwesomeIcon icon={faVial} fixedWidth /> Testdurchführung</TableCell>
                             </TableRow>
                         </TableHead>

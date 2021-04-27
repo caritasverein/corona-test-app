@@ -1,25 +1,57 @@
-
 @import "~bootstrap-utilities";
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .pointer {
   cursor: pointer;
 }
 
-
 .text-muted {
   opacity: 0.5;
+}
+
+.name-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "name name"
+    "dateOfBirth dateOfBirth"
+    "address address";
+}
+
+[data-area="name"] {
+  grid-area: name;
+}
+
+[data-area="dateOfBirth"] {
+  grid-area: dateOfBirth;
+}
+
+[data-area="address"] {
+  grid-area: address;
+}
+
+
+
+.pending-tests  {
+  animation: pending 1s linear infinite;
+  font-size: 15pt;
+
+}
+
+@keyframes pending {
+  50% {
+    opacity: 0.5;
+  }
 }
