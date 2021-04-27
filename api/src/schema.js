@@ -56,6 +56,10 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'enum': ['positive', 'negative', 'invalid', null],
     },
+    'invalidatedAt': {
+      'type': ['string', 'null'],
+      'format': 'date-time',
+    },
   },
   'required': [
     'uuid',
