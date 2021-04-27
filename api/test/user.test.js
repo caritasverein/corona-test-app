@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 import chaiSchema from 'chai-json-schema';
 chai.use(chaiSchema);
-import awaitInit from './init.js';
+import initPromise from './init.js';
 
 const server = 'http://api:8080';
 const tomorrowDate = new Date();
@@ -18,7 +18,7 @@ import {windowSchema, appointmentSchema, subsetSchema} from '../src/schema.js';
 
 describe('user-api', function() {
   before(async function() {
-    await awaitInit;
+    await initPromise;
   });
   let appointmentUuid;
   describe('appointments', function() {
