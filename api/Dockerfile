@@ -4,7 +4,7 @@ RUN mkdir /app && chown 1000:1000 /app
 WORKDIR /app
 USER 1000
 COPY ./package* ./
-RUN npm i
+RUN npm ci --only=prod
 
 COPY ./src ./src
 
