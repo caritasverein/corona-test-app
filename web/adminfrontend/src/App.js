@@ -10,7 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlarmExclamation, faBirthdayCake, faCalendarTimes, faCheck, faComments, faEnvelope, faExclamationTriangle, faEye, faEyeSlash, faIdCard, faMapMarkerAlt, faMobile, faMobileAndroidAlt, faPhone, faPhoneRotary, faPrint, faSpinnerThird, faTimes, faVial } from "@fortawesome/pro-solid-svg-icons";
+import { faAlarmExclamation, faBirthdayCake, faCalendarTimes, faCheck, faClock, faComments, faEnvelope, faExclamationTriangle, faEye, faEyeSlash, faIdCard, faMapMarkerAlt, faMobile, faMobileAndroidAlt, faPhone, faPhoneRotary, faPrint, faSpinnerThird, faTimes, faVial } from "@fortawesome/pro-solid-svg-icons";
 import printjs from 'print-js'
 
 
@@ -330,9 +330,13 @@ function App() {
             weekday: undefined, year: 'numeric', month: 'numeric', day: 'numeric'
         }
 
+        const time = new Date(props.test.time);
+
         return <TableRow key={props.test.uuid}>
             <TableCell>
-
+                {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
+            </TableCell>
+            <TableCell>
                 <div className="name-container">
                     <div data-area="name">
                         {props.test.nameFamily}, {props.test.nameGiven}
@@ -344,7 +348,6 @@ function App() {
                         <FontAwesomeIcon fixedWidth icon={faMapMarkerAlt} /> {props.test.address}
                     </div>
                 </div>
-
             </TableCell>
             <TableCell>
                 {props.test.phoneMobile && <div><FontAwesomeIcon fixedWidth icon={faMobileAndroidAlt} /> {props.test.phoneMobile}</div>}
@@ -375,11 +378,11 @@ function App() {
                 </div>}
 
             <Container maxWidth={'lg'} className={'mt-5'}>
-
                 <TableContainer component={Paper}>
                     <Table className={classes.table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
+                                <TableCell><FontAwesomeIcon icon={faClock} fixedWidth /></TableCell>
                                 <TableCell><FontAwesomeIcon icon={faIdCard} fixedWidth /> Name</TableCell>
                                 <TableCell><FontAwesomeIcon icon={faComments} fixedWidth /> Kontakt</TableCell>
                                 <TableCell><FontAwesomeIcon icon={faVial} fixedWidth /> Testdurchführung</TableCell>
@@ -390,11 +393,7 @@ function App() {
                         </TableBody>
                     </Table>
                 </TableContainer>
-
-
             </Container>
-
-
         </div>
     );
 }
