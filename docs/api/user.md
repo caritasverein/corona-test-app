@@ -49,6 +49,11 @@ Please refer to [schema.md](./schema.md) to check the format of individual prope
 }
 ```
 
+## `GET /appointments/:uuid/pdf`
+```
+200 application/pdf
+```
+
 ## `PATCH /appointments/:uuid`
 ```
 {
