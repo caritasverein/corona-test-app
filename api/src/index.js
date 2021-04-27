@@ -33,8 +33,9 @@ app.get('/login', (req, res) => res.oidc.login({returnTo: '/admin/index.html'}))
 app.get('/me', requiresAuth(), (req, res)=>{
   res.send(req.oidc.user);
 });
+
 app.get('/', (req, res)=>{
-  res.send('hello');
+  res.send('');
 });
 
 app.use(userRouter);
