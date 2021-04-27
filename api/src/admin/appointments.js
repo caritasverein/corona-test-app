@@ -96,7 +96,7 @@ router.get(
     const [appointments] = await db.execute(`
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-        email, phoneMobile, phoneLandline, testStartedAt, testResult
+        email, phoneMobile, phoneLandline, testStartedAt, testResult, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ?
     `, [
       new Date(req.query.start),

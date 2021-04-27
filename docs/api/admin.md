@@ -75,5 +75,6 @@ Please refer to [schema.md](./schema.md) to check the format of individual prope
     phoneLandline,
     testStartedAt,
     testResult,
+    invalidatedAt
 }]
 ```
