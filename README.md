@@ -25,7 +25,6 @@ MYSQL_DATABASE=coronatests
 
 
 # Only available in development env
-FONTAWESOME_KEY=YOURKEY
 MYSQL_PORT=3306
 OIDC_PORT=9090
 OIDC_ISSUER_BASE_URL=http://oidc-mock:9090/

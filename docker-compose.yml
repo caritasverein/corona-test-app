@@ -20,8 +20,6 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
-      args:
-        FONTAWESOME_KEY: ${FONTAWESOME_KEY?err}
     restart: unless-stopped
     ports:
       - "${WEB_PORT:-80}:80"

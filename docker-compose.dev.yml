@@ -53,8 +53,6 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile-dev-admin
-      args:
-        FONTAWESOME_KEY: ${FONTAWESOME_KEY?err}
     restart: unless-stopped
     volumes:
       - ./web/adminfrontend:/app
