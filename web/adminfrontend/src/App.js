@@ -10,7 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPrint, faSpinner, faTimes, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faList, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPrint, faSign, faSpinner, faTag, faTimes, faVial } from "@fortawesome/free-solid-svg-icons";
 
 import printjs from 'print-js'
 
@@ -98,9 +98,16 @@ function App() {
         const params = new URLSearchParams({ "start": startOfDay.toISOString(), "end": endOfDay.toISOString() });
         const url = new URL('./appointments?' + params.toString(), apiBaseURL);
         const response = await fetch(url);
-        const result = await response.json();
-        if (JSON.stringify(result) !== JSON.stringify(testsForComparison)) {
-            setTests(result);
+        if (response.ok) {
+            const result = await response.json();
+            console.log("fetch:", result)
+            if (JSON.stringify(result) !== JSON.stringify(testsForComparison)) {
+                setTests(result);
+            }
+        } else {
+            const text = await response.json()
+            setErrorWindowMessage(text?.message?.toString() || text.toString())
+            setOpenErrorWindow(true)
         }
     }, []);
 
@@ -333,6 +340,9 @@ function App() {
 
         return <TableRow key={props.test.uuid}>
             <TableCell>
+                <b># {props.index + 1}</b>
+            </TableCell>
+            <TableCell>
                 {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
             </TableCell>
             <TableCell>
@@ -381,6 +391,7 @@ function App() {
                     <Table className={classes.table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
+                                <TableCell><FontAwesomeIcon icon={faTag} fixedWidth /></TableCell>
                                 <TableCell><FontAwesomeIcon icon={faClock} fixedWidth /></TableCell>
                                 <TableCell><FontAwesomeIcon icon={faIdCard} fixedWidth /> Name</TableCell>
                                 <TableCell><FontAwesomeIcon icon={faComments} fixedWidth /> Kontakt</TableCell>
@@ -388,7 +399,7 @@ function App() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tests.length > 0 && tests.filter(test => hiddenTests.indexOf(test.uuid) === -1).map(test => <TestRow key={'row-' + test.uuid} test={test} />)}
+                            {tests.length > 0 && tests.filter(test => hiddenTests.indexOf(test.uuid) === -1).map((test, index) => <TestRow key={'row-' + test.uuid} test={test} index={index} />)}
                         </TableBody>
                     </Table>
                 </TableContainer>
