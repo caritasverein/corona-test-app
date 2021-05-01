@@ -6,6 +6,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     restart: unless-stopped
+    read_only: true
     environment:
       NODE_ENV: production
       MYSQL_USER: ${MYSQL_USER:-coronatests}
@@ -21,12 +22,20 @@ services:
       context: ./web
       dockerfile: Dockerfile
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /run
     ports:
       - "${WEB_PORT:-80}:80"
 
   db:
     image: mariadb
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run/mysqld
     volumes:
       - ./db:/docker-entrypoint-initdb.d
       - mariadb:/var/lib/mysql
