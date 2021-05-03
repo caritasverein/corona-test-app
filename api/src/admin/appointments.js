@@ -4,7 +4,6 @@ import {v4 as uuidv4} from 'uuid';
 import {
   validateParamSubset,
   validateBodySubset,
-  validateProperties,
   validateQuerySubset,
   validate,
   windowSchema,

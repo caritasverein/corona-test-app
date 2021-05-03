@@ -52,6 +52,8 @@ function fillUnoccupiedTimeslots(window, occupied) {
   const end = new Date(window.end).getTime() / 1000;
   const duration = end-start;
   const numSlots = Math.floor(duration / window.appointmentDuration);
+  const limit = new Date();
+  limit.setMinutes(0, 0, 0);
 
   return new Array(numSlots)
     .fill(start)
@@ -60,8 +62,9 @@ function fillUnoccupiedTimeslots(window, occupied) {
       const time = new Date(timeslot*1000).toISOString();
       // object-injection not possible for ISO-formatted datetime
       // eslint-disable-next-line security/detect-object-injection
-      return {time, full: occupationMap[time] || false};
-    });
+      return {time, full: occupationMap[time] || new Date(time) < new Date()};
+    })
+    .filter((timeslot) => new Date(timeslot.time) >= limit);
 }
 
 router.get(
