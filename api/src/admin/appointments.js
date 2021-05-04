@@ -11,6 +11,7 @@ import {
 } from '../schema.js';
 import db from '../db.js';
 import {getAppointment} from '../user/appointments.js';
+import {sendNotifications} from '../notifications.js';
 
 const router = new Router();
 export const appointmentRouter = router;
@@ -83,6 +84,8 @@ router.patch(
 
     const appointment = await getAppointment(req.params.uuid);
     if (!appointment) return res.sendStatus(404);
+
+    if (appointment.testResult) await sendNotifications(appointment);
 
     res.send(appointment);
   },
