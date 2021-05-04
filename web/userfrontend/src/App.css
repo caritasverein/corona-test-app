@@ -1,0 +1,26 @@
+body {
+  --mdc-theme-primary: #152968;
+  --mdc-theme-on-primary: #FFF;
+  --mdc-theme-secondary: #25A534;
+  --mdc-theme-on-secondary: #FFF;
+}
+.danger {
+  --mdc-theme-primary: #EE6524;
+  --mdc-theme-on-primary: #FFF;
+}
+.warn {
+  --mdc-theme-primary: #ffdd00;
+  --mdc-theme-on-primary: #000;
+}
+.info {
+  --mdc-theme-primary: #009ED7;
+  --mdc-theme-on-primary: #FFF;
+}
+.ok {
+  --mdc-theme-primary: #74B842;
+  --mdc-theme-on-primary: #FFF;
+}
+.note {
+  --mdc-theme-primary: #3c4666;
+  --mdc-theme-on-primary: #FFF;
+}

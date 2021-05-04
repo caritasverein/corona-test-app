@@ -105,7 +105,8 @@ function App() {
                 setTests(result);
             }
         } else {
-            const text = await response.json()
+            if (response.status ===  401) window.location.pathname = '/api/login';
+            const text = await response.json();
             setErrorWindowMessage(text?.message?.toString() || text.toString())
             setOpenErrorWindow(true)
         }
