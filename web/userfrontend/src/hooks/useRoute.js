@@ -19,6 +19,7 @@ export const useRoute = () => {
         document.title,
         process.env.PUBLIC_URL + '/' + path
       );
+      window.scrollTo(0, 0);
       return v;
     });
   }, [set_Value]);

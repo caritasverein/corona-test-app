@@ -52,7 +52,7 @@ function App() {
             title="Location"
             src="/location.html"
             style={{border: 'none', width: '100%', height: '50vh'}}
-            sandbox
+            sandbox=""
           />
           <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
             {existingAppointments.length ? <h2><mwc-icon>bookmarks</mwc-icon>&nbsp;{strings.storedAppointments()}</h2> : ''}

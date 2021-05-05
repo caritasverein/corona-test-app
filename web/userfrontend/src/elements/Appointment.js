@@ -163,7 +163,9 @@ export const Appointment = ({uuid})=>{
   }
 
   return <>
-    <h3><mwc-icon>event</mwc-icon>&nbsp; {strings.yourAppointment()}</h3>
+    <h3><mwc-icon
+      style={{'--mdc-icon-size': '2rem', verticalAlign: '-8px'}}
+    >event</mwc-icon>&nbsp; {strings.yourAppointment()}</h3>
     <h2>{strings.yourAppointmentAt(localeFull(appointment.time))}</h2>
     <p>{strings.testStatusDetail(testStatus)}</p>
     {appointment.testResult && <div style={{
@@ -326,9 +328,9 @@ export const Appointment = ({uuid})=>{
           >{strings.storeLocalAppointment()}</mwc-button>
         </>}
       </>}
-      <mwc-button
+      {testStatus !== 'reservation' && <mwc-button
         onClick={()=>window.location.pathname = '/'}
-      >{strings.backToAppointmentSelection()}</mwc-button>
+      >{strings.backToAppointmentSelection()}</mwc-button>}
     </div>
   </>
 }
