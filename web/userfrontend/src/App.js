@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import '@material/mwc-top-app-bar-fixed';
 import '@material/mwc-button';
+import '@material/mwc-icon';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -54,11 +55,12 @@ function App() {
             sandbox
           />
           <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-            {existingAppointments.length ? <h2>{strings.storedAppointments()}</h2> : ''}
+            {existingAppointments.length ? <h2><mwc-icon>bookmarks</mwc-icon>&nbsp;{strings.storedAppointments()}</h2> : ''}
             {existingAppointments.map(({uuid, time})=><>
               <mwc-button
                 outlined
                 fullwidth
+                icon="bookmark_border"
                 onClick={()=>setRoute([uuid])}
               >{strings.yourAppointmentAt(localeFull(time))}</mwc-button>
             </>)}
@@ -67,7 +69,7 @@ function App() {
               fullwidth
               onClick={()=>setRoute(['newAppointment'])}
             >
-              + {strings.newAppointment()}
+              <mwc-icon>add</mwc-icon>&nbsp;{strings.newAppointment()}
             </mwc-button>
           </div>
         </>}

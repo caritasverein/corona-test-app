@@ -1,22 +1,29 @@
 import { useState, useCallback } from 'react';
 
-const getPath = ()=>{
+const getPath = () => {
   const [, ...path] = window.location.pathname.replace(process.env.PUBLIC_URL, '').split('/');
   return path;
 };
 
-export const useRoute = ()=>{
+export const useRoute = () => {
   const [_value, set_Value] = useState(getPath);
 
+  const setValue = useCallback((v = '') => {
+    const path = typeof v === 'string' ? v : v.map(
+      (p) => encodeURIComponent(p)
+    ).join('/');
 
-  const setValue = useCallback((v)=>{
-    set_Value((old)=>{
-      window.history.pushState(null, document.title, '/'+v.map((p)=>encodeURIComponent(p)).join('/'));
+    set_Value((old) => {
+      window.history.pushState(
+        null,
+        document.title,
+        process.env.PUBLIC_URL + '/' + path
+      );
       return v;
     });
   }, [set_Value]);
 
-  window.addEventListener('popstate', useCallback((v)=>{
+  window.addEventListener('popstate', useCallback((v) => {
     set_Value(getPath());
   }, [set_Value]));
 

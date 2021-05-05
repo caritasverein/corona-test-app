@@ -38,6 +38,15 @@ export function useApi(method, path, body, init = undefined, error = false) {
   return [value, update, errorValue];
 }
 
+export function useInterval(update, interval) {
+  useEffect(() => {
+      const id = setInterval(() => {
+          update();
+      }, interval);
+      return () => clearInterval(id);
+  }, [update, interval]);
+}
+
 export const apiFetch = (method, path, body)=>{
   const url = new URL('./'+path, apiBaseURL);
   return fetch(url, {

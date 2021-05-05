@@ -83,7 +83,7 @@ const audioDing = new Audio('ding.mp3');
 
 function App() {
 
-    const defaultTime = 60 * 15;
+    const defaultTime = 60 * 1;
     const classes = useStyles();
 
     const [tests, setTests] = useState([]);

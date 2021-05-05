@@ -4,6 +4,9 @@ body {
   --mdc-theme-secondary: #25A534;
   --mdc-theme-on-secondary: #FFF;
 }
+mwc-icon {
+  vertical-align: -4px;
+}
 .danger {
   --mdc-theme-primary: #EE6524;
   --mdc-theme-on-primary: #FFF;

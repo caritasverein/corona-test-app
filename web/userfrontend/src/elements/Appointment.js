@@ -4,11 +4,12 @@ import './mwc-fa-checkbox.js';
 import '@material/mwc-button';
 import '@material/mwc-checkbox';
 import '@material/mwc-formfield';
+import '@material/mwc-icon';
 
 import { toast } from 'react-toastify';
 import printjs from 'print-js';
 
-import {useApi, apiFetch} from '../hooks/useApi.js';
+import {useApi, apiFetch, useInterval} from '../hooks/useApi.js';
 import {useStorage} from '../hooks/useStorage.js';
 import {localeFull} from '../util/date.js';
 
@@ -61,22 +62,26 @@ const appointmentDetail = {
     label: 'Vorname',
     required: true,
     type: 'text',
+    icon: 'person',
   },
   "nameFamily": {
     label: 'Nachname',
     required: true,
     type: 'text',
+    icon: 'badge',
   },
   "address": {
     label: 'Adresse, Hausnummer',
     required: true,
     type: 'text',
+    icon: 'home',
     get: (v)=>v?v.split('\n')[0]:'',
   },
   "town": {
     label: 'PLZ, Ort',
     required: true,
     type: 'text',
+    icon: 'location_city',
     pattern: '^[1-9]{5}(,| ) ?.*+$',
     get: (_, v)=>v.address?v.address.split('\n')[1]:'',
   },
@@ -84,6 +89,7 @@ const appointmentDetail = {
     label: 'Geburtsdatum',
     required: true,
     type: 'text',
+    icon: 'cake',
     get: (v)=>v?new Date(new Date(v).toISOString().split('T')[0]).toLocaleDateString():'',
     pattern: '^\\s*(3[01]|[12][0-9]|0?[1-9])\\.(1[012]|0?[1-9])\\.((?:19|20)?\\d{2})\\s*$',
     placeholder: 'tt.mm.jjjj',
@@ -104,18 +110,21 @@ const appointmentDetail = {
   "phoneMobile": {
     label: 'Handynummer',
     type: 'tel',
+    icon: 'smartphone',
     pattern: '^(0|\\+49)(15|16|17)[0-9]+$',
     set: (v)=>(v.replace('+49', '0').replace(/[^0-9]/g, '') || null),
   },
   "phoneLandline": {
     label: 'Festnetznummer',
     type: 'tel',
+    icon: 'phone',
     pattern: '^(0|\\+49)[2-9][0-9]+$',
     set: (v)=>(v.replace('+49', '0').replace(/[^0-9]/g, '') || null),
   },
   "email": {
     label: 'E-Mail',
     type: 'email',
+    icon: 'email',
     set: (v)=>(v.replace(/[\s]/g, ' ') || null),
   },
 };
@@ -134,20 +143,14 @@ export const Appointment = ({uuid})=>{
   const [appointment, updateAppointment, appointmentError] = useApi(
     'GET', 'appointments/'+uuid, undefined, undefined, true,
   );
-
-  useEffect(() => {
-      const interval = setInterval(() => {
-          updateAppointment();
-      }, 5000);
-      return () => clearInterval(interval);
-  }, [updateAppointment]);
+  useInterval(updateAppointment, 5 * 1000);
 
   const testStatus = getAppointmentStatus(appointment);
   const [editMode, setEditMode] = useState(testStatus==='reservation');
   if (!editMode && testStatus==='reservation') setEditMode(true);
   if (editMode && !(['reservation', 'pending']).includes(testStatus)) setEditMode(false);
 
-  if (testStatus === 'loading') return <h2>{strings.testStatusDetail(testStatus)}</h2>;
+  if (testStatus === 'loading') return <h2><mwc-icon>hourglass_top</mwc-icon>&nbsp; {strings.testStatusDetail(testStatus)}</h2>;
   if (appointmentError) {
     toast(`${strings.toastAppointmentError(appointmentError)} (${appointmentError.status} ${appointmentError.message})`);
     window.setTimeout(()=>{
@@ -160,7 +163,7 @@ export const Appointment = ({uuid})=>{
   }
 
   return <>
-    <h3>{strings.yourAppointment()}</h3>
+    <h3><mwc-icon>event</mwc-icon>&nbsp; {strings.yourAppointment()}</h3>
     <h2>{strings.yourAppointmentAt(localeFull(appointment.time))}</h2>
     <p>{strings.testStatusDetail(testStatus)}</p>
     {appointment.testResult && <div style={{
@@ -187,6 +190,7 @@ export const Appointment = ({uuid})=>{
           required={def.required ?? null}
           pattern={def.pattern}
           label={def.label || name}
+          iconTrailing={def.icon}
           value={def.get?def.get(appointment[name]??'', appointment):appointment[name]??''}
         ></mwc-fa-textfield>}
       </ React.Fragment>)}
@@ -196,6 +200,7 @@ export const Appointment = ({uuid})=>{
       <mwc-button
         class="ok"
         raised
+        icon="send"
         onClick={(e)=>{
           e.preventDefault();
           let target = e.target;
@@ -237,7 +242,7 @@ export const Appointment = ({uuid})=>{
       <p>{strings.dataPolicy()}</p>
     </form>}
     {!editMode && <>
-      <h3 style={{marginBottom: '0.5rem'}}>{strings.personalDetail()}:</h3>
+      <h3 style={{marginBottom: '0.5rem'}}><mwc-icon>badge</mwc-icon>&nbsp; {strings.personalDetail()}:</h3>
       <div style={{display: 'flex', justifyContent: 'space-between'}}>
         <div style={{display: editMode?'none':'flex', flexDirection:'column'}}>
           {appointment.nameGiven} {appointment.nameFamily}<br />
@@ -247,12 +252,14 @@ export const Appointment = ({uuid})=>{
         {testStatus==='pending' && <mwc-button
           style={{flexGrow: '0'}}
           raised
+          icon="edit"
+          trailingIcon
           onClick={(e)=>{
             setEditMode((v)=>!v);
           }}
-        >{strings.change()} ✍</mwc-button>}
+        >{strings.change()}</mwc-button>}
       </div>
-      <h3 style={{marginBottom: '0.5rem'}}>{strings.contactDetail()}:</h3>
+      <h3 style={{marginBottom: '0.5rem'}}><mwc-icon>contact_mail</mwc-icon>&nbsp; {strings.contactDetail()}:</h3>
       <div style={{display: 'flex', justifyContent: 'space-between'}}>
         <div style={{display: editMode?'none':'flex', flexDirection:'column'}}>
           {strings.phoneMobile()}: {appointment.phoneMobile || strings.noPhoneMobile()}<br />
@@ -262,10 +269,12 @@ export const Appointment = ({uuid})=>{
         {testStatus==='pending' && <mwc-button
           style={{flexGrow: '0'}}
           raised
+          icon="edit"
+          trailingIcon
           onClick={(e)=>{
             setEditMode((v)=>!v);
           }}
-        >{strings.change()} ✍</mwc-button>}
+        >{strings.change()}</mwc-button>}
       </div>
     </>}
     <h3 style={{marginBottom: 0, marginTop: '2rem'}}>Optionen</h3>
@@ -281,6 +290,7 @@ export const Appointment = ({uuid})=>{
         <mwc-button
           class="danger"
           raised
+          icon="event_busy"
           onClick={(e)=>{
             if (!window.confirm('Möchen Sie den Termin wirklich absagen?')) return;
             setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
@@ -292,6 +302,7 @@ export const Appointment = ({uuid})=>{
         <p style={{marginBottom: 0}}>{strings.printAppointmentDetail()}</p>
         <mwc-button
           raised
+          icon="print"
         >{strings.printAppointment()}</mwc-button>
 
         {isStored ? <>
@@ -299,6 +310,7 @@ export const Appointment = ({uuid})=>{
           <mwc-button
             class="danger"
             raised
+            icon="bookmark_remove"
             onClick={()=>{
               setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
             }}
@@ -307,6 +319,7 @@ export const Appointment = ({uuid})=>{
           <p style={{marginBottom: 0}}>{strings.storeLocalAppointmentDetail()}</p>
           <mwc-button
             raised
+            icon="bookmark_add"
             onClick={()=>{
               setStoredAppointments((a)=>a.find((a)=>a.uuid===uuid) ? a : [...a, {uuid, time: appointment.time}]);
             }}
