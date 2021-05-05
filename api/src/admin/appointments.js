@@ -82,6 +82,18 @@ router.patch(
       ]);
     }
 
+    if (req.body.needsCertificate !== undefined) {
+      await db.execute(`
+        UPDATE appointments
+        SET
+          needsCertificate = ?
+        WHERE uuid = ?
+      `, [
+        req.body.needsCertificate,
+        req.params.uuid,
+      ]);
+    }
+
     const appointment = await getAppointment(req.params.uuid);
     if (!appointment) return res.sendStatus(404);
 
@@ -98,7 +110,8 @@ router.get(
     const [appointments] = await db.execute(`
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-        email, phoneMobile, phoneLandline, testStartedAt, testResult, invalidatedAt
+        email, phoneMobile, phoneLandline, testStartedAt, testResult,
+        needsCertificate, createdAt, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ? ORDER BY time
     `, [
       new Date(req.query.start),

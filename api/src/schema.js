@@ -56,6 +56,14 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'enum': ['positive', 'negative', 'invalid', null],
     },
+    'needsCertificate': {
+      'type': ['string', 'null'],
+      'enum': ['true', null],
+    },
+    'createdAt': {
+      'type': ['string', 'null'],
+      'format': 'date-time',
+    },
     'invalidatedAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
@@ -73,6 +81,7 @@ export const appointmentSchema = {
     'phoneLandline',
     'testStartedAt',
     'testResult',
+    'needsCertificate',
   ],
   'additionalProperties': false,
 };
@@ -89,10 +98,15 @@ export const appointmentTestSchema = {
       'type': ['string', 'null'],
       'enum': ['positive', 'negative', 'invalid', null],
     },
+    'needsCertificate': {
+      'type': ['string', 'null'],
+      'enum': ['true', null],
+    },
   },
   'anyOf': [
     {'required': ['testStartedAt']},
     {'required': ['testResult']},
+    {'required': ['needsCertificate']},
   ],
   'additionalProperties': false,
 };
@@ -119,7 +133,7 @@ export const windowSchema = {
       },
     },
   },
-  'required': ['id', 'start', 'end', 'times'],
+  'required': ['id', 'start', 'end', 'times', 'numQueues', 'appointmentDuration'],
   'additionalProperties': false,
 };
 
@@ -134,8 +148,7 @@ export function subsetSchema(properties=[], schema=appointmentSchema) {
       Object.entries(schema.properties)
         .filter(([k, v])=>properties.includes(k)),
     ),
-    required: schema.required
-      .filter((r)=>properties.includes(r)),
+    required: properties,
   };
 }
 

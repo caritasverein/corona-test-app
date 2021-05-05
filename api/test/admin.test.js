@@ -47,6 +47,8 @@ describe('admin-api', function() {
         .send({
           start: new Date(tomorrow + 'T18:00:00Z'),
           end: new Date(tomorrow + 'T19:00:00Z'),
+          numQueues: 1,
+          appointmentDuration: 300,
         });
       if (debug) console.log(res.status, res.body);
 
@@ -121,6 +123,19 @@ describe('admin-api', function() {
       expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(appointmentSchema);
       expect(res.body.testResult).to.eq('negative');
+    });
+
+    it('should set appointment test needsCertificate', async function() {
+      const res = await agent
+        .patch('/admin/appointments/'+appointmentUuid)
+        .send({
+          needsCertificate: 'true',
+        });
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body).to.be.jsonSchema(appointmentSchema);
+      expect(res.body.needsCertificate).to.eq('true');
     });
 
     it('should query appointments', async function() {

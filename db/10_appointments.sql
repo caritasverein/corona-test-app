@@ -11,6 +11,7 @@ CREATE TABLE `appointments` (
   `email` varchar(64),
   `phoneMobile` varchar(64),
   `phoneLandline` varchar(64),
+  `needsCertificate` ENUM('true'),
   `testStartedAt` datetime,
   `testId` INT UNSIGNED,
   `testResult` ENUM('negative', 'positive', 'invalid'),

@@ -106,7 +106,7 @@ describe('user-api', function() {
 
       expect(res.status).to.eq(200);
       expect(res.body).to.be.an('array');
-      expect(res.body.length).to.equal(2);
+      expect(res.body.length).to.at.least(2);
       res.body.forEach((e)=>
         expect(e).to.be.jsonSchema(subsetSchema(['id', 'start', 'end'], windowSchema)),
       );
