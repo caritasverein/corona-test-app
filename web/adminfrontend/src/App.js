@@ -10,7 +10,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faList, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPrint, faSign, faSpinner, faTag, faTimes, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faCheckSquare, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPrint, faSpinner, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 
 import printjs from 'print-js'
 
@@ -70,8 +71,29 @@ const useStyles = makeStyles((theme) => ({
         margin: '10px',
         position: 'absolute',
         width: 'max-content'
+    },
+    activatedColor: {
+        backgroundColor: green['500'],
+        marginRight: '10px;',
+        color: 'white',
+        '&:hover': {
+            backgroundColor: green['900']
+        }
     }
 }));
+
+function iOS() {
+    return [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+    ].includes(navigator.platform)
+        // iPad on iOS 13 detection
+        || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+}
 
 const startOfDay = new Date();
 startOfDay.setHours(0, 0, 0, 0);
@@ -93,22 +115,41 @@ function App() {
     const [pendingTests, setPendingTests] = useState(0)
     const [finishedTests, setFinishedTests] = useState([]);
     const [hiddenTests, setHiddenTests] = useState(JSON.parse(localStorage.getItem('hiddenTests')) || [])
+    const [showLoginButton, setShowLoginButton] = useState(false);
+    const [testsNum, setTestsNum] = useState({ ids: [] });
+
+    const login = () => {
+        window.location = '/api/login'
+    }
 
     const fetchTests = useCallback(async (testsForComparison) => {
         const params = new URLSearchParams({ "start": startOfDay.toISOString(), "end": endOfDay.toISOString() });
         const url = new URL('./appointments?' + params.toString(), apiBaseURL);
         const response = await fetch(url);
         if (response.ok) {
-            const result = await response.json();
-            console.log("fetch:", result)
+            const result = (await response.json()).filter(r => r.nameGiven);
             if (JSON.stringify(result) !== JSON.stringify(testsForComparison)) {
+                const _testsNum = { ...testsNum }
+                result.forEach(t => {
+                    if (!_testsNum[t.uuid]) {
+                        const time = new Date(t.time)
+                        const newId = time.getMinutes() + (time.getHours() * 60);
+                        const additionals = _testsNum.ids.filter(id => id === newId).length + 1;
+                        _testsNum[t.uuid] = newId + '-' + additionals
+                        _testsNum.ids.push(newId);
+                    }
+                });
+                setTestsNum(_testsNum)
                 setTests(result);
             }
         } else {
-            if (response.status ===  401) window.location.pathname = '/api/login';
-            const text = await response.json();
-            setErrorWindowMessage(text?.message?.toString() || text.toString())
-            setOpenErrorWindow(true)
+            if (response.status === 401) {
+                setShowLoginButton(true);
+            } else {
+                const text = await response.json();
+                setErrorWindowMessage(text?.message?.toString() || text.toString())
+                setOpenErrorWindow(true)
+            }
         }
     }, []);
 
@@ -132,7 +173,7 @@ function App() {
         }).map(test => test.uuid);
         _finishedTests.forEach(test => {
             if (finishedTests.indexOf(test) === -1) {
-                audioDing.play();
+                if (!iOS()) audioDing.play();
             }
         })
         if (JSON.stringify(_finishedTests) !== JSON.stringify(finishedTests)) {
@@ -253,19 +294,23 @@ function App() {
             return () => { clearInterval(timer); }
         }, [counter]);
 
-        const hideButton = <Button onClick={() => hideTest(props.test.uuid)} size={'small'} className={'ml-3 '} variant={'contained'}><FontAwesomeIcon icon={faEyeSlash} /></Button>
-        const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} className={'ml-3 '} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPrint} />}>Zertifikat</Button>
-        const cancelTestButton = <Button disabled={onUpdate} variant={'contained'} className={'ml-2'} onClick={() => cancelTest()}>Nicht erschienen</Button>
-        const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'secondary'} onClick={() => startTest()}>Test starten</Button>
+        const hideButton = <Button onClick={() => hideTest(props.test.uuid)} size={'small'} className={'my-2 mx-2 float-right'} variant={'contained'}><FontAwesomeIcon icon={faEyeSlash} /></Button>
+        const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} className={'my-2 mx-2 ' + (props.test.needsCertificate ? classes.activatedColor : '')} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPrint} />}>{props.test.needsCertificate ? 'Zertifikat erforderlich' : 'Zertifikat'}</Button>
+        const cancelTestButton = <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => cancelTest()}>Nicht erschienen</Button>
+        const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'secondary'} className={'my-2 mx-2'} onClick={() => startTest()}>Test starten</Button>
+        const needsCertificateButton = props.test.needsCertificate
+            ? <Button disabled={onUpdate} variant={'contained'} className={classes.activatedColor + ' my-2 mx-2'} onClick={() => needsCertificate(false)} startIcon={<FontAwesomeIcon icon={faCheckSquare} />}>Zertifikat</Button>
+            : <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => needsCertificate(true)} startIcon={<FontAwesomeIcon icon={faSquare} />}>Zertifikat</Button>
+
         const resultButtons = <React.Fragment>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.negativeButton} onClick={() => setResult('negative')}>negative</Button>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.positiveButton} onClick={() => setResult('positive')}>positive</Button>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.invalidButton} onClick={() => setResult('invalid')}>Ungültig</Button>
+            <Button disabled={onUpdate} variant={'contained'} className={classes.negativeButton + ' mx-2 my-2'} onClick={() => setResult('negative')}>negative</Button>
+            <Button disabled={onUpdate} variant={'contained'} className={classes.positiveButton + ' mx-2 my-2'} onClick={() => setResult('positive')}>positive</Button>
+            <Button disabled={onUpdate} variant={'contained'} className={classes.invalidButton + ' mx-2 my-2'} onClick={() => setResult('invalid')}>Ungültig</Button>
         </React.Fragment>
 
         const stopTestButton = (timeLeft) => {
-            return <Button disabled={timeLeft <= 0 || onUpdate} variant={'contained'} className={classes.warningButton} onClick={() => stopTest()}>
-                <FontAwesomeIcon fixedWidth icon={faVial} className={'mr-2 flash'} /> {timeLeft <= 0 ? 'Bitte warten' : Math.floor(timeLeft / 60) + ':' + ('' + timeLeft % 60).padStart(2, '0')}
+            return <Button disabled={timeLeft <= 0 || onUpdate} variant={'contained'} className={classes.warningButton + ' mx-2 my-2'} onClick={() => stopTest()}>
+                <FontAwesomeIcon fixedWidth icon={faVial} className={'mr-3 flash '} /> {timeLeft <= 0 ? 'Bitte warten' : Math.floor(timeLeft / 60) + ':' + ('' + timeLeft % 60).padStart(2, '0')}
             </Button>
         }
 
@@ -287,6 +332,12 @@ function App() {
             setOnUpdate(false);
         }
 
+        const needsCertificate = async (value) => {
+            setOnUpdate(true);
+            await updateServer(props.test.uuid, { needsCertificate: value ? "true" : null })
+            setOnUpdate(false);
+        }
+
         const setResult = async (res) => {
             if (res === 'negative' || ['positive', 'invalid'].indexOf(res) > -1 && window.confirm(resultText[res] + " - Bist du sicher?")) {
                 setOnUpdate(true);
@@ -299,16 +350,23 @@ function App() {
 
         if (props.test.testResult === null && now - defaultTime < testUnixtime) {
             // Test is running
-            handler = stopTestButton(secondsLeft);
+            handler = <div>
+                {stopTestButton(secondsLeft)}
+                {needsCertificateButton}
+            </div>
 
         } else if (props.test.testResult === null && testUnixtime > 0 && now - defaultTime >= testUnixtime) {
             // Waiting for results
-            handler = resultButtons;
+            handler = <div>
+                {resultButtons}
+                {needsCertificateButton}
+            </div>
 
         } else if (props.test.testResult !== null) {
             // Test is finished
             handler = <div className={classes[props.test.testResult]}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}
                 {props.test.testResult === 'negative' && printButton}
+                {props.test.testResult !== 'negative' && props.test.needsCertificate && <span className={'ml-3'}><b>Person wartet auf Zertifikat</b></span>}
                 {hideButton}
             </div>
 
@@ -323,6 +381,7 @@ function App() {
             handler = <React.Fragment>
                 {startTestButton}
                 {cancelTestButton}
+                {needsCertificateButton}
             </React.Fragment>
 
         }
@@ -341,7 +400,7 @@ function App() {
 
         return <TableRow key={props.test.uuid}>
             <TableCell>
-                <b># {props.index + 1}</b>
+                <div style={{whiteSpace: 'nowrap'}}>{testsNum[props.test.uuid]}</div>
             </TableCell>
             <TableCell>
                 {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
@@ -360,9 +419,9 @@ function App() {
                 </div>
             </TableCell>
             <TableCell>
-                {props.test.phoneMobile && <div><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</div>}
-                {props.test.phoneLandline && <div><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</div>}
-                {props.test.email && <div><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</div>}
+                {props.test.phoneMobile && <div style={{whiteSpace: 'nowrap'}}><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</div>}
+                {props.test.phoneLandline && <div style={{whiteSpace: 'nowrap'}}><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</div>}
+                {props.test.email && <div style={{whiteSpace: 'nowrap'}}><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</div>}
             </TableCell>
             <TableCell>
                 <TestHandler {...props} />
@@ -377,6 +436,7 @@ function App() {
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
                     </Typography>
+                    {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {onUpdate && <div><FontAwesomeIcon spin icon={faSpinner} size={'2x'} /></div>}
                     {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
                 </Toolbar>
