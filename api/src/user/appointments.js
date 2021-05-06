@@ -150,6 +150,8 @@ router.delete(
       WHERE uuid = ?
     `, [req.params.uuid]);
 
+    const appointment = await getAppointment(req.params.uuid);
+    if (appointment.nameFamily) await sendNotifications(appointment);
     return res.sendStatus(204);
   },
 );

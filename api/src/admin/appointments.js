@@ -112,7 +112,7 @@ router.get(
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
         email, phoneMobile, phoneLandline, testStartedAt, testResult,
         needsCertificate, createdAt, invalidatedAt
-      FROM appointments WHERE time >= ? AND time <= ? ORDER BY time
+      FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
     `, [
       new Date(req.query.start),
       new Date(req.query.end),
