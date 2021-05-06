@@ -2,7 +2,6 @@ import 'element-internals-polyfill';
 import {LitElement, html, css} from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
 import './scroll-select.js';
-import useCustomElement from '../hooks/useCustomElement.js';
 
 const localeWeekday = new Intl.DateTimeFormat('default', {
   weekday: 'short'
@@ -38,7 +37,7 @@ function toISODate(d) {
   return d.toISOString().split('T')[0];
 }
 
-class ScrollSelectDate extends LitElement {
+class SelectWeek extends LitElement {
   static get formAssociated() {
     return true;
   }
@@ -249,10 +248,5 @@ class ScrollSelectDate extends LitElement {
   }
 }
 
-customElements.define('select-week', ScrollSelectDate);
-export const SelectWeek = (props)=>{
-  const [customElementProps, ref] = useCustomElement(props);
-
-  return <select-week {...customElementProps} ref={ref} />;
-}
-export default SelectWeek;
+import {registerComponent} from '../registerComponent.js';
+export default registerComponent('select-week', SelectWeek);

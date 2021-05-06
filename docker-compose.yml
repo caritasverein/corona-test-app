@@ -26,6 +26,7 @@ services:
     tmpfs:
       - /var/cache/nginx
       - /run
+      - /etc/nginx/conf.d
     ports:
       - "${WEB_PORT:-80}:80"
 

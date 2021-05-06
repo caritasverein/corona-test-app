@@ -2,10 +2,7 @@ import {TextField} from '@material/mwc-textfield';
 
 export class TextFieldFA extends TextField {
   static get formAssociated() {return true}
-  constructor() {
-    super();
-    this.internals = this.attachInternals();
-  }
+
   formDisabledCallback(disabled) {
     this.disabled = disabled;
   }
@@ -22,6 +19,11 @@ export class TextFieldFA extends TextField {
     this._checkValidity();
   }
 
+  connectedCallback() {
+    this.internals = this.attachInternals();
+    super.connectedCallback();
+  }
+
   updateValidity(report) {
     const isValid = this._checkValidity();
 
@@ -30,6 +32,9 @@ export class TextFieldFA extends TextField {
       this.formElement.validationMessage
     );
     if (isValid) this.validationMessage = '';
+    if (!isValid) this.internals.setFormValue(null);
+    if (!isValid) this.setAttribute('invalid', 'invalid');
+    else this.removeAttribute('invalid');
 
     if (report) {
       this.validationMessage = this.formElement.validationMessage;
@@ -50,6 +55,11 @@ export class TextFieldFA extends TextField {
 
   firstUpdated() {
     super.firstUpdated();
+    console.log(this.name);
+
+    if (this.internals.form)
+      this.internals.form.addEventListener('formdata', ()=>this.updateValidity(true));
+
     this.formElement.addEventListener('invalid', ()=>this.updateValidity(true));
     this.addEventListener('invalid', ()=>this.updateValidity(true));
     this.updateValidity(false);
@@ -59,4 +69,5 @@ export class TextFieldFA extends TextField {
   }
 }
 
-customElements.define('mwc-fa-textfield', TextFieldFA);
+import {registerComponent} from '../registerComponent.js';
+export default registerComponent('mwc-fa-textfield', TextFieldFA);

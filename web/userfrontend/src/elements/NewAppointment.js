@@ -1,14 +1,14 @@
 import React, {useState, useCallback} from 'react';
 
-import '@material/mwc-button';
-
 import { toast, Slide } from 'react-toastify';
+import '@material/mwc-button';
 import '@material/mwc-icon';
 
 import {useApi, apiFetch, useInterval} from '../hooks/useApi.js';
+import {useRoute} from '../hooks/useRoute.js';
 import {localeFull, localeTime, localeDayAndMonth, utcDay} from '../util/date.js';
 
-import {SelectWeek} from './select-week.js';
+import SelectWeek from 'shared/components/select-week.js';
 
 const strings = {
   newAppointment: ()=>`Neuer Termin`,
@@ -24,8 +24,9 @@ const strings = {
   backToAppointmentSelection: ()=>`Zurück zur Übersicht`,
 };
 
-export const NewAppointment = ({created})=>{
-  const [windows, updateWindows] = useApi('GET', 'windows', undefined, []);
+export const NewAppointment = ({created, admin})=>{
+  const [route, setRoute] = useRoute();
+  const [windows, updateWindows] = useApi('windows', []);
   useInterval(updateWindows, 90 * 1000);
 
   const [selectedDate, setSelectedDate] = useState(()=>{
@@ -34,7 +35,7 @@ export const NewAppointment = ({created})=>{
     return today.toISOString();
   });
 
-  const [slots, updateSlots] = useApi('GET', 'windows/'+utcDay(selectedDate), undefined, []);
+  const [slots, updateSlots] = useApi('windows/'+utcDay(selectedDate), []);
   useInterval(updateSlots, 30 * 1000);
 
   const groupedSlots = {};
@@ -61,7 +62,8 @@ export const NewAppointment = ({created})=>{
         {...{[selectedSlot?'enabled':'disabled']: true}}
         onClick={()=>{
           closeToast();
-          apiFetch('POST','appointments', {time:selectedSlot})
+          if (admin) return created(selectedSlot)
+          apiFetch('POST', 'appointments', {time:selectedSlot})
             .then(res=>created(res.uuid))
             .catch((e)=>{
               toast(`${strings.toastError(e)} (${e.status} ${e.message})`);
@@ -83,14 +85,14 @@ export const NewAppointment = ({created})=>{
       draggable: false,
       progress: undefined,
     });
-  }, [confirmToast, created, updateSlots]);
+  }, [confirmToast, created, updateSlots, admin]);
 
   return <>
     <h2><mwc-icon>event</mwc-icon>&nbsp; {strings.newAppointment()}</h2>
     <h3><mwc-icon>date_range</mwc-icon>&nbsp; {strings.selectDay()}</h3>
     <SelectWeek
       onChange={(e)=>setSelectedDate(e.target.value)}
-      $extraClasses={(d)=>{
+      extraClasses={(d)=>{
         d = new Date(d);
         d.setHours(0,0,0,0);
         const ret = {disabled: true};
@@ -116,15 +118,13 @@ export const NewAppointment = ({created})=>{
           <h4 style={{marginBottom: '0.5rem'}}>{strings.fromTimeOn(hour)}:</h4>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem'}}>
             {slots.map(t=><React.Fragment key={t.time}>
-              {new Date(t.time).getMinutes()===0 && <>
-              </>}
               <mwc-button
                 style={{
                   textDecoration: t.full?'line-through':'none',
                 }}
-                class={selectedSlot === t.time?'info':''}
+                class={(selectedSlot === t.time?'info':'') + (t.full&&admin ? 'warn':'')}
                 raised
-                {...{[t.full?'disabled':'enabled']: true}}
+                {...{[t.full&&!admin?'disabled':'enabled']: true}}
                 onClick={()=>{
                   confirm(t.time);
                   setSelectedSlot(selectedSlot !== t.time ? t.time : undefined);
@@ -139,7 +139,7 @@ export const NewAppointment = ({created})=>{
     <mwc-button
       fullwidth
       style={{marginTop: '2rem'}}
-      onClick={()=>window.location.pathname = '/'}
+      onClick={()=>setRoute()}
     >{strings.backToAppointmentSelection()}</mwc-button>
   </>;
 }

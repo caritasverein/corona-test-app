@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 const getPath = () => {
   const [, ...path] = window.location.pathname.replace(process.env.PUBLIC_URL, '').split('/');
@@ -19,14 +19,24 @@ export const useRoute = () => {
         document.title,
         process.env.PUBLIC_URL + '/' + path
       );
+      window.dispatchEvent(new Event('pushstate'));
       window.scrollTo(0, 0);
       return v;
     });
   }, [set_Value]);
 
-  window.addEventListener('popstate', useCallback((v) => {
+  const setValueCb = useCallback((v) => {
     set_Value(getPath());
-  }, [set_Value]));
+  }, [set_Value]);
+
+  useEffect(()=>{
+    window.addEventListener('popstate', setValueCb);
+    window.addEventListener('pushstate', setValueCb);
+    return ()=>{
+      window.removeEventListener('popstate', setValueCb);
+      window.removeEventListener('pushstate', setValueCb);
+    }
+  }, [setValueCb]);
 
   return [_value, setValue];
 }

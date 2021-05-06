@@ -10,7 +10,7 @@ function strip$(str) {
   return str.replace(/^\$/, '');
 }
 
-const useCustomElement = (props, customMapping = {}) => {
+export const useCustomElement = (props, customMapping = {}) => {
   const ref = React.createRef();
 
   React.useLayoutEffect(() => {
@@ -30,7 +30,8 @@ const useCustomElement = (props, customMapping = {}) => {
       fns.forEach(({ key, fn }) => current.addEventListener(key, fn));
 
       vls = Object.keys(props)
-        .filter(key => key.startsWith('$'))
+        .filter(key => !key.startsWith('on'))
+        .filter(key => !key.startsWith('$'))
         .map(key => ({
           key: customMapping[key] || strip$(key),
           val: props[key],
@@ -49,8 +50,8 @@ const useCustomElement = (props, customMapping = {}) => {
   }, [customMapping, props, ref]);
 
   const customElementProps = Object.keys(props)
-    .filter(key => !key.startsWith('on'))
-    .filter(key => !key.startsWith('$'))
+    .filter(key => key.startsWith('$'))
+    .map(key => strip$(key))
     .reduce((acc, key) => {
       const prop = props[key];
 

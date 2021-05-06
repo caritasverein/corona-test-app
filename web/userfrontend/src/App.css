@@ -8,6 +8,14 @@ mwc-icon {
   vertical-align: -2px;
   --mdc-icon-size: 1em;
 }
+.primary {
+  --mdc-theme-primary: #152968;
+  --mdc-theme-on-primary: #FFF;
+}
+.secondary {
+  --mdc-theme-primary: #25A534;
+  --mdc-theme-on-primary: #FFF;
+}
 .danger {
   --mdc-theme-primary: #EE6524;
   --mdc-theme-on-primary: #FFF;

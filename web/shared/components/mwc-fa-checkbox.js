@@ -13,10 +13,6 @@ export class CheckboxFA extends Checkbox {
     else this.formElement.removeAttribute('required');
   }
 
-  constructor() {
-    super();
-    this.internals = this.attachInternals();
-  }
   formDisabledCallback(disabled) {
     this.disabled = disabled;
   }
@@ -31,6 +27,11 @@ export class CheckboxFA extends Checkbox {
     this.checked = this.hasAttribute('checked');
     this.formElement.checked = this.checked;
     this._checkValidity();
+  }
+
+  connectedCallback() {
+    this.internals = this.attachInternals();
+    super.connectedCallback();
   }
 
   _checkValidity() {
@@ -55,6 +56,8 @@ export class CheckboxFA extends Checkbox {
     );
 
     if (isValid) this.validationMessage = '';
+    if (!isValid) this.setAttribute('invalid', 'invalid');
+    else this.removeAttribute('invalid');
 
     if (report) {
       this.validationMessage = this.formElement.validationMessage;
@@ -85,6 +88,12 @@ export class CheckboxFA extends Checkbox {
     super.firstUpdated();
     this.required = this.hasAttribute('required');
 
+    if (this.internals.form)
+      this.internals.form.addEventListener('formdata', (e)=>{
+        e.preventDefault();
+        this.updateValidity(true);
+      });
+
     this.formElement.addEventListener('invalid', ()=>this.updateValidity(true));
     this.addEventListener('invalid', ()=>this.reportValidity());
     this.updateValidity(false);
@@ -94,4 +103,5 @@ export class CheckboxFA extends Checkbox {
   }
 }
 
-customElements.define('mwc-fa-checkbox', CheckboxFA);
+import {registerComponent} from '../registerComponent.js';
+export default registerComponent('mwc-fa-checkbox', CheckboxFA);

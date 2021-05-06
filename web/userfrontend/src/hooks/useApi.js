@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 
 const apiBaseURL = new URL(window.location);
-apiBaseURL.pathname = '/api/';
+apiBaseURL.pathname = '/api'+process.env.PUBLIC_URL+'/';
 
 export function usePromise(promise, init = "", error = false) {
   if (!(promise instanceof Promise)) init = promise;
@@ -16,20 +16,20 @@ export function usePromise(promise, init = "", error = false) {
   return value;
 }
 
-export function useApi(method, path, body, init = undefined, error = false) {
+export function useApi(path, init = undefined, error = false) {
   const [value, setValue] = useState(init);
   const [errorValue, setErrorValue] = useState();
 
   const update = useCallback(()=>{
-    const promise = apiFetch(method, path, body);
+    const promise = apiFetch('GET', path);
     promise.then((v)=>{
+      setErrorValue(null);
       setValue(old=>JSON.stringify(old)===JSON.stringify(v)?old:v);
-    });
-    promise.catch(setErrorValue);
+    }, setErrorValue);
     if (error === true) promise.catch(setValue);
     if (typeof error === 'function') promise.catch(error).then(setValue, setErrorValue);
     return promise;
-  }, [method, path, body, error]);
+  }, [path, error]);
 
   useEffect(() => {
     update()
@@ -61,8 +61,9 @@ export const apiFetch = (method, path, body)=>{
     if (!contentType) return res;
     const isJSON = contentType.startsWith('application/json');
     if (!res.ok && isJSON) throw await res.json();
+    // eslint-disable-next-line
     if (!res.ok) throw {status: res.status, message: await res.text()};
     if (isJSON) return res.json();
-    res.text();
+    return res.text();
   });
 }
