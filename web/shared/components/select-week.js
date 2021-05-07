@@ -1,4 +1,3 @@
-import 'element-internals-polyfill';
 import {LitElement, html, css} from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
 import './scroll-select.js';

@@ -118,7 +118,7 @@ function EditAppointment(props) {
         check[k] && check[k].set ? check[k].set(v) : v
       ]);
 
-    const data = Object.fromEntries(entries);
+    const data = Object.fromEntries(entries.reverse());
     data.address += '\n'+data.town;
     delete data.town;
 
