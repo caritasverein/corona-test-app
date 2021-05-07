@@ -1,4 +1,4 @@
-import { AppBar, Button, Container, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Button, Container, Dialog, DialogContent, DialogTitle, Toolbar, Typography } from "@material-ui/core";
 import { red, green, yellow } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -10,8 +10,9 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faCheckSquare, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPrint, faSpinner, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faCheckSquare, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPlus, faPrint, faSpinner, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
 import { faSquare } from "@fortawesome/free-regular-svg-icons";
+import EditAppointment from 'shared/components/edit-appointment.js';
 
 import printjs from 'print-js'
 
@@ -79,6 +80,24 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             backgroundColor: green['900']
         }
+    },
+    highlightedRow: {
+        backgroundColor: theme.palette.warning.light
+    },
+    '@keyframes blinker': {
+        '50%': { backgroundColor: green['900'] },
+    },
+    flashPrintButton: {
+        animationName: '$blinker',
+        animationDuration: '1s',
+        animationTimingFunction: 'linear',
+        animationIterationCount: 'infinite',
+        backgroundColor: green['500'],
+        marginRight: '10px;',
+        color: 'white',
+        '&:hover': {
+            backgroundColor: green['900']
+        }
     }
 }));
 
@@ -116,7 +135,8 @@ function App() {
     const [finishedTests, setFinishedTests] = useState([]);
     const [hiddenTests, setHiddenTests] = useState(JSON.parse(localStorage.getItem('hiddenTests')) || [])
     const [showLoginButton, setShowLoginButton] = useState(false);
-    const [testsNum, setTestsNum] = useState({ ids: [] });
+    const [showAddingDialog, setShowAddingDialog] = useState(false);
+    const [highlights, setHighlights] = useState([])
 
     const login = () => {
         window.location = '/api/login'
@@ -129,17 +149,6 @@ function App() {
         if (response.ok) {
             const result = (await response.json()).filter(r => r.nameGiven);
             if (JSON.stringify(result) !== JSON.stringify(testsForComparison)) {
-                const _testsNum = { ...testsNum }
-                result.forEach(t => {
-                    if (!_testsNum[t.uuid]) {
-                        const time = new Date(t.time)
-                        const newId = time.getMinutes() + (time.getHours() * 60);
-                        const additionals = _testsNum.ids.filter(id => id === newId).length + 1;
-                        _testsNum[t.uuid] = newId + '-' + additionals
-                        _testsNum.ids.push(newId);
-                    }
-                });
-                setTestsNum(_testsNum)
                 setTests(result);
             }
         } else {
@@ -171,16 +180,25 @@ function App() {
             const { now, testUnixtime } = getTestTimes(test);
             return test.testResult === null && testUnixtime > 0 && now - defaultTime >= testUnixtime
         }).map(test => test.uuid);
-        _finishedTests.forEach(test => {
+        /*_finishedTests.forEach(test => {
             if (finishedTests.indexOf(test) === -1) {
                 if (!iOS()) audioDing.play();
             }
-        })
+        })*/
         if (JSON.stringify(_finishedTests) !== JSON.stringify(finishedTests)) {
             setFinishedTests(_finishedTests);
         }
         setPendingTests(_finishedTests.length)
     }, [defaultTime, finishedTests, getTestTimes, tests]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (finishedTests.length > 0) {
+                if (!iOS()) audioDing.play();
+            }
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [finishedTests]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -201,6 +219,16 @@ function App() {
         updatePendingTests();
     }, [tests, updatePendingTests])
 
+    const toggleHighlighted = (uuid) => {
+        const index = highlights.indexOf(uuid);
+        if (index > -1) {
+            const _highlights = [...highlights]
+            _highlights.splice(index, 1)
+            setHighlights(_highlights)
+        } else {
+            setHighlights([...highlights, uuid])
+        }
+    }
 
     const errorWindowHandleClose = () => {
         setOpenErrorWindow(false);
@@ -219,6 +247,7 @@ function App() {
     }
 
     const printPDF = (uuid) => {
+        updateServer(uuid, {needsCertificate: null})
         const url = new URL('../appointments/' + uuid + '/pdf', apiBaseURL);
         printjs(url.toString())
     }
@@ -260,6 +289,30 @@ function App() {
 
     }
 
+    const handleAddingDialogClose = () => {
+        setShowAddingDialog(false)
+    }
+
+    const handleAddingDialogSave = async (data) => {
+        const handleError = (err) => {
+            console.log(err)
+            setErrorWindowMessage(err)
+            setOpenErrorWindow(true);
+        }
+        const options = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }
+        const url = new URL('./appointments', apiBaseURL);
+        const response = await fetch(url, options);
+        if (response.ok) {
+            handleAddingDialogClose()
+        } else {
+            handleError(await response.text())
+        }
+    }
+
     const deleteFromServer = async (uuid) => {
         const handleError = (err) => {
             console.log(err)
@@ -295,7 +348,7 @@ function App() {
         }, [counter]);
 
         const hideButton = <Button onClick={() => hideTest(props.test.uuid)} size={'small'} className={'my-2 mx-2 float-right'} variant={'contained'}><FontAwesomeIcon icon={faEyeSlash} /></Button>
-        const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} className={'my-2 mx-2 ' + (props.test.needsCertificate ? classes.activatedColor : '')} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPrint} />}>{props.test.needsCertificate ? 'Zertifikat erforderlich' : 'Zertifikat'}</Button>
+        const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} className={'my-2 mx-2 ml-3 ' + (props.test.needsCertificate ? classes.flashPrintButton : '')} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPrint} />}>{props.test.needsCertificate ? 'Zertifikat' : 'Zertifikat'}</Button>
         const cancelTestButton = <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => cancelTest()}>Nicht erschienen</Button>
         const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'secondary'} className={'my-2 mx-2'} onClick={() => startTest()}>Test starten</Button>
         const needsCertificateButton = props.test.needsCertificate
@@ -339,7 +392,7 @@ function App() {
         }
 
         const setResult = async (res) => {
-            if (res === 'negative' || ['positive', 'invalid'].indexOf(res) > -1 && window.confirm(resultText[res] + " - Bist du sicher?")) {
+            if (res === 'negative' || (['positive', 'invalid'].indexOf(res) > -1 && window.confirm(resultText[res] + " - Bist du sicher?"))) {
                 setOnUpdate(true);
                 await updateServer(props.test.uuid, { testResult: res })
                 setOnUpdate(false);
@@ -364,7 +417,7 @@ function App() {
 
         } else if (props.test.testResult !== null) {
             // Test is finished
-            handler = <div className={classes[props.test.testResult]}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}
+            handler = <div className={classes[props.test.testResult] + ' my-2 mx-2'}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}
                 {props.test.testResult === 'negative' && printButton}
                 {props.test.testResult !== 'negative' && props.test.needsCertificate && <span className={'ml-3'}><b>Person wartet auf Zertifikat</b></span>}
                 {hideButton}
@@ -398,9 +451,9 @@ function App() {
 
         const time = new Date(props.test.time);
 
-        return <TableRow key={props.test.uuid}>
+        return <TableRow key={props.test.uuid} className={highlights.indexOf(props.test.uuid) > -1 ? classes.highlightedRow : ''}>
             <TableCell>
-                <div style={{whiteSpace: 'nowrap'}}>{testsNum[props.test.uuid]}</div>
+                <Button onClick={() => toggleHighlighted(props.test.uuid)} variant={'contained'} className={highlights.indexOf(props.test.uuid) > -1 ? classes.positiveButton : ''}>{props.test.id}</Button>
             </TableCell>
             <TableCell>
                 {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
@@ -419,9 +472,9 @@ function App() {
                 </div>
             </TableCell>
             <TableCell>
-                {props.test.phoneMobile && <div style={{whiteSpace: 'nowrap'}}><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</div>}
-                {props.test.phoneLandline && <div style={{whiteSpace: 'nowrap'}}><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</div>}
-                {props.test.email && <div style={{whiteSpace: 'nowrap'}}><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</div>}
+                {props.test.phoneMobile && <div style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</div>}
+                {props.test.phoneLandline && <div style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</div>}
+                {props.test.email && <div style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</div>}
             </TableCell>
             <TableCell>
                 <TestHandler {...props} />
@@ -436,11 +489,21 @@ function App() {
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
                     </Typography>
-                    {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {onUpdate && <div><FontAwesomeIcon spin icon={faSpinner} size={'2x'} /></div>}
+                    <Button onClick={() => setShowAddingDialog(true)} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>
+                    {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
                 </Toolbar>
             </AppBar>
+
+            <Dialog open={showAddingDialog} onClose={handleAddingDialogClose}>
+                <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+                <DialogContent>
+                    <EditAppointment admin appointment={{ time: "2021-05-07T10:00:00.000Z" }} update={handleAddingDialogSave} />
+                </DialogContent>
+
+            </Dialog>
+
 
             {openErrorWindow &&
                 <div className={classes.errorAlert} onClick={() => errorWindowHandleClose()}>
