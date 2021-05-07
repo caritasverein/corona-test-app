@@ -6,7 +6,7 @@ USER 1000
 COPY ./package* ./
 RUN npm ci --only=prod
 
-COPY ./src ./src
+COPY ./ ./
 
 EXPOSE 8080
 

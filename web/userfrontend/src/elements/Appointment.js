@@ -54,11 +54,13 @@ const strings = {
   cancelAppointment: ()=>`Termin Absagen`,
   printAppointmentDetail: ()=>`Sie möchten eine „Erinnerungshilfe“? Hier können Sie Ihren gebuchten Termin ausdrucken.`,
   printAppointment: ()=>`Termin Drucken`,
-  deleteLocalAppointmentDetail: ()=>`Sie haben Ihren Termin auf diesem Gerät gespeichert. Besuchen Sie ${window.location.host} erneut, so können Sie Ihr Testergebnis abrufen oder den Termin absagen.`,
+  deleteLocalAppointmentDetail: ()=>`Sie haben Ihren Termin auf diesem Gerät gespeichert. Um diese Seite mit Ihrer Termin-Bestätigung (und später auch das Testergebnis) wieder aufzurufen, besuchen Sie ${window.location.host} erneut.`,
   deleteLocalAppointment: ()=>`Von diesem Gerät löschen`,
   storeLocalAppointmentDetail: ()=>`Sie können Ihren Termin auf diesem Gerät speichern. Dann können Sie diese Seite jederzeit wieder aufrufen. Dort können Sie nach Test-Ende auch Ihr Testergebnis sehen.`,
   storeLocalAppointment: ()=>`Auf diesem Gerät speichern`,
+  confirmNotStored: ()=>`Sie haben diesen Termin noch nicht auf diesem Gerät gespeichert. Möchten Sie dennoch fortfahren?`,
   backToAppointmentSelection: ()=>`Zurück zur Terminübersicht`,
+  preventNavigation: ()=>`Die Buchung Ihres Termins ist noch nicht abgeschlossen. Möchten Sie die Seite wirklich verlassen?`,
 }
 
 function getAppointmentStatus(appointment) {
@@ -67,6 +69,10 @@ function getAppointmentStatus(appointment) {
   if (appointment.testResult) return 'completed';
   if (appointment.testStartedAt) return 'processing';
   return 'pending';
+}
+
+function preventNavigation() {
+  return strings.preventNavigation;
 }
 
 export const Appointment = ({uuid})=>{
@@ -80,6 +86,8 @@ export const Appointment = ({uuid})=>{
   const [editMode, setEditMode] = useState(testStatus==='reservation');
   if (!editMode && testStatus==='reservation') setEditMode(true);
   if (editMode && !(['reservation', 'pending']).includes(testStatus)) setEditMode(false);
+  if (testStatus === 'reservation') window.onbeforeunload = preventNavigation;
+  else window.onbeforeunload = ()=>{};
 
   if (appointmentError) {
     if (appointmentError.status === 404) {
@@ -132,6 +140,7 @@ export const Appointment = ({uuid})=>{
         .then(async ()=>{
           toast(strings.saveSuccess());
           await updateAppointment();
+          window.scrollTo(0, 0);
           setEditMode(false);
         }).catch(e=>{
           console.error(e);
@@ -240,7 +249,12 @@ export const Appointment = ({uuid})=>{
         </>}
       </>}
       {testStatus !== 'reservation' && <mwc-button
-        onClick={()=>window.location.pathname = '/'}
+        onClick={()=>{
+          if (!isStored) {
+            if (!window.confirm(strings.confirmNotStored())) return;
+          }
+          window.location.pathname = '/'
+        }}
       >{strings.backToAppointmentSelection()}</mwc-button>}
     </div>
   </>

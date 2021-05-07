@@ -10,12 +10,13 @@ import '@material/mwc-button';
 import '@material/mwc-dialog';
 
 const strings = {
-  save: ()=>`Speichern`,
+  save: ()=>`Absenden`,
   contactDetailDetail: ()=>`Bitte geben Sie in mindestens 1 Feld Ihre Kontaktdaten ein. Dann können wir mit Ihnen Kontakt aufnehmen – zum Beispiel bei Termin\u2011Verschiebungen. Wenn Sie Ihre Handy-Nummer und/oder E-Mail-Adresse angeben, bekommen Sie Ihr Ergebnis innerhalb von 30 Minuten nach dem Test elektronisch zugeschickt. Sie können aber auch vor Ort ein ausgedrucktes Formular mitnehmen.`,
   acceptTerms: ()=>`Ich erkläre mich mir der oben stehenden Vereinbarung einverstanden`,
   dataPolicy: ()=>`Ich erkläre mich einverstanden, dass zum Zweck der Abrechnung und zum Schutz potentiell weiterer Kontaktpersonen mein Befundergebnis sowie meine Kontaktdaten (Name, Anschrift) durch den Caritas-Verein Altenoythe erhoben und gespeichert werden. Die erhobenen Daten können zum Zweck der Abrechnung mit der Kassenärztlichen Vereinigung genutzt werden und unterliegenden der Gesetzlichen Speicherdauer (10 Jahre).
   Die Befundergebnisse können im Sinne der Teststrategie an das Gesundheitsamt, Hausarzt, gesetzlicher Vertreter übermittelt werden.
   Mir ist bewusst, dass mein Einverständnis jederzeit und ohne Angabe von Gründen schriftlich widerrufen werden kann! Die Einwilligung ist freiwillig und gilt zeitlich unbeschränkt.`,
+  confirmNoContact: ()=>`Sie haben weder eine Handnummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen Ihr Testergebnis nicht automatisch zusenden.`,
 };
 
 const appointmentDetail = (admin)=>({
@@ -32,7 +33,7 @@ const appointmentDetail = (admin)=>({
     icon: 'badge',
   },
   "address": {
-    label: 'Adresse, Hausnummer',
+    label: 'Straße, Hausnummer',
     required: true,
     type: 'text',
     icon: 'home',
@@ -123,7 +124,7 @@ function EditAppointment(props) {
     delete data.town;
 
     if (!acceptedNoContact) {
-      if (!data.phoneMobile && !data.phoneLandline) {
+      if (!data.phoneMobile && !data.email) {
         this.shadowRoot.querySelector('#confirmNoContact').show();
         return;
       }
@@ -181,10 +182,7 @@ function EditAppointment(props) {
         @click=${submit}
       >${strings.save()}</mwc-button>
       <mwc-dialog id="confirmNoContact" @closed=${submit}>
-        <div>
-          Sie haben weder eine Telefonnummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen keine Terminänderungen mitteilen!<br/>
-          Bitte geben Sie mindestens eine Konkaktmöglichkeit an.
-        </div>
+        <div>${strings.confirmNoContact()}</div>
         <mwc-button
           raised
           slot="primaryAction"
