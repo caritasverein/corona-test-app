@@ -17,7 +17,7 @@
     "@webcomponents/webcomponentsjs": "^2.5.0",
     "cra-build-watch": "^3.4.0",
     "dompurify": "^2.2.8",
-    "element-internals-polyfill": "^0.1.30",
+    "element-internals-polyfill": "^0.1.33",
     "eslint-config-google": "^0.14.0",
     "haunted": "^4.8.0",
     "lit-element": "^2.4.0",

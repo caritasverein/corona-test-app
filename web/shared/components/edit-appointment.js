@@ -93,23 +93,19 @@ const appointmentDetail = {
 
 function EditAppointment(props) {
   const {appointment, update} = props;
-  const causesubmit = (e)=>{
-    if (e.detail && e.detail.action === 'cancel') return;
-    if (e.detail && e.detail.action === 'accept') this.acceptedNoContact = true;
-    let target = e.target;
-    while(!(target instanceof HTMLFormElement)) target = target.parentNode;
-    target.querySelector('input[type=submit]').click();
-  };
+
   const submit = (e)=>{
+    if (e.detail && e.detail.action === 'cancel') return;
+    const acceptedNoContact = e.detail && e.detail.action === 'accept';
+
     let form = e.target;
     while(!(form instanceof HTMLFormElement)) form = form.parentNode;
     e.preventDefault();
 
-    const invalidElement = form.querySelector('[invalid]');
-    const valid = !invalidElement; // Sadly form.reportValidity(); does not work
+    const valid = form.reportValidity();
     if (!valid) {
-      console.log(invalidElement);
-      invalidElement.scrollIntoView({behavior: "smooth", block: "center"});
+      form.querySelector('[invalid], :invalid')
+        .scrollIntoView({behavior: "smooth", block: "center"});
       return;
     }
 
@@ -123,8 +119,8 @@ function EditAppointment(props) {
     data.address += '\n'+data.town;
     delete data.town;
 
-    if (!this.acceptedNoContact) {
-      if (!data.phoneMobile && !data.phoneLandline && !data.email) {
+    if (!acceptedNoContact) {
+      if (!data.phoneMobile && !data.phoneLandline) {
         this.shadowRoot.querySelector('#confirmNoContact').show();
         return;
       }
@@ -170,9 +166,9 @@ function EditAppointment(props) {
         class="ok"
         raised
         icon="send"
-        @click=${causesubmit}
+        @click=${submit}
       >${strings.save()}</mwc-button>
-      <mwc-dialog id="confirmNoContact" @closed=${causesubmit}>
+      <mwc-dialog id="confirmNoContact" @closed=${submit}>
         <div>
           Sie haben weder eine Telefonnummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen keine Terminänderungen mitteilen!<br/>
           Bitte geben Sie mindestens eine Konkaktmöglichkeit an.
