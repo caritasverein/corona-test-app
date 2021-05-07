@@ -5,6 +5,9 @@ import App from './App';
 import theme from './theme';
 import 'fontsource-roboto';
 
+import 'element-internals-polyfill';
+import '@webcomponents/webcomponentsjs/webcomponents-loader.js';
+
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 
