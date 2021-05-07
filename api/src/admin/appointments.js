@@ -120,13 +120,12 @@ router.get(
 
     const ids = [];
 
-    appointments.map((t) => {
+    appointments.forEach((t) => {
       const time = new Date(t.time);
       const newId = time.getMinutes() + (time.getHours() * 60);
       const additionals = ids.filter((id) => id === newId).length + 1;
       ids.push(newId);
       t.id = newId + '-' + additionals;
-      return t;
     });
 
     res.send(appointments);
