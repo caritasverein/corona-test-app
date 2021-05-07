@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import '@material/mwc-button';
 import '@material/mwc-formfield';
 import '@material/mwc-icon';
@@ -60,7 +60,7 @@ const strings = {
   storeLocalAppointment: ()=>`Auf diesem Gerät speichern`,
   confirmNotStored: ()=>`Sie haben diesen Termin noch nicht auf diesem Gerät gespeichert. Möchten Sie dennoch fortfahren?`,
   backToAppointmentSelection: ()=>`Zurück zur Terminübersicht`,
-  preventNavigation: ()=>`Die Buchung Ihres Termins ist noch nicht abgeschlossen. Möchten Sie die Seite wirklich verlassen?`,
+  preventNavigation: ()=>`Die Buchung Ihres Termins ist noch nicht abgeschlossen. Ihre Reservierung verfällt in einer Stunde. Möchten Sie die Seite wirklich verlassen?`,
 }
 
 function getAppointmentStatus(appointment) {
@@ -72,7 +72,7 @@ function getAppointmentStatus(appointment) {
 }
 
 function preventNavigation() {
-  return strings.preventNavigation;
+  return strings.preventNavigation();
 }
 
 export const Appointment = ({uuid})=>{
@@ -86,8 +86,18 @@ export const Appointment = ({uuid})=>{
   const [editMode, setEditMode] = useState(testStatus==='reservation');
   if (!editMode && testStatus==='reservation') setEditMode(true);
   if (editMode && !(['reservation', 'pending']).includes(testStatus)) setEditMode(false);
-  if (testStatus === 'reservation') window.onbeforeunload = preventNavigation;
-  else window.onbeforeunload = ()=>{};
+
+  useEffect(()=>{
+    if (testStatus === 'reservation') {
+      window.onbeforeunload = preventNavigation;
+    } else {
+      window.onbeforeunload = null;
+    }
+    return ()=>{
+      window.onbeforeunload = null;
+    }
+  }, [testStatus]);
+
 
   if (appointmentError) {
     if (appointmentError.status === 404) {
@@ -97,7 +107,7 @@ export const Appointment = ({uuid})=>{
         <p>Möglicherweise ist er zu lange her oder wurde abgesagt.</p>
         <mwc-button
           fullwidth
-          onClick={()=>window.location.pathname = '/'}
+          onClick={()=>setRoute()}
         >{strings.backToAppointmentSelection()}</mwc-button>
       </>;
     }
@@ -203,7 +213,7 @@ export const Appointment = ({uuid})=>{
       {appointment.testResult && <>
         <mwc-button
           raised
-          onClick={(e)=>printjs(`/api/appointments/${encodeURIComponent(uuid)}/pdf`)}
+          onClick={(e)=>window.open(`/api/appointments/${encodeURIComponent(uuid)}/pdf`,'_blank')}
         >{strings.printResult()}</mwc-button>
       </>}
       {(testStatus==='pending' || testStatus === 'reservation') && <>
@@ -214,8 +224,11 @@ export const Appointment = ({uuid})=>{
           icon="event_busy"
           onClick={(e)=>{
             if (!window.confirm('Möchen Sie den Termin wirklich absagen?')) return;
-            setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
-            apiFetch('DELETE','appointments/'+uuid).then(()=>window.location.pathname = '/');
+            apiFetch('DELETE','appointments/'+uuid).then(()=>{
+              window.onbeforeunload = null;
+              setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
+              setRoute();
+            });
           }}
         >{strings.cancelAppointment()}</mwc-button>
       </>}
@@ -253,7 +266,7 @@ export const Appointment = ({uuid})=>{
           if (!isStored) {
             if (!window.confirm(strings.confirmNotStored())) return;
           }
-          window.location.pathname = '/'
+          setRoute();
         }}
       >{strings.backToAppointmentSelection()}</mwc-button>}
     </div>

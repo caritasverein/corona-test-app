@@ -5,24 +5,44 @@ const getPath = () => {
   return path;
 };
 
+window.addEventListener('popstate', (e)=>{
+  if (window.onbeforeunload) {
+    if (window.confirm(window.onbeforeunload())) {
+      return;
+    } else {
+      window.history.forward();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+});
+
 export const useRoute = () => {
   const [_value, set_Value] = useState(getPath);
 
   const setValue = useCallback((v = '') => {
-    const path = typeof v === 'string' ? v : v.map(
-      (p) => encodeURIComponent(p)
-    ).join('/');
+    const path =
+      process.env.PUBLIC_URL + '/' +
+      (typeof v === 'string' ? v : v.map(
+        (p) => encodeURIComponent(p)
+      ).join('/'));
 
-    set_Value((old) => {
-      window.history.pushState(
-        null,
-        document.title,
-        process.env.PUBLIC_URL + '/' + path
-      );
-      window.dispatchEvent(new Event('pushstate'));
-      window.scrollTo(0, 0);
-      return v;
-    });
+    if (window.location.pathname === path) return;
+    console.log(window.location.pathname, path)
+
+    if (window.onbeforeunload && !window.confirm(window.onbeforeunload())) {
+      window.history.forward();
+      return;
+    }
+
+    window.history.pushState(
+      null,
+      document.title,
+      path
+    );
+    window.dispatchEvent(new Event('pushstate'));
+    window.scrollTo(0, 0);
+    set_Value(v);
   }, [set_Value]);
 
   const setValueCb = useCallback((v) => {

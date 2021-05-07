@@ -24,12 +24,14 @@ const appointmentDetail = (admin)=>({
     label: 'Vorname',
     required: true,
     type: 'text',
+    autocomplete: 'given-name',
     icon: 'person',
   },
   "nameFamily": {
     label: 'Nachname',
     required: true,
     type: 'text',
+    autocomplete: 'family-name',
     icon: 'badge',
   },
   "address": {
@@ -37,6 +39,7 @@ const appointmentDetail = (admin)=>({
     required: true,
     type: 'text',
     icon: 'home',
+    autocomplete: 'address-line1',
     get: (v)=>v?v.split('\n')[0]:'',
   },
   "town": {
@@ -44,6 +47,7 @@ const appointmentDetail = (admin)=>({
     required: true,
     type: 'text',
     icon: 'location_city',
+    autocomplete: 'address-line2',
     pattern: '^[1-9]{5}(,| ) ?.+$',
     get: (_, v)=>v.address?v.address.split('\n')[1]:'',
   },
@@ -55,6 +59,7 @@ const appointmentDetail = (admin)=>({
     get: (v)=>v?new Date(new Date(v).toISOString().split('T')[0]).toLocaleDateString():'',
     pattern: '^\\s*(3[01]|[12][0-9]|0?[1-9])\\.(1[012]|0?[1-9])\\.((?:19|20)?\\d{2})\\s*$',
     placeholder: 'tt.mm.jjjj',
+    autocomplete: 'bday',
     set: (v)=>{
         if (!v || v.split('.').length < 3) return null;
         let [day, month, year] = v.split('.').map(v=>parseInt(v));
@@ -74,6 +79,7 @@ const appointmentDetail = (admin)=>({
     type: 'tel',
     icon: 'smartphone',
     pattern: '^(0|\\+49)(15|16|17)[0-9]+$',
+    autocomplete: 'mobile tel',
     change: (v)=>(v.replace('+49', '0').replace(/[^0-9\+]/g, '') || ''),
     set: (v)=>(v.replace('+49', '0').replace(/[^0-9]/g, '') || null),
   },
@@ -81,6 +87,7 @@ const appointmentDetail = (admin)=>({
     label: 'Festnetznummer',
     type: 'tel',
     icon: 'phone',
+    autocomplete: 'home tel',
     pattern: '^(0|\\+49)[2-9][0-9]+$',
     change: (v)=>(v.replace('+49', '0').replace(/[^0-9\+]/g, '') || ''),
     set: (v)=>(v.replace('+49', '0').replace(/[^0-9]/g, '') || null),
@@ -89,6 +96,7 @@ const appointmentDetail = (admin)=>({
     label: 'E-Mail',
     type: 'email',
     icon: 'email',
+    autocomplete: 'home email',
     set: (v)=>(v.replace(/[\s]/g, ' ') || null),
   },
 });
@@ -161,6 +169,7 @@ function EditAppointment(props) {
             name=${name || ''}
             ?required=${def.required}
             pattern=${def.pattern || ''}
+            autocomplete=${def.autocomplete || ''}
             label=${def.label || name}
             iconTrailing=${def.icon || name}
             value=${def.get?def.get(appointment[name]||'', appointment):appointment[name]||''}
