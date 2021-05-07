@@ -111,10 +111,11 @@ function EditAppointment(props) {
       return;
     }
 
+    const check = appointmentDetail(admin)
     const entries = [...new FormData(form).entries()]
       .map(([k, v]) => [
         k,
-        appointmentDetail[k] && appointmentDetail[k].set ? appointmentDetail[k].set(v) : v
+        check[k] && check[k].set ? check[k].set(v) : v
       ]);
 
     const data = Object.fromEntries(entries);
