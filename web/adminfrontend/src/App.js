@@ -302,7 +302,7 @@ function App() {
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify({...data, time: new Date().toISOString()})
         }
         const url = new URL('./appointments', apiBaseURL);
         const response = await fetch(url, options);
@@ -481,7 +481,7 @@ function App() {
             </TableCell>
         </TableRow>
     }
-
+    
     return (
         <div className="App">
             <AppBar position="sticky">
@@ -499,11 +499,10 @@ function App() {
             <Dialog open={showAddingDialog} onClose={handleAddingDialogClose}>
                 <DialogTitle id="form-dialog-title">Neue Person hinzufügen</DialogTitle>
                 <DialogContent>
-                    <EditAppointment admin appointment={{ time: "2021-05-07T10:00:00.000Z" }} update={handleAddingDialogSave} />
+                    <EditAppointment admin appointment={{}} update={handleAddingDialogSave} />
                 </DialogContent>
 
             </Dialog>
-
 
             {openErrorWindow &&
                 <div className={classes.errorAlert} onClick={() => errorWindowHandleClose()}>
