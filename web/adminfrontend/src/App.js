@@ -497,7 +497,7 @@ function App() {
             </AppBar>
 
             <Dialog open={showAddingDialog} onClose={handleAddingDialogClose}>
-                <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+                <DialogTitle id="form-dialog-title">Neue Person hinzufügen</DialogTitle>
                 <DialogContent>
                     <EditAppointment admin appointment={{ time: "2021-05-07T10:00:00.000Z" }} update={handleAddingDialogSave} />
                 </DialogContent>
