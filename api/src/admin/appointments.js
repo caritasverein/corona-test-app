@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 import {
   validateParamSubset,
@@ -10,8 +10,8 @@ import {
   appointmentTestSchema,
 } from '../schema.js';
 import db from '../db.js';
-import { getAppointment } from '../user/appointments.js';
-import { sendNotifications } from '../notifications.js';
+import {getAppointment} from '../user/appointments.js';
+import {sendNotifications} from '../notifications.js';
 
 const router = new Router();
 export const appointmentRouter = router;
@@ -49,14 +49,14 @@ router.post(
       req.body.phoneLandline,
     ]);
 
-    res.status(201).send({ uuid });
+    res.status(201).send({uuid});
   },
 );
 
 router.patch(
   '/:uuid',
   validateParamSubset(['uuid']),
-  validate({ 'body': appointmentTestSchema }),
+  validate({'body': appointmentTestSchema}),
   async (req, res) => {
     if (req.body.testStartedAt !== undefined) {
       await db.execute(`
