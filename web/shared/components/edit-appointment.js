@@ -73,6 +73,7 @@ const appointmentDetail = {
     type: 'tel',
     icon: 'smartphone',
     pattern: '^(0|\\+49)(15|16|17)[0-9]+$',
+    change: (v)=>(v.replace('+49', '0').replace(/[^0-9\+]/g, '') || ''),
     set: (v)=>(v.replace('+49', '0').replace(/[^0-9]/g, '') || null),
   },
   "phoneLandline": {
@@ -80,6 +81,7 @@ const appointmentDetail = {
     type: 'tel',
     icon: 'phone',
     pattern: '^(0|\\+49)[2-9][0-9]+$',
+    change: (v)=>(v.replace('+49', '0').replace(/[^0-9\+]/g, '') || ''),
     set: (v)=>(v.replace('+49', '0').replace(/[^0-9]/g, '') || null),
   },
   "email": {
@@ -155,6 +157,7 @@ function EditAppointment(props) {
           label=${def.label || name}
           iconTrailing=${def.icon || name}
           value=${def.get?def.get(appointment[name]||'', appointment):appointment[name]||''}
+          @input=${(e)=>def.change ? e.target.value = def.change(e.target.value) : e.target.value}
         ></mwc-fa-textfield>
       `)}
       <p style='font-size: 90%'>${strings.dataPolicy()}</p>

@@ -35,13 +35,13 @@ async function checkValidNewAppoitment(date) {
   return true;
 }
 
-export async function getAppointment(uuid) {
+export async function getAppointment(uuid, valid=false) {
   const [[appointment]] = await db.execute(`
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
       email, phoneMobile, phoneLandline, testStartedAt, testResult, needsCertificate
     FROM
-      appointments
+      ${valid?'appointments_valid':'appointments'}
     WHERE uuid = ?
   `, [
     uuid,
@@ -73,7 +73,7 @@ router.get(
   '/:uuid',
   validateParamSubset(['uuid']),
   async (req, res)=>{
-    const appointment = await getAppointment(req.params.uuid);
+    const appointment = await getAppointment(req.params.uuid, true);
 
     if (!appointment) return res.sendStatus(404);
     res.send(appointment);

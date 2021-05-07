@@ -55,7 +55,6 @@ export class TextFieldFA extends TextField {
 
   firstUpdated() {
     super.firstUpdated();
-    console.log(this.name);
 
     if (this.internals.form)
       this.internals.form.addEventListener('formdata', ()=>this.updateValidity(true));
