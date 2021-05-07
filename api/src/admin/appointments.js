@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   validateParamSubset,
@@ -10,8 +10,8 @@ import {
   appointmentTestSchema,
 } from '../schema.js';
 import db from '../db.js';
-import {getAppointment} from '../user/appointments.js';
-import {sendNotifications} from '../notifications.js';
+import { getAppointment } from '../user/appointments.js';
+import { sendNotifications } from '../notifications.js';
 
 const router = new Router();
 export const appointmentRouter = router;
@@ -29,7 +29,7 @@ router.post(
     'phoneMobile',
     'phoneLandline',
   ]),
-  async (req, res)=>{
+  async (req, res) => {
     const uuid = uuidv4();
 
     await db.execute(`
@@ -49,15 +49,15 @@ router.post(
       req.body.phoneLandline,
     ]);
 
-    res.status(201).send({uuid});
+    res.status(201).send({ uuid });
   },
 );
 
 router.patch(
   '/:uuid',
   validateParamSubset(['uuid']),
-  validate({'body': appointmentTestSchema}),
-  async (req, res)=>{
+  validate({ 'body': appointmentTestSchema }),
+  async (req, res) => {
     if (req.body.testStartedAt !== undefined) {
       await db.execute(`
         UPDATE appointments
@@ -106,7 +106,7 @@ router.patch(
 router.get(
   '/',
   validateQuerySubset(['start', 'end'], windowSchema),
-  async (req, res)=>{
+  async (req, res) => {
     const [appointments] = await db.execute(`
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
@@ -117,6 +117,17 @@ router.get(
       new Date(req.query.start),
       new Date(req.query.end),
     ]);
+
+    const ids = [];
+
+    appointments.map((t) => {
+      const time = new Date(t.time);
+      const newId = time.getMinutes() + (time.getHours() * 60);
+      const additionals = ids.filter((id) => id === newId).length + 1;
+      ids.push(newId);
+      t.id = newId + '-' + additionals;
+      return t;
+    });
 
     res.send(appointments);
   },
