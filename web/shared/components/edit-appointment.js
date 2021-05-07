@@ -18,7 +18,7 @@ const strings = {
   Mir ist bewusst, dass mein Einverständnis jederzeit und ohne Angabe von Gründen schriftlich widerrufen werden kann! Die Einwilligung ist freiwillig und gilt zeitlich unbeschränkt.`,
 };
 
-const appointmentDetail = {
+const appointmentDetail = (admin)=>({
   "nameGiven": {
     label: 'Vorname',
     required: true,
@@ -65,7 +65,7 @@ const appointmentDetail = {
     },
   },
   "desc1": {
-    type: "description",
+    type: admin?"hidden":"description",
     text: strings.contactDetailDetail()
   },
   "phoneMobile": {
@@ -90,11 +90,11 @@ const appointmentDetail = {
     icon: 'email',
     set: (v)=>(v.replace(/[\s]/g, ' ') || null),
   },
-};
+});
 
 
 function EditAppointment(props) {
-  const {appointment, update} = props;
+  const {appointment, update, admin} = props;
 
   const submit = (e)=>{
     if (e.detail && e.detail.action === 'cancel') return;
@@ -146,24 +146,32 @@ function EditAppointment(props) {
     <form @submit=${submit}>
       <input type="submit" style="display: none"/>
       <input type="hidden" name="time" value=${appointment.time} />
-      ${Object.entries(appointmentDetail).map(([name, def])=>
-        def.type==='description' ? html`<p>
+      ${Object.entries(appointmentDetail(admin)).map(([name, def])=>{
+        if (def.type==='description') return html`<p>
           ${def.text}
-        </p>`:html`<mwc-fa-textfield
-          type=${def.type || 'text'}
-          name=${name || ''}
-          ?required=${def.required}
-          pattern=${def.pattern || ''}
-          label=${def.label || name}
-          iconTrailing=${def.icon || name}
-          value=${def.get?def.get(appointment[name]||'', appointment):appointment[name]||''}
-          @input=${(e)=>def.change ? e.target.value = def.change(e.target.value) : e.target.value}
-        ></mwc-fa-textfield>
-      `)}
-      <p style='font-size: 90%'>${strings.dataPolicy()}</p>
-      <mwc-formfield label=${'* ' + strings.acceptTerms()}>
-        <mwc-fa-checkbox required ?checked=${appointment.nameFamily}></mwc-fa-checkbox>
-      </mwc-formfield>
+        </p>`
+
+        if (def.type==='hidden') return '';
+
+        return html`
+          <mwc-fa-textfield
+            type=${def.type || 'text'}
+            name=${name || ''}
+            ?required=${def.required}
+            pattern=${def.pattern || ''}
+            label=${def.label || name}
+            iconTrailing=${def.icon || name}
+            value=${def.get?def.get(appointment[name]||'', appointment):appointment[name]||''}
+            @input=${(e)=>def.change ? e.target.value = def.change(e.target.value) : e.target.value}
+          ></mwc-fa-textfield>
+        `
+      })}
+      ${admin ? '' : html`
+        <p style='font-size: 90%'>${strings.dataPolicy()}</p>
+        <mwc-formfield label=${'* ' + strings.acceptTerms()}>
+          <mwc-fa-checkbox required ?checked=${appointment.nameFamily}></mwc-fa-checkbox>
+        </mwc-formfield>
+      `}
 
       <mwc-button
         class="ok"
