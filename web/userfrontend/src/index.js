@@ -1,10 +1,10 @@
+import 'react-app-polyfill/stable';
+import 'element-internals-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import '@webcomponents/webcomponentsjs/webcomponents-loader.js';
-import 'element-internals-polyfill';
 
 ReactDOM.render(
   <React.StrictMode>
