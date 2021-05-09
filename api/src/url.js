@@ -1,5 +1,5 @@
 const weburl = new URL('http://localhost');
-weburl.proto = process.env.WEB_PROTO;
+weburl.protocol = process.env.WEB_PROTO;
 weburl.hostname = process.env.WEB_DOMAIN;
 weburl.port = process.env.WEB_PORT;
 weburl.pathname= process.env.WEB_PATH;
