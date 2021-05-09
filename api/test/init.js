@@ -37,7 +37,7 @@ const generateApointments = async (numbers) => {
       nameFamily: namesFamily[Math.floor(Math.random() * namesFamily.length)],
       nameGiven: namesGiven[Math.floor(Math.random() * namesGiven.length)],
       dateOfBirth: randomDate(new Date('1960-01-01T00:00:00.000Z'), new Date('2003-01-01T00:00:00.000Z')),
-      address: streets[Math.floor(Math.random() * streets.length)] + ' ' + Math.floor(Math.random() * 20 + 1) + ', ' + plz[Math.floor(Math.random() * plz.length)],
+      address: streets[Math.floor(Math.random() * streets.length)] + ' ' + Math.floor(Math.random() * 20 + 1) + '\n' + plz[Math.floor(Math.random() * plz.length)],
       phoneLandLine: '044' + Math.floor(Math.random() * 100000000),
       testStartedAt: i <= 4 ? new Date() : null,
       invalidatedAt: i === 6 ? new Date() : null,

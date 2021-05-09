@@ -10,25 +10,39 @@ OIDC_APP_SECRET= # e.g. openssl rand -hex 32
 
 # Required in production
 OIDC_ISSUER_BASE_URL= # https://login.microsoftonline.com/TENNANT_ID
-OIDC_APP_BASE_URL= # https://corona-tests/api   (note /api as the path)
 OIDC_CLIENT_ID= # e.g. azure application client id
+CERTIFICATE_PATH= # TBD
+SMTP_CONNECTION= # smtp://noreply%40corona-test.tld:secretpassword@smtp.office365.com:25/?pool=true
+SMTP_FROM= # noreply@corona-test.tld
+TWILIO_ACCOUNT_SID= #
+TWILIO_AUTH_TOKEN= #
+TWILIO_SMS_FROM= #
+WEB_DOMAIN= # corona-test.tld
 ```
 
 It may also contain these additional entries:
 ```shell
-WEB_PORT=8080 # defaults to 80 in production
+HOST_WEB_PORT=8080 # defaults to 80 in production
 
 MYSQL_USER=coronatests
 MYSQL_RANDOM_ROOT_PASSWORD=true
 MYSQL_DATABASE=coronatests
-
+CERTIFICATE_PATH=./res/demoCertificate.pdf
+SMTP_CONNECTION= # empty string disables mail transport
+SMTP_FROM=noreply@localhost
+TWILIO_ACCOUNT_SID= # empty string disables twilio transport
+TWILIO_AUTH_TOKEN=
+TWILIO_SMS_FROM=+15005550006
+WEB_DOMAIN=localhost
+WEB_PROTO=http
+WEB_PORT=8080
+WEB_PATH=/
 
 
 # Only available in development env
-MYSQL_PORT=3306
-OIDC_PORT=9090
-OIDC_ISSUER_BASE_URL=http://oidc-mock:9090/
-OIDC_APP_BASE_URL=http://localhost:8080/api # note /api as path
+HOST_MYSQL_PORT=3306
+HOST_OIDC_PORT=9090
+OIDC_ISSUER_BASE_URL=http://oidc-mock:9090
 OIDC_CLIENT_ID=coronatests
 ```
 

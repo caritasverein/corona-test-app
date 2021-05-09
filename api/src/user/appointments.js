@@ -1,6 +1,7 @@
 import Router from 'express-promise-router';
 import {v4 as uuidv4} from 'uuid';
 import fsSync, {promises as fs} from 'fs';
+import {createTestCertificate} from '../pdf.js';
 
 import {
   validateParamSubset,
@@ -90,12 +91,11 @@ router.get(
     const appointment = await getAppointment(req.params.uuid, true);
     if (!appointment.testResult) return res.sendStatus(423);
 
-    const stat = await fs.stat('./res/testResult.pdf');
-    const file = fsSync.createReadStream('./res/testResult.pdf');
-    res.setHeader('Content-Length', stat.size);
+    const pdf = await createTestCertificate(appointment);
+    res.setHeader('Content-Length', pdf.byteLength);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=quote.pdf');
-    file.pipe(res);
+    res.setHeader('Content-Disposition', 'attachment; filename=Zertifikat.pdf');
+    res.send(Buffer.from(pdf));
   },
 );
 
