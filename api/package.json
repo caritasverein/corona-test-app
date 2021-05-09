@@ -18,7 +18,9 @@
     "express-promise-router": "^4.1.0",
     "helmet": "^4.5.0",
     "mysql2": "^2.2.5",
+    "nodemailer": "^6.6.0",
     "nodemon": "^2.0.7",
+    "twilio": "^3.62.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

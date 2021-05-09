@@ -16,10 +16,10 @@ const strings = {
   toastAppointmentError: (err)=>`Es ist ein Fehler aufgetreten. Bitte versuche es erneut!`,
   yourAppointment: ()=>`Ihr Termin`,
   yourAppointmentAt: (date)=>`am ${date} Uhr`,
-  testStatusDetail: (status)=>({
+  testStatusDetail: (status, mail, sms)=>({
     loading: 'Wird geladen...',
     reservation: `Dieser Termin ist nun für Sie geblockt. Bitte füllen Sie das folgende Formular aus. Die Daten werden für die Test-Bestätigung benötigt. Klicken Sie dann auf „speichern“. Erst danach ist der Termin verbindlich für Sie reserviert!`,
-    pending: <>Ihr Termin wurde bestätigt. Bitte zum Termin unbedingt einen Lichtbildausweis (Personalausweis oder Führerschein) mitbringen!<br />WICHTIG: Bitte 30 Minuten vor dem Test nicht essen, trinken oder rauchen!</>,
+    pending: <>Ihr Termin wurde bestätigt{mail || sms ? ` und eine ${mail && sms ? 'E-Mail, sowie eine SMS' : ((mail ? 'Mail' : '') + (sms ? 'SMS' : ''))} an Sie verschickt.` : '.'} Bitte zum Termin unbedingt einen Lichtbildausweis (Personalausweis oder Führerschein) mitbringen!<br />WICHTIG: Bitte 30 Minuten vor dem Test nicht essen, trinken oder rauchen!</>,
     processing: 'Ihr Test wird derzeit bearbeitet. Bitte beachten Sie, dass es bis zu 30 Minuten dauern kann, bis Ihr Ergebnis feststeht.',
     completed: 'Der Test wurde abgeschlossen.',
   })[status],
@@ -127,7 +127,7 @@ export const Appointment = ({uuid})=>{
       style={{'--mdc-icon-size': '2rem', verticalAlign: '-8px'}}
     >event</mwc-icon>&nbsp; {strings.yourAppointment()}</h3>
     <h2>{strings.yourAppointmentAt(localeFull(appointment.time))}</h2>
-    <p>{strings.testStatusDetail(testStatus)}</p>
+    <p>{strings.testStatusDetail(testStatus, appointment.email, appointment.phoneMobile)}</p>
     {appointment.testResult && <>
       <div style={{
         background: ({

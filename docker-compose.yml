@@ -16,6 +16,15 @@ services:
       CLIENT_ID: ${OIDC_CLIENT_ID?err}
       BASE_URL: ${OIDC_APP_BASE_URL?err}
       SECRET: ${OIDC_APP_SECRET?err}
+      SMTP_CONNECTION: ${SMTP_CONNECTION?err}
+      SMTP_FROM: ${SMTP_FROM?err}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID?err}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN?err}
+      TWILIO_SMS_FROM: ${TWILIO_SMS_FROM?err}
+      WEB_DOMAIN: ${WEB_DOMAIN?err}
+      WEB_PROTO: ${WEB_PROTO:-https}
+      WEB_PORT: ${WEB_PORT:-443}
+      WEB_PATH: ${WEB_PATH:-/}
 
   web:
     build:
@@ -28,7 +37,7 @@ services:
       - /run
       - /etc/nginx/conf.d
     ports:
-      - "${WEB_PORT:-80}:80"
+      - "${DOCKER_WEB_PORT:-80}:80"
 
   db:
     image: mariadb

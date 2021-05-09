@@ -7,7 +7,10 @@ import {
   validateBodySubset,
 } from '../schema.js';
 import db from '../db.js';
-import {sendNotifications} from '../notifications.js';
+import {
+  sendAppointmentNotifications,
+  sendCancelationNotifications,
+} from '../notifications.js';
 
 const router = new Router();
 export const appointmentRouter = router;
@@ -84,7 +87,7 @@ router.get(
   '/:uuid/pdf',
   validateParamSubset(['uuid']),
   async (req, res)=>{
-    const appointment = await getAppointment(req.params.uuid);
+    const appointment = await getAppointment(req.params.uuid, true);
     if (!appointment.testResult) return res.sendStatus(423);
 
     const stat = await fs.stat('./res/testResult.pdf');
@@ -131,9 +134,9 @@ router.patch(
       req.params.uuid,
     ]);
 
-    const appointment = await getAppointment(req.params.uuid);
+    const appointment = await getAppointment(req.params.uuid, true);
     if (!appointment) return res.sendStatus(404);
-    if (appointment.nameFamily) await sendNotifications(appointment);
+    if (appointment.nameFamily) await sendAppointmentNotifications(appointment);
 
     res.send(appointment);
   },
@@ -151,7 +154,7 @@ router.delete(
     `, [req.params.uuid]);
 
     const appointment = await getAppointment(req.params.uuid);
-    if (appointment.nameFamily) await sendNotifications(appointment);
+    if (appointment.nameFamily) await sendCancelationNotifications(appointment);
     return res.sendStatus(204);
   },
 );

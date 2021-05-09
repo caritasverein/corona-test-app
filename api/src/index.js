@@ -12,6 +12,7 @@ import helmet from 'helmet';
 import oidc from 'express-openid-connect';
 const {auth, requiresAuth} = oidc;
 
+import {apiURL} from './url.js';
 import {handleValidationError} from './schema.js';
 
 import {adminRouter} from './admin.js';
@@ -20,8 +21,10 @@ import {userRouter} from './user.js';
 const app = express();
 app.use(helmet());
 app.use(express.json());
+console.log(apiURL().toString());
 app.use(auth({
   authRequired: false,
+  baseURL: apiURL().toString(),
   errorOnRequiredAuth: true,
   routes: {
     login: false,
