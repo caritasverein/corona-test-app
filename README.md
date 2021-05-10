@@ -53,6 +53,8 @@ Start dev env using
 ./dev.sh
 ```
 
+If the containers are throwing ACCESS errors due to filesystem permissions, make sure all project files are owned by USER 1000 on the host.
+
 ### Enable oidc-mock login
 For the oidc-mock server to work during development as well as automated testing, you need to locally resolve the domain `oidc-mock` to `127.0.0.1`.\
 On Linux you can add the following line to your `/etc/hosts`:
