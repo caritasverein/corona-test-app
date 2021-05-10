@@ -23,10 +23,12 @@ async function login() {
     .get('/login')
     .redirects(1)
     .then((e)=>e.res.headers.location);
+  console.log(callbackLocation);
 
   const callback = new URL(callbackLocation);
-  await agent
-    .get('/callback'+callback.search+callback.hash);
+  console.log('/callback'+callback.search+callback.hash);
+  console.log(await agent
+    .get('/callback'+callback.search+callback.hash));
 
   const res = await agent.get('/admin/me');
   if (debug) console.log(res.status, res.body);

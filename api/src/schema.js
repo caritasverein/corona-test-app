@@ -60,6 +60,10 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'enum': ['true', null],
     },
+    'marked': {
+      'type': ['string', 'null'],
+      'enum': ['true', null],
+    },
     'createdAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
@@ -82,6 +86,7 @@ export const appointmentSchema = {
     'testStartedAt',
     'testResult',
     'needsCertificate',
+    'marked',
   ],
   'additionalProperties': false,
 };
@@ -102,11 +107,16 @@ export const appointmentTestSchema = {
       'type': ['string', 'null'],
       'enum': ['true', null],
     },
+    'marked': {
+      'type': ['string', 'null'],
+      'enum': ['true', null],
+    },
   },
   'anyOf': [
     {'required': ['testStartedAt']},
     {'required': ['testResult']},
     {'required': ['needsCertificate']},
+    {'required': ['marked']},
   ],
   'additionalProperties': false,
 };

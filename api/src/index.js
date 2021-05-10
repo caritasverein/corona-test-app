@@ -12,6 +12,7 @@ import helmet from 'helmet';
 import oidc from 'express-openid-connect';
 const {auth, requiresAuth} = oidc;
 
+import {initPromise} from './db.js';
 import {apiURL} from './url.js';
 import {handleValidationError} from './schema.js';
 
@@ -58,4 +59,6 @@ app.use((error, req, res, next) => {
   next();
 });
 
-app.listen(8080);
+initPromise.then(()=>{
+  app.listen(8080);
+});

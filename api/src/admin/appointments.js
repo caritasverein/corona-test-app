@@ -96,6 +96,18 @@ router.patch(
       ]);
     }
 
+    if (req.body.marked !== undefined) {
+      await db.execute(`
+        UPDATE appointments
+        SET
+          marked = ?
+        WHERE uuid = ?
+      `, [
+        req.body.marked,
+        req.params.uuid,
+      ]);
+    }
+
     const appointment = await getAppointment(req.params.uuid);
     if (!appointment) return res.sendStatus(404);
 
@@ -113,7 +125,7 @@ router.get(
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
         email, phoneMobile, phoneLandline, testStartedAt, testResult,
-        needsCertificate, createdAt, invalidatedAt
+        needsCertificate, marked, createdAt, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
     `, [
       new Date(req.query.start),
