@@ -92,9 +92,10 @@ router.get(
     if (!appointment.testResult) return res.sendStatus(423);
 
     const pdf = await createTestCertificate(appointment);
+
     res.setHeader('Content-Length', pdf.byteLength);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=Zertifikat.pdf');
+    // res.setHeader('Content-Disposition', `attachment; filename=${appointment.uuid}.pdf`);
     res.send(Buffer.from(pdf));
   },
 );

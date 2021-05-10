@@ -14,7 +14,7 @@ export async function createTestCertificate(appointment) {
       addr2: appointment.address.split('\n')[1],
       dateOfBirth: appointment.dateOfBirth.toLocaleDateString('de-DE', {timeZone: 'UTC'}),
       testedAt: new Date(appointment.testStartedAt).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'}),
-      // signature: `Dieses Dokument wurde maschinell erstellt und ist ohne Unterschrift gültig`,
+      signature: ``, // `Dieses Dokument wurde maschinell erstellt und ist ohne Unterschrift gültig`,
   };
   const checkboxes = {
     positive: appointment.testResult === 'positive',
