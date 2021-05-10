@@ -196,7 +196,7 @@ function App() {
             if (finishedTests.length > 0) {
                 if (!iOS()) audioDing.play();
             }
-        }, 5000);
+        }, 1000);
         return () => clearInterval(interval);
     }, [finishedTests]);
 
@@ -249,7 +249,7 @@ function App() {
     const printPDF = (uuid) => {
         updateServer(uuid, {needsCertificate: null})
         const url = new URL('../appointments/' + uuid + '/pdf', apiBaseURL);
-        printjs(url.toString())
+        window.open(url.toString(), '_blank');
     }
 
     const hideTest = (uuid) => {
@@ -481,7 +481,7 @@ function App() {
             </TableCell>
         </TableRow>
     }
-    
+
     return (
         <div className="App">
             <AppBar position="sticky">
