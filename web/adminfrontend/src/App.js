@@ -1,5 +1,5 @@
 import { AppBar, Button, Container, Dialog, DialogContent, DialogTitle, Toolbar, Typography } from "@material-ui/core";
-import { red, green, yellow } from '@material-ui/core/colors';
+import { red, green, yellow, orange } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     highlightedRow: {
-        backgroundColor: theme.palette.warning.light
+        backgroundColor: orange['100']
     },
     '@keyframes blinker': {
         '50%': { backgroundColor: green['900'] },
@@ -219,15 +219,12 @@ function App() {
         updatePendingTests();
     }, [tests, updatePendingTests])
 
-    const toggleHighlighted = (uuid) => {
-        const index = highlights.indexOf(uuid);
-        if (index > -1) {
-            const _highlights = [...highlights]
-            _highlights.splice(index, 1)
-            setHighlights(_highlights)
-        } else {
-            setHighlights([...highlights, uuid])
-        }
+    const toggleHighlighted = async (uuid, value) => {
+
+        setOnUpdate(true);
+        await updateServer(uuid, { marked: value ? "true" : null })
+        setOnUpdate(false);
+
     }
 
     const errorWindowHandleClose = () => {
@@ -247,7 +244,7 @@ function App() {
     }
 
     const printPDF = (uuid) => {
-        updateServer(uuid, {needsCertificate: null})
+        updateServer(uuid, { needsCertificate: null })
         const url = new URL('../appointments/' + uuid + '/pdf', apiBaseURL);
         window.open(url.toString(), '_blank');
     }
@@ -302,7 +299,7 @@ function App() {
         const options = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({...data, time: new Date().toISOString()})
+            body: JSON.stringify({ ...data, time: new Date().toISOString() })
         }
         const url = new URL('./appointments', apiBaseURL);
         const response = await fetch(url, options);
@@ -356,8 +353,8 @@ function App() {
             : <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => needsCertificate(true)} startIcon={<FontAwesomeIcon icon={faSquare} />}>Zertifikat</Button>
 
         const resultButtons = <React.Fragment>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.negativeButton + ' mx-2 my-2'} onClick={() => setResult('negative')}>negative</Button>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.positiveButton + ' mx-2 my-2'} onClick={() => setResult('positive')}>positive</Button>
+            <Button disabled={onUpdate} variant={'contained'} className={classes.negativeButton + ' mx-2 my-2'} onClick={() => setResult('negative')}>negativ</Button>
+            <Button disabled={onUpdate} variant={'contained'} className={classes.positiveButton + ' mx-2 my-2'} onClick={() => setResult('positive')}>positiv</Button>
             <Button disabled={onUpdate} variant={'contained'} className={classes.invalidButton + ' mx-2 my-2'} onClick={() => setResult('invalid')}>Ungültig</Button>
         </React.Fragment>
 
@@ -418,8 +415,8 @@ function App() {
         } else if (props.test.testResult !== null) {
             // Test is finished
             handler = <div className={classes[props.test.testResult] + ' my-2 mx-2'}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}
-                {props.test.testResult === 'negative' && printButton}
-                {props.test.testResult !== 'negative' && props.test.needsCertificate && <span className={'ml-3'}><b>Person wartet auf Zertifikat</b></span>}
+                {['negative', 'positive'].indexOf(props.test.testResult) > -1 && printButton}
+                {props.test.needsCertificate && ['negative', 'positive'].indexOf(props.test.testResult) === -1 && <span className={'ml-3'}><b>Person wartet auf Zertifikat</b></span>}
                 {hideButton}
             </div>
 
@@ -451,9 +448,13 @@ function App() {
 
         const time = new Date(props.test.time);
 
-        return <TableRow key={props.test.uuid} className={highlights.indexOf(props.test.uuid) > -1 ? classes.highlightedRow : ''}>
+        return <TableRow key={props.test.uuid} className={props.test.marked ? classes.highlightedRow : ''}>
             <TableCell>
-                <Button onClick={() => toggleHighlighted(props.test.uuid)} variant={'contained'} className={highlights.indexOf(props.test.uuid) > -1 ? classes.positiveButton : ''}>{props.test.id}</Button>
+                <Button onClick={() => toggleHighlighted(props.test.uuid, !props.test.marked)} variant={'contained'} className={highlights.indexOf(props.test.uuid) > -1 ? classes.positiveButton : ''}>
+                    <div style={{whiteSpace: 'nowrap'}}>
+                        {props.test.id}
+                    </div>
+                </Button>
             </TableCell>
             <TableCell>
                 {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
@@ -490,7 +491,7 @@ function App() {
                         <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
                     </Typography>
                     {onUpdate && <div><FontAwesomeIcon spin icon={faSpinner} size={'2x'} /></div>}
-                    <Button onClick={() => setShowAddingDialog(true)} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>
+                    <Button onClick={() => setShowAddingDialog(true)} className={'mx-2'} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>
                     {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
                 </Toolbar>
