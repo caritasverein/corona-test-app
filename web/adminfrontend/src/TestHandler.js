@@ -1,5 +1,4 @@
-import { faCalendarTimes, faCertificate, faCheck, faCheckSquare, faExclamationTriangle, faFileContract, faPrint, faSign, faSpinner, faTimes, faVial } from "@fortawesome/free-solid-svg-icons";
-import { faSquare } from "@fortawesome/free-regular-svg-icons";
+import { faCalendarTimes, faCheck, faCircleNotch, faExclamationTriangle, faFileContract, faPrint, faTimes, faVial } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@material-ui/core";
 import printJS from "print-js";
@@ -114,14 +113,14 @@ export default function TestHandler(props) {
         // Test is running
         handler = <div>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon icon={faSpinner} spin fixedWidth /> Test läuft ({displayTime(secondsLeft)})...</div> : stopTestButton(secondsLeft)}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{color: 'gray'}} icon={faCircleNotch} spin fixedWidth /> Test läuft ({displayTime(secondsLeft)})...</div> : stopTestButton(secondsLeft)}
         </div>
 
     } else if (props.test.testResult === null && isFinished) {
         // Waiting for results
         handler = <div>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon icon={faSpinner} spin fixedWidth /> Warte auf Ergebnisse...</div> : resultButtons}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{color: 'gray'}} icon={faCircleNotch} spin fixedWidth /> Warte auf Ergebnisse...</div> : resultButtons}
         </div>
 
     } else if (props.test.testResult !== null) {
@@ -144,7 +143,7 @@ export default function TestHandler(props) {
         // Waiting for test start
         handler = <React.Fragment>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon icon={faSpinner} spin fixedWidth /> Warte auf Testung...</div> : startTestButton}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{color: 'gray'}} icon={faCircleNotch} spin fixedWidth /> Warte auf Testung...</div> : startTestButton}
         </React.Fragment>
 
     } else {

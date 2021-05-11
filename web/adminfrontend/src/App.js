@@ -8,10 +8,10 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faClock, faIdCard, faPlus, faSpinner, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faClock, faIdCard, faPlus, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
 import EditAppointment from 'shared/components/edit-appointment.js';
 
-import { calculateTimes, apiBaseURL, useStyles, defaultTime } from "./helper";
+import { apiBaseURL, useStyles, defaultTime } from "./helper";
 import TestRow from "./TestRow";
 
 function iOS() {
@@ -47,7 +47,6 @@ function App() {
     const [finishedTests, setFinishedTests] = useState([]);
     const [showLoginButton, setShowLoginButton] = useState(false);
     const [showAddingDialog, setShowAddingDialog] = useState(false);
-    const [expandedTests, setExpandedTests] = useState([]);
     const [view, setView] = useState('all')
 
     const login = () => {
@@ -115,7 +114,7 @@ function App() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            //updatePendingTests();
+            updatePendingTests();
         }, 1000);
         return () => clearInterval(interval);
     }, [updatePendingTests]);
@@ -129,8 +128,6 @@ function App() {
         setOpenErrorWindow(false);
     };
 
-
-    
     const updateTest = (uuid, update) => {
         const index = tests.findIndex(d => d.uuid === uuid);
         if (index > -1) {
@@ -139,20 +136,6 @@ function App() {
             setTests(_tests)
         }
     }
-
-
-    const toggleExpandedTest = (uuid) => {
-        const index = expandedTests.findIndex(d => d === uuid);
-        if (index > -1) {
-            const _expandedTests = [...expandedTests];
-            _expandedTests.splice(index, 1);
-            setExpandedTests(_expandedTests)
-        } else {
-            setExpandedTests([...expandedTests, uuid])
-        }
-    }
-
-    
 
     const handleAddingDialogClose = () => {
         setShowAddingDialog(false)
