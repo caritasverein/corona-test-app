@@ -246,7 +246,11 @@ function App() {
     const printPDF = (uuid) => {
         updateServer(uuid, { needsCertificate: null })
         const url = new URL('../appointments/' + uuid + '/pdf', apiBaseURL);
-        window.open(url.toString(), '_blank');
+        if (navigator.userAgent.includes('Android') || navigator.userAgent.includes('Mobile')) {
+          window.open(url.toString(), '_blank');
+        } else {
+          printjs(url.toString());
+        }
     }
 
     const hideTest = (uuid) => {
