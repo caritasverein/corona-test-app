@@ -156,22 +156,12 @@ router.get(
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
         email, phoneMobile, phoneLandline, testStartedAt, testResult,
-        needsCertificate, marked, onSite, slot, createdAt, invalidatedAt
+        needsCertificate, marked, onSite, slot, createdAt, updatedAt, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
     `, [
       new Date(req.query.start),
       new Date(req.query.end),
     ]);
-
-    const ids = [];
-
-    appointments.forEach((t) => {
-      const time = new Date(t.time);
-      const newId = time.getMinutes() + (time.getHours() * 60);
-      const additionals = ids.filter((id) => id === newId).length + 1;
-      ids.push(newId);
-      t.id = newId + '-' + additionals;
-    });
 
     res.send(appointments);
   },

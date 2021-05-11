@@ -75,6 +75,10 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'format': 'date-time',
     },
+    'updatedAt': {
+      'type': ['string', 'null'],
+      'format': 'date-time',
+    },
     'invalidatedAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
