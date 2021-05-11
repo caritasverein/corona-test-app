@@ -13,6 +13,7 @@ CREATE TABLE `appointments` (
   `phoneLandline` varchar(64),
   `needsCertificate` ENUM('true'),
   `marked` ENUM('true'),
+  `onSite` ENUM('true'),
   `testStartedAt` datetime,
   `testId` INT UNSIGNED,
   `testResult` ENUM('negative', 'positive', 'invalid'),

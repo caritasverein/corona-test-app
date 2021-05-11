@@ -64,6 +64,10 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'enum': ['true', null],
     },
+    'onSite': {
+      'type': ['string', 'null'],
+      'enum': ['true', null],
+    },
     'createdAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
@@ -87,6 +91,7 @@ export const appointmentSchema = {
     'testResult',
     'needsCertificate',
     'marked',
+    'onSite',
   ],
   'additionalProperties': false,
 };
@@ -111,12 +116,17 @@ export const appointmentTestSchema = {
       'type': ['string', 'null'],
       'enum': ['true', null],
     },
+    'onSite': {
+      'type': ['string', 'null'],
+      'enum': ['true', null],
+    },
   },
   'anyOf': [
     {'required': ['testStartedAt']},
     {'required': ['testResult']},
     {'required': ['needsCertificate']},
     {'required': ['marked']},
+    {'required': ['onSite']},
   ],
   'additionalProperties': false,
 };

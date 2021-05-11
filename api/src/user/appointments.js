@@ -43,7 +43,7 @@ export async function getAppointment(uuid, valid=false) {
   const [[appointment]] = await db.execute(`
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-      email, phoneMobile, phoneLandline, testStartedAt, testResult, needsCertificate, marked
+      email, phoneMobile, phoneLandline, testStartedAt, testResult, needsCertificate, marked, onSite
     FROM
       ${valid?'appointments_valid':'appointments'}
     WHERE uuid = ?

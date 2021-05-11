@@ -14,6 +14,10 @@ export const initPromise = (async ()=>{
     ADD COLUMN IF NOT EXISTS \`marked\` ENUM('true') NULL DEFAULT NULL AFTER needsCertificate;
   `);
   await db.query(`
+    ALTER TABLE \`coronatests\`.\`appointments\`
+    ADD COLUMN IF NOT EXISTS \`onSite\` ENUM('true') NULL DEFAULT NULL AFTER marked;
+  `);
+  await db.query(`
     CREATE OR REPLACE
       ALGORITHM = UNDEFINED
       DEFINER = \`coronatests\`@\`%\`
