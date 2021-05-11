@@ -65,6 +65,8 @@ export class TextFieldFA extends TextField {
 
     this.formElement.addEventListener('change', ()=>this.updateValue());
     this.updateValue()
+
+    this.formElement.autocomplete = this.getAttribute('autocomplete');
   }
 }
 
