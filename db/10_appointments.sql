@@ -16,7 +16,6 @@ CREATE TABLE `appointments` (
   `onSite` ENUM('true'),
   `slot` INT UNSIGNED,
   `testStartedAt` datetime,
-  `testId` INT UNSIGNED,
   `testResult` ENUM('negative', 'positive', 'invalid'),
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `uuid_UNIQUE` (`uuid`)

@@ -19,7 +19,7 @@ export const initPromise = (async ()=>{
   `);
   await db.query(`
     ALTER TABLE \`coronatests\`.\`appointments\`
-    ADD COLUMN IF NOT EXISTS \`slot\` ENUM('true') NULL DEFAULT NULL AFTER onSite;
+    ADD COLUMN IF NOT EXISTS \`slot\` INT UNSIGNED NULL DEFAULT NULL AFTER onSite;
   `);
   await db.query(`
     CREATE OR REPLACE
