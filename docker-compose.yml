@@ -30,6 +30,8 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
     restart: unless-stopped
     read_only: true
     tmpfs:

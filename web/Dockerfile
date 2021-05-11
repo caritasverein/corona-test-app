@@ -15,6 +15,8 @@ RUN npm run build
 
 
 FROM node:14 AS adminbuilder
+ARG REACT_APP_TEST_DURATION
+ENV REACT_APP_TEST_DURATION $REACT_APP_TEST_DURATION
 
 RUN mkdir /app
 RUN mkdir /shared

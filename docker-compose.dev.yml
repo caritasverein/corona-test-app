@@ -68,6 +68,7 @@ services:
       - ./web/shared:/shared
     environment:
       NODE_ENV: development
+      REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
 
   web-user:
     build:

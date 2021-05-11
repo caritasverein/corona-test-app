@@ -2,7 +2,8 @@ import { makeStyles } from "@material-ui/core";
 import { green, orange, red, yellow } from "@material-ui/core/colors";
 import { useEffect, useState } from "react";
 
-const defaultTime = 60 * 15;
+console.log(process.env.REACT_APP_TEST_DURATION)
+const defaultTime = parseInt(process.env.REACT_APP_TEST_DURATION || '900');
 
 const apiBaseURL = new URL(window.location);
 apiBaseURL.pathname = '/api/admin/';
