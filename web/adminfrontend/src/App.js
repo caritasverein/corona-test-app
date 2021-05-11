@@ -1,6 +1,4 @@
-import { AppBar, Button, Container, Dialog, DialogContent, DialogTitle, Toolbar, Typography } from "@material-ui/core";
-import { red, green, yellow, orange } from '@material-ui/core/colors';
-import { makeStyles } from '@material-ui/core/styles';
+import { AppBar, Button, Container, Dialog, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Toolbar, Typography } from "@material-ui/core";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -10,96 +8,11 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBirthdayCake, faCalendarTimes, faCheck, faCheckSquare, faClock, faComments, faEnvelope, faExclamationTriangle, faEyeSlash, faIdCard, faMapMarkerAlt, faMobileAlt, faPhoneAlt, faPlus, faPrint, faSpinner, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
-import { faSquare } from "@fortawesome/free-regular-svg-icons";
+import { faBell, faClock, faIdCard, faPlus, faSpinner, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
 import EditAppointment from 'shared/components/edit-appointment.js';
 
-import printjs from 'print-js'
-
-const apiBaseURL = new URL(window.location);
-apiBaseURL.pathname = '/api/admin/';
-
-const useStyles = makeStyles((theme) => ({
-    title: {
-        flexGrow: 1
-    },
-    table: {
-        minWidth: 650,
-    },
-    positiveButton: {
-        backgroundColor: red['500'],
-        marginRight: '10px;',
-        color: 'white',
-        '&:hover': {
-            backgroundColor: red['900']
-        }
-    },
-    negativeButton: {
-        backgroundColor: green['500'],
-        marginRight: '10px;',
-        color: 'white',
-        '&:hover': {
-            backgroundColor: green['900']
-        }
-    },
-    invalidButton: {
-        backgroundColor: yellow['800'],
-        color: 'white',
-        '&:hover': {
-            backgroundColor: yellow['900']
-        }
-    },
-    warningButton: {
-        backgroundColor: yellow['800'],
-        '&:hover': {
-            backgroundColor: yellow['900']
-        }
-    },
-    positive: {
-        color: red['500']
-    },
-    invalid: {
-        color: yellow['900']
-    },
-    negative: {
-        color: green['500']
-    },
-    errorAlert: {
-        color: red[900],
-        backgroundColor: red[100],
-        padding: '10px 20px 10px 20px',
-        borderRadius: '3px',
-        margin: '10px',
-        position: 'absolute',
-        width: 'max-content'
-    },
-    activatedColor: {
-        backgroundColor: green['500'],
-        marginRight: '10px;',
-        color: 'white',
-        '&:hover': {
-            backgroundColor: green['900']
-        }
-    },
-    highlightedRow: {
-        backgroundColor: orange['100']
-    },
-    '@keyframes blinker': {
-        '50%': { backgroundColor: green['900'] },
-    },
-    flashPrintButton: {
-        animationName: '$blinker',
-        animationDuration: '1s',
-        animationTimingFunction: 'linear',
-        animationIterationCount: 'infinite',
-        backgroundColor: green['500'],
-        marginRight: '10px;',
-        color: 'white',
-        '&:hover': {
-            backgroundColor: green['900']
-        }
-    }
-}));
+import { calculateTimes, apiBaseURL, useStyles, defaultTime } from "./helper";
+import TestRow from "./TestRow";
 
 function iOS() {
     return [
@@ -124,19 +37,18 @@ const audioDing = new Audio('ding.mp3');
 
 function App() {
 
-    const defaultTime = 60 * 15;
+    
     const classes = useStyles();
 
     const [tests, setTests] = useState([]);
     const [openErrorWindow, setOpenErrorWindow] = useState(false);
     const [errorWindowMessage, setErrorWindowMessage] = useState('');
-    const [onUpdate, setOnUpdate] = useState(false);
     const [pendingTests, setPendingTests] = useState(0)
     const [finishedTests, setFinishedTests] = useState([]);
-    const [hiddenTests, setHiddenTests] = useState(JSON.parse(localStorage.getItem('hiddenTests')) || [])
     const [showLoginButton, setShowLoginButton] = useState(false);
     const [showAddingDialog, setShowAddingDialog] = useState(false);
-    const [highlights, setHighlights] = useState([])
+    const [expandedTests, setExpandedTests] = useState([]);
+    const [view, setView] = useState('all')
 
     const login = () => {
         window.location = '/api/login'
@@ -167,17 +79,10 @@ function App() {
     }, [fetchTests])
 
 
-    const getTestTimes = useCallback((test) => {
-        const now = Math.round((new Date()).getTime() / 1000);
-        const testUnixtime = test.testStartedAt ? Math.round((new Date(test.testStartedAt).getTime()) / 1000) : 0;
-        const secondsLeft = defaultTime - (testUnixtime > 0 ? now - testUnixtime : 0);
-        return { now, testUnixtime, secondsLeft }
-    }, [defaultTime])
-
-
     const updatePendingTests = useCallback(() => {
         const _finishedTests = tests.filter(test => {
-            const { now, testUnixtime } = getTestTimes(test);
+            const now = Math.round((new Date()).getTime() / 1000);
+            const testUnixtime = test.testStartedAt ? Math.round((new Date(test.testStartedAt).getTime()) / 1000) : 0;
             return test.testResult === null && testUnixtime > 0 && now - defaultTime >= testUnixtime
         }).map(test => test.uuid);
         /*_finishedTests.forEach(test => {
@@ -189,7 +94,7 @@ function App() {
             setFinishedTests(_finishedTests);
         }
         setPendingTests(_finishedTests.length)
-    }, [defaultTime, finishedTests, getTestTimes, tests]);
+    }, [finishedTests, tests])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -210,7 +115,7 @@ function App() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            updatePendingTests();
+            //updatePendingTests();
         }, 1000);
         return () => clearInterval(interval);
     }, [updatePendingTests]);
@@ -219,45 +124,13 @@ function App() {
         updatePendingTests();
     }, [tests, updatePendingTests])
 
-    const toggleHighlighted = async (uuid, value) => {
-
-        setOnUpdate(true);
-        await updateServer(uuid, { marked: value ? "true" : null })
-        setOnUpdate(false);
-
-    }
 
     const errorWindowHandleClose = () => {
         setOpenErrorWindow(false);
     };
 
-    const resultIcons = {
-        'positive': <FontAwesomeIcon icon={faExclamationTriangle} fixedWidth />,
-        'negative': <FontAwesomeIcon icon={faCheck} fixedWidth />,
-        'invalid': <FontAwesomeIcon icon={faTimes} fixedWidth />
-    }
 
-    const resultText = {
-        'positive': 'Testergebnis positiv',
-        'negative': 'Testergebnis negativ',
-        'invalid': 'Testergebnis ungültig'
-    }
-
-    const printPDF = (uuid) => {
-        updateServer(uuid, { needsCertificate: null })
-        const url = new URL('../appointments/' + uuid + '/pdf', apiBaseURL);
-        if (navigator.userAgent.includes('Android') || navigator.userAgent.includes('Mobile')) {
-          window.open(url.toString(), '_blank');
-        } else {
-          printjs(url.toString());
-        }
-    }
-
-    const hideTest = (uuid) => {
-        setHiddenTests([...hiddenTests, uuid])
-        localStorage.setItem('hiddenTests', JSON.stringify([...hiddenTests, uuid]))
-    }
-
+    
     const updateTest = (uuid, update) => {
         const index = tests.findIndex(d => d.uuid === uuid);
         if (index > -1) {
@@ -267,28 +140,19 @@ function App() {
         }
     }
 
-    const updateServer = async (uuid, update) => {
-        const handleError = (err) => {
-            console.log(err)
-            setErrorWindowMessage(err)
-            setOpenErrorWindow(true);
-        }
-        const options = {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...update, uuid: undefined })
-        }
-        const url = new URL('./appointments/' + uuid, apiBaseURL);
-        const response = await fetch(url, options);
-        if (response.ok) {
-            const result = await response.json();
-            updateTest(uuid, result);
-            return true
-        } else {
-            handleError(await response.text())
-        }
 
+    const toggleExpandedTest = (uuid) => {
+        const index = expandedTests.findIndex(d => d === uuid);
+        if (index > -1) {
+            const _expandedTests = [...expandedTests];
+            _expandedTests.splice(index, 1);
+            setExpandedTests(_expandedTests)
+        } else {
+            setExpandedTests([...expandedTests, uuid])
+        }
     }
+
+    
 
     const handleAddingDialogClose = () => {
         setShowAddingDialog(false)
@@ -314,177 +178,12 @@ function App() {
         }
     }
 
-    const deleteFromServer = async (uuid) => {
-        const handleError = (err) => {
-            console.log(err)
-            setErrorWindowMessage(err)
-            setOpenErrorWindow(true);
-        }
-        const url = new URL('../appointments/' + uuid, apiBaseURL);
-        const options = {
-            method: 'DELETE',
-        }
-        const response = await fetch(url, options);
-        if (response.ok) {
-            updateTest(uuid, { invalidatedAt: new Date() });
-            return true
-        } else {
-            handleError(await response.text())
-        }
 
-    }
-
-    const TestHandler = (props) => {
-
-        const { now, testUnixtime, secondsLeft } = getTestTimes(props.test);
-
-        // Counter for active test button
-        const [counter, setCounter] = useState(secondsLeft);
-        useEffect(() => {
-            const timer = counter <= defaultTime && counter > 0 && setInterval(() => {
-                setCounter(counter - 1);
-            }, 1000);
-            if (counter === 0) { clearInterval(timer); }
-            return () => { clearInterval(timer); }
-        }, [counter]);
-
-        const hideButton = <Button onClick={() => hideTest(props.test.uuid)} size={'small'} className={'my-2 mx-2 float-right'} variant={'contained'}><FontAwesomeIcon icon={faEyeSlash} /></Button>
-        const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} className={'my-2 mx-2 ml-3 ' + (props.test.needsCertificate ? classes.flashPrintButton : '')} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPrint} />}>{props.test.needsCertificate ? 'Zertifikat' : 'Zertifikat'}</Button>
-        const cancelTestButton = <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => cancelTest()}>Nicht erschienen</Button>
-        const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'secondary'} className={'my-2 mx-2'} onClick={() => startTest()}>Test starten</Button>
-        const needsCertificateButton = props.test.needsCertificate
-            ? <Button disabled={onUpdate} variant={'contained'} className={classes.activatedColor + ' my-2 mx-2'} onClick={() => needsCertificate(false)} startIcon={<FontAwesomeIcon icon={faCheckSquare} />}>Zertifikat</Button>
-            : <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => needsCertificate(true)} startIcon={<FontAwesomeIcon icon={faSquare} />}>Zertifikat</Button>
-
-        const resultButtons = <React.Fragment>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.negativeButton + ' mx-2 my-2'} onClick={() => setResult('negative')}>negativ</Button>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.positiveButton + ' mx-2 my-2'} onClick={() => setResult('positive')}>positiv</Button>
-            <Button disabled={onUpdate} variant={'contained'} className={classes.invalidButton + ' mx-2 my-2'} onClick={() => setResult('invalid')}>Ungültig</Button>
-        </React.Fragment>
-
-        const stopTestButton = (timeLeft) => {
-            return <Button disabled={timeLeft <= 0 || onUpdate} variant={'contained'} className={classes.warningButton + ' mx-2 my-2'} onClick={() => stopTest()}>
-                <FontAwesomeIcon fixedWidth icon={faVial} className={'mr-3 flash '} /> {timeLeft <= 0 ? 'Bitte warten' : Math.floor(timeLeft / 60) + ':' + ('' + timeLeft % 60).padStart(2, '0')}
-            </Button>
-        }
-
-        const cancelTest = async () => {
-            setOnUpdate(true);
-            await deleteFromServer(props.test.uuid)
-            setOnUpdate(false);
-        }
-
-        const startTest = async () => {
-            setOnUpdate(true);
-            await updateServer(props.test.uuid, { testStartedAt: (new Date()).toISOString() })
-            setOnUpdate(false);
-        }
-
-        const stopTest = async () => {
-            setOnUpdate(true);
-            await updateServer(props.test.uuid, { testStartedAt: null })
-            setOnUpdate(false);
-        }
-
-        const needsCertificate = async (value) => {
-            setOnUpdate(true);
-            await updateServer(props.test.uuid, { needsCertificate: value ? "true" : null })
-            setOnUpdate(false);
-        }
-
-        const setResult = async (res) => {
-            if (res === 'negative' || (['positive', 'invalid'].indexOf(res) > -1 && window.confirm(resultText[res] + " - Bist du sicher?"))) {
-                setOnUpdate(true);
-                await updateServer(props.test.uuid, { testResult: res })
-                setOnUpdate(false);
-            }
-        }
-
-        let handler = <React.Fragment></React.Fragment>
-
-        if (props.test.testResult === null && now - defaultTime < testUnixtime) {
-            // Test is running
-            handler = <div>
-                {stopTestButton(secondsLeft)}
-                {needsCertificateButton}
-            </div>
-
-        } else if (props.test.testResult === null && testUnixtime > 0 && now - defaultTime >= testUnixtime) {
-            // Waiting for results
-            handler = <div>
-                {resultButtons}
-                {needsCertificateButton}
-            </div>
-
-        } else if (props.test.testResult !== null) {
-            // Test is finished
-            handler = <div className={classes[props.test.testResult] + ' my-2 mx-2'}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}
-                {['negative', 'positive'].indexOf(props.test.testResult) > -1 && printButton}
-                {props.test.needsCertificate && ['negative', 'positive'].indexOf(props.test.testResult) === -1 && <span className={'ml-3'}><b>Person wartet auf Zertifikat</b></span>}
-                {hideButton}
-            </div>
-
-        } else if (props.test.invalidatedAt) {
-            handler = <div>
-                <FontAwesomeIcon icon={faCalendarTimes} fixedWidth /> Termin abgesagt.
-                {hideButton}
-            </div>
-
-        } else {
-            // Test is ready to start
-            handler = <React.Fragment>
-                {startTestButton}
-                {cancelTestButton}
-                {needsCertificateButton}
-            </React.Fragment>
-
-        }
-
-        return handler;
-
-    }
-
-    const TestRow = (props) => {
-
-        const options = {
-            weekday: undefined, year: 'numeric', month: 'numeric', day: 'numeric'
-        }
-
-        const time = new Date(props.test.time);
-
-        return <TableRow key={props.test.uuid} className={props.test.marked ? classes.highlightedRow : ''}>
-            <TableCell>
-                <Button onClick={() => toggleHighlighted(props.test.uuid, !props.test.marked)} variant={'contained'} className={highlights.indexOf(props.test.uuid) > -1 ? classes.positiveButton : ''}>
-                    <div style={{whiteSpace: 'nowrap'}}>
-                        {props.test.id}
-                    </div>
-                </Button>
-            </TableCell>
-            <TableCell>
-                {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
-            </TableCell>
-            <TableCell>
-                <div className="name-container">
-                    <div data-area="name">
-                        {props.test.nameFamily}, {props.test.nameGiven}
-                    </div>
-                    <div data-area="dateOfBirth" className="text-muted">
-                        <FontAwesomeIcon fixedWidth icon={faBirthdayCake} /> {(new Date(props.test.dateOfBirth)).toLocaleDateString('de-DE', options)}
-                    </div>
-                    <div data-area="address" className="text-muted">
-                        <FontAwesomeIcon fixedWidth icon={faMapMarkerAlt} /> {props.test.address}
-                    </div>
-                </div>
-            </TableCell>
-            <TableCell>
-                {props.test.phoneMobile && <div style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</div>}
-                {props.test.phoneLandline && <div style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</div>}
-                {props.test.email && <div style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</div>}
-            </TableCell>
-            <TableCell>
-                <TestHandler {...props} />
-            </TableCell>
-        </TableRow>
+    const viewFilter = (test) => {
+        if(view === 'all') return true;
+        if(view === 'tests') return test.onSite && test.testResult === null;
+        //const { isFinished} = calculateTimes(test);
+        if(view === 'secretary') return test.onSite === null || (test.testResult === null) || (test.testResult !== null && test.needsCertificate)
     }
 
     return (
@@ -494,7 +193,19 @@ function App() {
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
                     </Typography>
-                    {onUpdate && <div><FontAwesomeIcon spin icon={faSpinner} size={'2x'} /></div>}
+                    <FormControl variant="filled" className={classes.formControl + ' mx-2'} size="small">
+                        <InputLabel id="demo-simple-select-filled-label">Ansicht</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={view}
+                            onChange={e => setView(e.target.value)}
+                        >
+                            <MenuItem value={'all'}>Alles anzeigen</MenuItem>
+                            <MenuItem value={'tests'}>Testungen</MenuItem>
+                            <MenuItem value={'secretary'}>Empfang</MenuItem>
+                        </Select>
+                    </FormControl>
                     <Button onClick={() => setShowAddingDialog(true)} className={'mx-2'} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>
                     {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
@@ -514,20 +225,24 @@ function App() {
                     {errorWindowMessage} <FontAwesomeIcon className={'ml-2 pointer'} icon={faTimes} />
                 </div>}
 
-            <Container maxWidth={'lg'} className={'mt-5'}>
+            <Container maxWidth={'lg'} className={'my-5'}>
                 <TableContainer component={Paper}>
                     <Table className={classes.table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
+                                <TableCell></TableCell>
                                 <TableCell><FontAwesomeIcon icon={faTag} fixedWidth /></TableCell>
                                 <TableCell><FontAwesomeIcon icon={faClock} fixedWidth /></TableCell>
                                 <TableCell><FontAwesomeIcon icon={faIdCard} fixedWidth /> Name</TableCell>
-                                <TableCell><FontAwesomeIcon icon={faComments} fixedWidth /> Kontakt</TableCell>
                                 <TableCell><FontAwesomeIcon icon={faVial} fixedWidth /> Testdurchführung</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tests.length > 0 && tests.filter(test => hiddenTests.indexOf(test.uuid) === -1).map((test, index) => <TestRow key={'row-' + test.uuid} test={test} index={index} />)}
+                            {tests.length > 0 && 
+                            tests
+                            //.filter(test => hiddenTests.indexOf(test.uuid) === -1)
+                            .filter(test => viewFilter(test))
+                            .map((test, index) => <TestRow key={'row-' + test.uuid} view={view} test={test} index={index} triggerUpdate={updateTest} />)}
                         </TableBody>
                     </Table>
                 </TableContainer>
