@@ -37,7 +37,7 @@ const audioDing = new Audio('ding.mp3');
 
 function App() {
 
-    
+
     const classes = useStyles();
 
     const [tests, setTests] = useState([]);
@@ -221,7 +221,7 @@ function App() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tests.length > 0 && 
+                            {tests.length > 0 &&
                             tests
                             //.filter(test => hiddenTests.indexOf(test.uuid) === -1)
                             .filter(test => viewFilter(test))

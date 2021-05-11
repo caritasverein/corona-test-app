@@ -17,7 +17,7 @@ export default function TestRow(props) {
 
     const time = new Date(props.test.time);
 
-    const toggleHighlighted = async (uuid, value) => {      
+    const toggleHighlighted = async (uuid, value) => {
         await updateServer(uuid, { marked: value ? "true" : null }, props.triggerUpdate)
     }
 
