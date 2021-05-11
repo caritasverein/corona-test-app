@@ -14,6 +14,7 @@ CREATE TABLE `appointments` (
   `needsCertificate` ENUM('true'),
   `marked` ENUM('true'),
   `onSite` ENUM('true'),
+  `slot` INT UNSIGNED,
   `testStartedAt` datetime,
   `testId` INT UNSIGNED,
   `testResult` ENUM('negative', 'positive', 'invalid'),

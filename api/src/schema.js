@@ -68,6 +68,9 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'enum': ['true', null],
     },
+    'slot': {
+      'type': ['number', 'null'],
+    },
     'createdAt': {
       'type': ['string', 'null'],
       'format': 'date-time',

@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   validateParamSubset,
@@ -10,7 +10,7 @@ import {
   appointmentTestSchema,
 } from '../schema.js';
 import db from '../db.js';
-import {getAppointment} from '../user/appointments.js';
+import { getAppointment } from '../user/appointments.js';
 import {
   sendResultNotifications,
 } from '../notifications.js';
@@ -51,14 +51,14 @@ router.post(
       req.body.phoneLandline,
     ]);
 
-    res.status(201).send({uuid});
+    res.status(201).send({ uuid });
   },
 );
 
 router.patch(
   '/:uuid',
   validateParamSubset(['uuid']),
-  validate({'body': appointmentTestSchema}),
+  validate({ 'body': appointmentTestSchema }),
   async (req, res) => {
     if (req.body.testStartedAt !== undefined) {
       await db.execute(`
@@ -108,19 +108,37 @@ router.patch(
       ]);
     }
 
-    
+
     if (req.body.onSite !== undefined) {
+
+      const [slots] = await db.query(`
+        SELECT 
+          slot
+        FROM
+          \`appointments\`
+        WHERE
+          \`appointments\`.\`onSite\` = 'true'
+          AND 
+          \`appointments\`.\`testResult\` IS NULL
+          AND 
+            DATE(\`appointments\`.\`time\`) = CURDATE()
+        ORDER BY slot ASC;
+      `);
+
+      const newSlot = slots.findIndex((slot, index) => slot.slot !== index + 1) + 1
+
       await db.execute(`
         UPDATE appointments
         SET
-        onSite = ?
+        onSite = ?,
+        slot = ?
         WHERE uuid = ?
       `, [
         req.body.onSite,
+        (newSlot ? newSlot : slots.length + 1),
         req.params.uuid,
       ]);
     }
-
 
     const appointment = await getAppointment(req.params.uuid);
     if (!appointment) return res.sendStatus(404);
@@ -139,7 +157,7 @@ router.get(
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
         email, phoneMobile, phoneLandline, testStartedAt, testResult,
-        needsCertificate, marked, onSite, createdAt, invalidatedAt
+        needsCertificate, marked, onSite, slot, createdAt, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
     `, [
       new Date(req.query.start),

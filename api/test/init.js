@@ -39,15 +39,16 @@ const generateApointments = async (numbers) => {
       dateOfBirth: randomDate(new Date('1960-01-01T00:00:00.000Z'), new Date('2003-01-01T00:00:00.000Z')),
       address: streets[Math.floor(Math.random() * streets.length)] + ' ' + Math.floor(Math.random() * 20 + 1) + '\n' + plz[Math.floor(Math.random() * plz.length)],
       phoneLandLine: '044' + Math.floor(Math.random() * 100000000),
-      testStartedAt: i <= 4 ? new Date() : null,
-      invalidatedAt: i === 6 ? new Date() : null,
-      testResult: i === 0 ? 'positive' : i === 1 ? 'negative' : i === 2 ? 'invalid' : null,
+      testStartedAt: null,
+      invalidatedAt: null,
+      testResult: null,
+      onSite: null,
     });
   }
 
   await db.execute(`
   INSERT INTO appointments
-    (uuid, time, nameFamily, nameGiven, dateOfBirth, address, phoneLandLine, testStartedAt, invalidatedAt, testResult)
+    (uuid, time, nameFamily, nameGiven, dateOfBirth, address, phoneLandLine, testStartedAt, invalidatedAt, testResult, onSite)
   VALUES
     ${tests.map((test) => '(' + Object.keys(test).map((t) => '?').join(',') + ')' ).join(',')}
   `, tests.flatMap((test) => Object.values(test)));
