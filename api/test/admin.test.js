@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 import chaiSchema from 'chai-json-schema';
 chai.use(chaiSchema);
-import initPromise from './init.js';
+import initPromise, {generateApointment} from './init.js';
 
 const server = 'http://api:8080';
 const agent = chai.request.agent(server);
@@ -83,13 +83,9 @@ describe('admin-api', function() {
         .post('/admin/appointments')
         .send({
           time: new Date(tomorrow + 'T00:00:00Z').toISOString(),
-          nameGiven: 'abc',
-          nameFamily: 'cde',
-          address: 'efg',
-          dateOfBirth: '2001-10-01',
+          ...generateApointment(),
           email: 'toast@teee.a',
           phoneMobile: '01722222',
-          phoneLandline: '04442222',
         });
       if (debug) console.log(res.status, res.body);
 
@@ -97,6 +93,20 @@ describe('admin-api', function() {
       expect(res.body).to.be.jsonSchema(subsetSchema(['uuid']));
 
       appointmentUuid = res.body.uuid;
+    });
+
+    it('should set appointments arrivedAt', async function() {
+      const res = await agent
+        .patch('/admin/appointments/'+appointmentUuid)
+        .send({
+          arrivedAt: new Date().toISOString(),
+        });
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body).to.be.jsonSchema(appointmentSchema);
+      expect(res.body.arrivedAt).to.not.eq(null);
+      expect(res.body.slot).to.eq(1);
     });
 
     it('should set appointment test testStartedAt', async function() {
@@ -136,6 +146,27 @@ describe('admin-api', function() {
       expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(appointmentSchema);
       expect(res.body.needsCertificate).to.eq('true');
+    });
+
+    it('should create collision-free slots', async function() {
+      for (const [i, m] of Object.entries([10, 15, 15, 20])) {
+        const res = await agent
+          .post('/admin/appointments')
+          .send({
+            time: new Date(tomorrow + `T00:${m}:00Z`).toISOString(),
+            ...generateApointment(),
+          });
+        expect(res.status).to.eq(201, JSON.stringify(res.body));
+
+        const res2 = await agent
+          .patch('/admin/appointments/'+res.body.uuid)
+          .send({
+            arrivedAt: new Date().toISOString(),
+          });
+
+        // slot reuse is implied because there should be a previous appointment that finished between tests
+        expect(res2.body.slot).to.eq(parseInt(i)+1, JSON.stringify(res2.body));
+      }
     });
 
     it('should query appointments', async function() {

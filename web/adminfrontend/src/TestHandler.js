@@ -81,7 +81,7 @@ export default function TestHandler(props) {
 
     const onSite = async () => {
         setOnUpdate(true);
-        await updateServer(props.test.uuid, { onSite: "true" }, props.triggerUpdate)
+        await updateServer(props.test.uuid, { arrivedAt: new Date().toISOString() }, props.triggerUpdate)
         setOnUpdate(false);
     }
 
@@ -139,7 +139,7 @@ export default function TestHandler(props) {
             {/*hideButton*/}
         </div>
 
-    } else if (props.test.onSite) {
+    } else if (props.test.arrivedAt) {
         // Waiting for test start
         handler = <React.Fragment>
             {needsCertificateButton}

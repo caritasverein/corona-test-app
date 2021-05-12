@@ -10,7 +10,6 @@ import {
   appointmentTestSchema,
 } from '../schema.js';
 import db from '../db.js';
-import {getAppointment} from '../user/appointments.js';
 import {
   sendResultNotifications,
 } from '../notifications.js';
@@ -18,6 +17,20 @@ import {
 const router = new Router();
 export const appointmentRouter = router;
 
+async function getAppointment(uuid, valid=false) {
+  const [[appointment]] = await db.execute(`
+    SELECT
+      uuid, time, nameGiven, nameFamily, address, dateOfBirth,
+      email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
+      needsCertificate, marked, slot, createdAt, updatedAt, invalidatedAt
+    FROM
+      ${valid?'appointments_valid':'appointments'}
+    WHERE uuid = ?
+  `, [
+    uuid,
+  ]);
+  return appointment;
+}
 
 router.post(
   '/',
@@ -108,33 +121,34 @@ router.patch(
       ]);
     }
 
-
-    if (req.body.onSite !== undefined) {
-      const [slots] = await db.query(`
+    if (req.body.arrivedAt !== undefined) {
+      const [rows] = await db.query(`
         SELECT
           slot
         FROM
           \`appointments\`
         WHERE
-          \`appointments\`.\`onSite\` = 'true'
+          \`appointments\`.\`arrivedAt\` IS NOT NULL
           AND
           \`appointments\`.\`testResult\` IS NULL
           AND
-            DATE(\`appointments\`.\`time\`) = CURDATE()
+          \`appointments\`.\`invalidatedAt\` IS NULL
         ORDER BY slot ASC;
       `);
 
-      const newSlot = slots.findIndex((slot, index) => slot.slot !== index + 1) + 1;
+      const slots = rows.map((r)=>r.slot-1);
+      const existingSlot = slots.findIndex((slot, index) => slot !== index);
+      const slot = (existingSlot !== -1 ? existingSlot : slots.length) + 1;
 
       await db.execute(`
         UPDATE appointments
         SET
-        onSite = ?,
+        arrivedAt = ?,
         slot = ?
         WHERE uuid = ?
       `, [
-        req.body.onSite,
-        (newSlot ? newSlot : slots.length + 1),
+        new Date(req.body.arrivedAt),
+        slot,
         req.params.uuid,
       ]);
     }
@@ -155,8 +169,8 @@ router.get(
     const [appointments] = await db.execute(`
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-        email, phoneMobile, phoneLandline, testStartedAt, testResult,
-        needsCertificate, marked, onSite, slot, createdAt, updatedAt, invalidatedAt
+        email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
+        needsCertificate, marked, slot, createdAt, updatedAt, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
     `, [
       new Date(req.query.start),

@@ -48,6 +48,10 @@ export const appointmentSchema = {
       'pattern': '^0[2-9][0-9]+$',
       'maxLength': 50,
     },
+    'arrivedAt': {
+      'type': ['string', 'null'],
+      'format': 'date-time',
+    },
     'testStartedAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
@@ -61,10 +65,6 @@ export const appointmentSchema = {
       'enum': ['true', null],
     },
     'marked': {
-      'type': ['string', 'null'],
-      'enum': ['true', null],
-    },
-    'onSite': {
       'type': ['string', 'null'],
       'enum': ['true', null],
     },
@@ -94,49 +94,43 @@ export const appointmentSchema = {
     'email',
     'phoneMobile',
     'phoneLandline',
+    'arrivedAt',
     'testStartedAt',
     'testResult',
     'needsCertificate',
     'marked',
-    'onSite',
+    'createdAt',
+    'updatedAt',
+    'invalidatedAt',
   ],
   'additionalProperties': false,
 };
 
-export const appointmentTestSchema = {
-  '$schema': 'http://json-schema.org/draft-07/schema#',
-  'type': 'object',
-  'properties': {
-    'testStartedAt': {
-      'type': ['string', 'null'],
-      'format': 'date-time',
-    },
-    'testResult': {
-      'type': ['string', 'null'],
-      'enum': ['positive', 'negative', 'invalid', null],
-    },
-    'needsCertificate': {
-      'type': ['string', 'null'],
-      'enum': ['true', null],
-    },
-    'marked': {
-      'type': ['string', 'null'],
-      'enum': ['true', null],
-    },
-    'onSite': {
-      'type': ['string', 'null'],
-      'enum': ['true', null],
-    },
-  },
-  'anyOf': [
-    {'required': ['testStartedAt']},
-    {'required': ['testResult']},
-    {'required': ['needsCertificate']},
-    {'required': ['marked']},
-    {'required': ['onSite']},
-  ],
-  'additionalProperties': false,
-};
+export const appointmentSchemaUser = subsetSchema([
+  'uuid',
+  'time',
+  'nameGiven',
+  'nameFamily',
+  'address',
+  'dateOfBirth',
+  'email',
+  'phoneMobile',
+  'phoneLandline',
+  'arrivedAt',
+  'testStartedAt',
+  'testResult',
+  'createdAt',
+  'updatedAt',
+  'invalidatedAt',
+]);
+
+export const appointmentTestSchema = subsetSchemaAnyOf([
+  'arrivedAt',
+  'testStartedAt',
+  'testResult',
+  'needsCertificate',
+  'marked',
+]);
 
 export const windowSchema = {
   '$schema': 'http://json-schema.org/draft-07/schema#',
@@ -165,8 +159,9 @@ export const windowSchema = {
 };
 
 export function subsetSchema(properties=[], schema=appointmentSchema) {
-  if (properties.find((p)=>!(p in schema.properties))) {
-    throw new Error('Required request property does not exist in this schema');
+  const missing = properties.find((p)=>!(p in schema.properties));
+  if (missing) {
+    throw new Error(`Required request property ${missing} does not exist in this schema`);
   }
 
   return {
@@ -176,6 +171,13 @@ export function subsetSchema(properties=[], schema=appointmentSchema) {
         .filter(([k, v])=>properties.includes(k)),
     ),
     required: properties,
+  };
+}
+export function subsetSchemaAnyOf(properties=[], schema=appointmentSchema) {
+  return {
+    ...subsetSchema(properties, schema),
+    'required': [],
+    'anyOf': properties.map((p)=>({'required': [p]})),
   };
 }
 

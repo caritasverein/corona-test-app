@@ -164,9 +164,9 @@ function App() {
 
     const viewFilter = (test) => {
         if(view === 'all') return true;
-        if(view === 'tests') return test.onSite && test.testResult === null;
+        if(view === 'tests') return test.arrivedAt && test.testResult === null;
         //const { isFinished} = calculateTimes(test);
-        if(view === 'secretary') return test.onSite === null || (test.testResult === null) || (test.testResult !== null && test.needsCertificate)
+        if(view === 'secretary') return test.arrivedAt === null || (test.testResult === null) || (test.testResult !== null && test.needsCertificate)
     }
 
     return (

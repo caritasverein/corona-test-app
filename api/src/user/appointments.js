@@ -38,11 +38,12 @@ async function checkValidNewAppoitment(date) {
   return true;
 }
 
-export async function getAppointment(uuid, valid=false) {
+async function getAppointment(uuid, valid=false) {
   const [[appointment]] = await db.execute(`
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-      email, phoneMobile, phoneLandline, testStartedAt, testResult, needsCertificate, marked, onSite, slot
+      email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
+      createdAt, updatedAt, invalidatedAt
     FROM
       ${valid?'appointments_valid':'appointments'}
     WHERE uuid = ?
@@ -122,7 +123,7 @@ router.patch(
         email = ?,
         phoneMobile = ?,
         phoneLandline = ?
-      WHERE uuid = ?
+      WHERE uuid = ? AND arrivedAt IS NULL
     `, [
       req.body.nameGiven,
       req.body.nameFamily,
@@ -150,7 +151,7 @@ router.delete(
       UPDATE appointments
       SET
         invalidatedAt = NOW()
-      WHERE uuid = ?
+      WHERE uuid = ? AND arrivedAt IS NULL
     `, [req.params.uuid]);
 
     const appointment = await getAppointment(req.params.uuid);

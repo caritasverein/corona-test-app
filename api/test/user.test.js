@@ -14,7 +14,7 @@ const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
 const debug = false;
 
-import {windowSchema, appointmentSchema, subsetSchema} from '../src/schema.js';
+import {windowSchema, appointmentSchemaUser, subsetSchema} from '../src/schema.js';
 
 describe('user-api', function() {
   before(async function() {
@@ -29,7 +29,7 @@ describe('user-api', function() {
       if (debug) console.log(res.status, res.body);
 
       expect(res.status).to.eq(201);
-      expect(res.body).to.be.jsonSchema(subsetSchema(['uuid']));
+      expect(res.body).to.be.jsonSchema(subsetSchema(['uuid'], appointmentSchemaUser));
 
       appointmentUuid = res.body.uuid;
     });
@@ -41,7 +41,7 @@ describe('user-api', function() {
       if (debug) console.log(res.status, res.body);
 
       expect(res.status).to.eq(201);
-      expect(res.body).to.be.jsonSchema(subsetSchema(['uuid']));
+      expect(res.body).to.be.jsonSchema(subsetSchema(['uuid'], appointmentSchemaUser));
     });
 
     it('should fail to create third appointment', async function() {
@@ -68,7 +68,7 @@ describe('user-api', function() {
       if (debug) console.log(res.status, res.body);
 
       expect(res.status).to.eq(200);
-      expect(res.body).to.be.jsonSchema(appointmentSchema);
+      expect(res.body).to.be.jsonSchema(appointmentSchemaUser);
     });
 
     it('should GET an appointment by uuid', async function() {
@@ -77,7 +77,7 @@ describe('user-api', function() {
       if (debug) console.log(res.status, res.body);
 
       expect(res.status).to.eq(200);
-      expect(res.body).to.be.jsonSchema(appointmentSchema);
+      expect(res.body).to.be.jsonSchema(appointmentSchemaUser);
     });
 
     it('should DELETE an appointment by uuid', async function() {
@@ -95,7 +95,7 @@ describe('user-api', function() {
       if (debug) console.log(res.status, res.body);
 
       expect(res.status).to.eq(201);
-      expect(res.body).to.be.jsonSchema(subsetSchema(['uuid']));
+      expect(res.body).to.be.jsonSchema(subsetSchema(['uuid'], appointmentSchemaUser));
     });
   });
 

@@ -15,11 +15,15 @@ export const initPromise = (async ()=>{
   `);
   await db.query(`
     ALTER TABLE \`coronatests\`.\`appointments\`
-    ADD COLUMN IF NOT EXISTS \`onSite\` ENUM('true') NULL DEFAULT NULL AFTER marked;
+    ADD COLUMN IF NOT EXISTS \`arrivedAt\` datetime NULL DEFAULT NULL AFTER marked;
   `);
   await db.query(`
     ALTER TABLE \`coronatests\`.\`appointments\`
-    ADD COLUMN IF NOT EXISTS \`slot\` INT UNSIGNED NULL DEFAULT NULL AFTER onSite;
+    ADD COLUMN IF NOT EXISTS \`slot\` INT UNSIGNED NULL DEFAULT NULL AFTER arrivedAt;
+  `);
+  await db.query(`
+    ALTER TABLE \`coronatests\`.\`windows\`
+    ADD COLUMN IF NOT EXISTS \`externalRef\` varchar(256) NULL DEFAULT NULL AFTER appointmentDuration;
   `);
   await db.query(`
     CREATE OR REPLACE

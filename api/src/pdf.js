@@ -1,8 +1,8 @@
 import {PDFDocument} from 'pdf-lib';
 import fs from 'fs';
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 const formPdfBytes = fs.readFileSync(process.env.CERTIFICATE_PATH);
-
 export async function createTestCertificate(appointment) {
   const pdfDoc = await PDFDocument.load(formPdfBytes);
 
