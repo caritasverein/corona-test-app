@@ -10,14 +10,14 @@ export const windowsRouter = router;
 
 async function getWindows() {
   const [windows] = await db.execute(
-    'SELECT id, start, end FROM windows WHERE end > NOW();',
+    'SELECT id, start, end FROM windows WHERE end > NOW() AND invalidatedAt IS NULL;',
   );
   return windows;
 }
 
 async function getWindowsAt(date) {
   const [windows] = await db.execute(
-    'SELECT id, start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ? AND end > NOW();',
+    'SELECT id, start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ? AND end > NOW() AND invalidatedAt IS NULL;',
     [date],
   );
   return windows;
