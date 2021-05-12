@@ -19,6 +19,17 @@ router.post(
     'appointmentDuration',
   ], windowSchema),
   async (req, res)=>{
+    const [existing] = await db.query(`
+        SELECT start FROM windows
+          WHERE start < ? AND end > ?;
+      `,
+      [
+        new Date(req.body.end),
+        new Date(req.body.start),
+      ],
+    );
+    if (existing.length) return res.send(409);
+
     const [ins] = await db.execute(`
         INSERT INTO windows (start, end, numQueues, appointmentDuration)
           VALUES (?, ?, ?, ?);
