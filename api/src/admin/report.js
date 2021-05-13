@@ -10,7 +10,9 @@ const router = new Router();
 export const reportRouter = router;
 
 const csvify = (v)=>{
-  return typeof v === 'string' ? JSON.stringify(v) : (''+v);
+  if (typeof v === 'string') return JSON.stringify(v);
+  if (v instanceof Date) return v.toISOString();
+  return ''+v;
 };
 
 router.get(
@@ -58,6 +60,7 @@ router.get(
       [{
         filename: 'Report_'+req.params.date+'.csv',
         content: csvReport,
+        contentType: 'text/csv; charset=UTF-8',
       }],
     );
 

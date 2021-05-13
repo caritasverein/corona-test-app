@@ -10,6 +10,7 @@ services:
       - ./api:/app
     environment:
       NODE_ENV: development
+      LOCATION_NAME: ${LOCATION_NAME:-My Testcenter}
       MYSQL_USER: ${MYSQL_USER:-coronatests}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD?err}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-coronatests}
@@ -71,6 +72,7 @@ services:
       - ./web/shared:/shared
     environment:
       NODE_ENV: development
+      REACT_APP_LOCATION_NAME: ${LOCATION_NAME:-My Testcenter}
       REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
 
   web-user:
@@ -93,6 +95,7 @@ services:
     ports:
       - "${HOST_MYSQL_PORT:-3306}:3306"
     environment:
+      REACT_APP_LOCATION_NAME: ${LOCATION_NAME:-My Testcenter}
       MYSQL_USER: ${MYSQL_USER:-coronatests}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD?err}
       MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD:-true}
