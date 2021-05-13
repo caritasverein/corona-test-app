@@ -7,6 +7,7 @@ CREATE TABLE `windows` (
   `end` datetime NOT NULL,
   `numQueues` INT UNSIGNED NOT NULL,
   `appointmentDuration` INT UNSIGNED NOT NULL,
+  `externalRef` varchar(256),
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

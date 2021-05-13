@@ -17,7 +17,7 @@ async function getWindows() {
 
 async function getWindowsAt(date) {
   const [windows] = await db.execute(
-    'SELECT id, start, end, numQueues, appointmentDuration FROM windows WHERE DATE(start) = ? AND end > NOW() AND invalidatedAt IS NULL;',
+    'SELECT id, start, end, numQueues, appointmentDuration, externalRef FROM windows WHERE DATE(start) = ? AND end > NOW() AND invalidatedAt IS NULL;',
     [date],
   );
   return windows;
@@ -81,9 +81,19 @@ router.get(
   }),
   async (req, res)=>{
     const windows = await getWindowsAt(new Date(req.params.date));
+    console.log(windows);
 
     const windowTimes = await Promise.all(
       windows.map(async (window)=>{
+        if (window.externalRef) {
+          return {
+            id: window.id,
+            start: window.start,
+            end: window.end,
+            externalRef: window.externalRef,
+            times: [],
+          };
+        }
         const occupied = await getOccupiedTimeslots(window);
         const times = fillUnoccupiedTimeslots(window, occupied);
 
@@ -91,6 +101,7 @@ router.get(
           id: window.id,
           start: window.start,
           end: window.end,
+          externalRef: window.externalRef,
           times,
         };
       }),

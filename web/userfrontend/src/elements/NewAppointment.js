@@ -22,10 +22,11 @@ const strings = {
   createAppointmentReservation: (time)=>`${time}\nreservieren!`,
   createAppointmentNoSelection: (time)=>`Kein Termin ausgewählt`,
   backToAppointmentSelection: ()=>`Zurück zur Übersicht`,
+  windowExternalRef: (start, end)=>`Ein anderes Testzentrum hat von ${localeTime(start)} bis ${localeTime(end)} Uhr geöffnet. Termine sind verfügbar unter`
 };
 
 export const NewAppointment = ({created, admin})=>{
-  const [route, setRoute] = useRoute();
+  const [, setRoute] = useRoute();
   const [windows, updateWindows] = useApi('windows', []);
   useInterval(updateWindows, 90 * 1000);
 
@@ -46,6 +47,7 @@ export const NewAppointment = ({created, admin})=>{
     if (!groupedSlots[hour]) groupedSlots[hour] = [];
     groupedSlots[hour].push(s);
   });
+  console.log(groupedSlots ,slots)
 
   const [selectedSlot, setSelectedSlot] = useState(undefined);
 
@@ -108,10 +110,10 @@ export const NewAppointment = ({created, admin})=>{
         return ret;
       }}
     ></SelectWeek>
-    {slots[0] && <>
+    {!slots.length && <p>{strings.noAppointmentsAvailable()}</p>}
+    {slots.length && <>
       <h3 style={{marginTop: '3rem'}}><mwc-icon>schedule</mwc-icon>&nbsp; {strings.selectTime()}</h3>
       <h4>{strings.appointmentsAvailable(localeDayAndMonth(slots[0].start))}</h4>
-      {!slots.length && <p>{strings.noAppointmentsAvailable()}</p>}
       {Object.entries(groupedSlots)
         .filter(([hour, slots])=>slots.find(s=>!s.full))
         .map(([hour, slots])=><React.Fragment key={hour}>
@@ -135,6 +137,9 @@ export const NewAppointment = ({created, admin})=>{
             </React.Fragment>)}
         </div>
       </React.Fragment>)}
+      {slots.filter(s=>s.externalRef).map(s=><>
+        <p>{strings.windowExternalRef(s.start, s.end)} <a href={s.externalRef}>{s.externalRef}</a></p>
+      </>)}
     </>}
     <mwc-button
       fullwidth

@@ -87,6 +87,15 @@ export default (async function() {
     daysAhead(6) + ' 09:00:00', daysAhead(6) + ' 12:00:00',
   ]);
 
+  await db.execute(`
+    INSERT INTO windows
+      (start, end, numQueues, appointmentDuration, externalRef)
+    VALUES
+      (?, ?, 0, 0, ?)
+  `, [
+    daysAhead(3) + ' 09:00:00', daysAhead(3) + ' 12:00:00',
+    'https://yatcw.com',
+  ]);
 
   await generateApointments(10);
 })();

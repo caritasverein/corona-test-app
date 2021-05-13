@@ -141,6 +141,10 @@ export const windowSchema = {
     'end': {'type': 'string', 'format': 'date-time'},
     'numQueues': {'type': 'integer', 'min': 1},
     'appointmentDuration': {'type': 'integer', 'min': 60},
+    'externalRef': {
+      'type': ['string', 'null'],
+      'format': 'iri',
+    },
     'times': {
       'type': 'array',
       'items': {
@@ -154,7 +158,7 @@ export const windowSchema = {
       },
     },
   },
-  'required': ['id', 'start', 'end', 'times', 'numQueues', 'appointmentDuration'],
+  'required': ['id', 'start', 'end', 'times', 'numQueues', 'appointmentDuration', 'externalRef'],
   'additionalProperties': false,
 };
 
