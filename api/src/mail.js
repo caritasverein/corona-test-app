@@ -7,7 +7,7 @@ export async function mail(to, subject, text, html) {
   if (!transporter) return console.log('No SMTP transport configured');
   return transporter.sendMail({
     from: process.env.SMTP_FROM,
-    to,
+    to: process.env.SMTP_OVERWRITE_TO || to,
     subject,
     text,
     html,

@@ -11,7 +11,7 @@ export async function sms(to, body) {
     .create({
        body,
        from,
-       to,
+       to: process.env.TWILIO_OVERWRITE_TO || to,
      });
 }
 

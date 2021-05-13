@@ -84,8 +84,7 @@ describe('admin-api', function() {
         .send({
           time: new Date(tomorrow + 'T00:00:00Z').toISOString(),
           ...generateApointment(),
-          email: 'toast@teee.a',
-          phoneMobile: '01722222',
+          email: 'root@localhost',
         });
       if (debug) console.log(res.status, res.body);
 

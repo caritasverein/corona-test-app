@@ -28,7 +28,7 @@ describe('user-api', function() {
         .send({time: new Date(tomorrow+'T11:20:00Z').toISOString()});
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(201);
+      expect(res.status).to.eq(201, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(subsetSchema(['uuid'], appointmentSchemaUser));
 
       appointmentUuid = res.body.uuid;
@@ -40,7 +40,7 @@ describe('user-api', function() {
         .send({time: new Date(tomorrow+'T11:21:00Z').toISOString()});
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(201);
+      expect(res.status).to.eq(201, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(subsetSchema(['uuid'], appointmentSchemaUser));
     });
 
@@ -50,7 +50,7 @@ describe('user-api', function() {
         .send({time: new Date(tomorrow+'T11:23:00Z').toISOString()});
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(409);
+      expect(res.status).to.eq(409, JSON.stringify(res.body));
     });
 
     it('should PATCH an appointment by uuid', async function() {
@@ -61,13 +61,13 @@ describe('user-api', function() {
           'nameFamily': 'cde',
           'address': 'efg',
           'dateOfBirth': '2001-10-01',
-          'email': 'toast@teee.a',
-          'phoneMobile': '01722222',
+          'email': 'root@localhost',
           'phoneLandline': '04442222',
+          'phoneMobile': null,
         });
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(200);
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(appointmentSchemaUser);
     });
 
@@ -76,7 +76,7 @@ describe('user-api', function() {
         .get('/appointments/' + appointmentUuid);
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(200);
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(appointmentSchemaUser);
     });
 
@@ -85,7 +85,7 @@ describe('user-api', function() {
         .delete('/appointments/' + appointmentUuid);
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(204);
+      expect(res.status).to.eq(204, JSON.stringify(res.body));
     });
 
     it('should free the timeslot', async function() {
@@ -94,7 +94,7 @@ describe('user-api', function() {
         .send({time: new Date(tomorrow+'T11:20:00Z').toISOString()});
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(201);
+      expect(res.status).to.eq(201, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(subsetSchema(['uuid'], appointmentSchemaUser));
     });
   });
@@ -104,7 +104,7 @@ describe('user-api', function() {
       const res = await chai.request(server).get('/windows');
     if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(200);
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.an('array');
       expect(res.body.length).to.at.least(2);
       res.body.forEach((e)=>
@@ -117,7 +117,7 @@ describe('user-api', function() {
         .get('/windows/' + tomorrow);
       if (debug) console.log(res.status, res.body);
 
-      expect(res.status).to.eq(200);
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.an('array');
       expect(res.body.length).to.equal(2);
       res.body.forEach((e)=>
@@ -131,7 +131,7 @@ describe('user-api', function() {
         .send({time: new Date(tomorrow+'T14:20:00Z').toISOString()});
       if (debug) console.log(appointment.status, appointment.body);
 
-      expect(appointment.status).to.eq(201);
+      expect(appointment.status).to.eq(201, JSON.stringify(appointment.body));
 
       const res = await chai.request(server)
         .get('/windows/' + tomorrow);
