@@ -28,16 +28,25 @@ async function sendMailAndSMS(appointment, subject, message) {
 
 export async function sendAppointmentNotifications(appointment) {
   const message = `Ihr Termin am ${new Date(appointment.time).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})} wurde erfolgreich für Sie gebucht. Für weitere Informationen besuchen Sie bitte ${appointmentURL(appointment)}`;
-  sendMailAndSMS(appointment, 'Ihr Termin - Testzentrum Wassermühle', message);
+  await sendMailAndSMS(appointment, 'Ihr Termin - Testzentrum Wassermühle', message);
 }
 
 export async function sendResultNotifications(appointment) {
-  const resultString = {'positive': 'positiv', 'negative': 'negativ', 'invalid': 'ungültig'};
+  const resultString = ({'positive': 'positiv', 'negative': 'negativ', 'invalid': 'ungültig'})[appointment.testResult];
   const message = `Ihr Testergebnis ist ${resultString}.\nFür weitere Informationen besuchen Sie bitte ${appointmentURL(appointment).toString()}\n`;
-  sendMailAndSMS(appointment, 'Ihr Testergebnis - Testzentrum Wassermühle', message);
+  await sendMailAndSMS(appointment, 'Ihr Testergebnis - Testzentrum Wassermühle', message);
+  if (appointment.testResult === 'positive') {
+    const message = `Ein Person wurde am ${new Date(appointment.testStartedAt).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})} positiv getestet:\n`+
+      `Zeitpunkt: ${new Date(appointment.testStartedAt).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})}\n`+
+      `Name: ${appointment.nameFamily}, ${appointment.nameGiven}\n`+
+      `Geburtsdatum: ${appointment.dateOfBirth.toLocaleDateString('de-DE')}\n`+
+      `Kontakt: ${appointment.phoneLandline || ' - '}, ${appointment.phoneMobile || ' - '}, ${appointment.email || ' - '}\n`;
+
+    await mail(process.env.REPORT_MAIL, 'Positives Testergebnis - Testzentrum Wassermühle', message);
+  }
 }
 
 export async function sendCancelationNotifications(appointment) {
   const message = `Ihr Termin am ${new Date(appointment.time).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})} wurde abgesagt.`;
-  sendMailAndSMS(appointment, 'Terminabsage - Testzentrum Wassermühle', message);
+  await sendMailAndSMS(appointment, 'Terminabsage - Testzentrum Wassermühle', message);
 }
