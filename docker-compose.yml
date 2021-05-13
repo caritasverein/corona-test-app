@@ -9,6 +9,7 @@ services:
     read_only: true
     environment:
       NODE_ENV: production
+      LOCATION_NAME: ${LOCATION_NAME?err}
       MYSQL_USER: ${MYSQL_USER:-coronatests}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD?err}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-coronatests}
@@ -32,6 +33,7 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
+        REACT_APP_LOCATION_NAME: ${LOCATION_NAME?err}
         REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
     restart: unless-stopped
     read_only: true

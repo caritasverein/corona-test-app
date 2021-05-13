@@ -13,8 +13,8 @@ import NewAppointment from './elements/NewAppointment.js';
 import Welcome from './elements/Welcome.js';
 
 const strings = {
-  locationName: ()=>`Testzentrum Wassermühle`,
-  welcomeTolocationName: ()=>`Willkommen im Testzentrum Wassermühle`,
+  locationName: ()=>process.env.REACT_APP_LOCATION_NAME,
+  welcomeTolocationName: ()=>`Willkommen im `+process.env.REACT_APP_LOCATION_NAME,
 };
 
 function App() {

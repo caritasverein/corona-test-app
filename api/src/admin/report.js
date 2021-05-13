@@ -36,7 +36,7 @@ router.get(
     const countNotStarted = rows.filter((r)=>!r.testStartedAt).length;
 
     const textReport =
-      `Testzentrum Wassermühle\n`+
+      `${process.env.LOCATION_NAME}\n`+
       `Report ${req.params.date} (generated at ${new Date().toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})})\n\n`+
       `Tests Total: ${countTotal}\n`+
       `Tests Negative: ${countNegative}\n`+
@@ -54,7 +54,7 @@ router.get(
 
     await mail(
       process.env.REPORT_MAIL,
-      'Report '+req.params.date+' - '+`Testzentrum Wassermühle`,
+      'Report '+req.params.date+' - '+process.env.LOCATION_NAME,
       textReport,
       ``,
       [{
