@@ -121,7 +121,7 @@ describe('user-api', function() {
       expect(res.body).to.be.an('array');
       expect(res.body.length).to.equal(2);
       res.body.forEach((e)=>
-        expect(e).to.be.jsonSchema(subsetSchema(['id', 'start', 'end', 'times'], windowSchema)),
+        expect(e).to.be.jsonSchema(subsetSchema(['id', 'start', 'end', 'times', 'externalRef'], windowSchema)),
       );
     });
 

@@ -81,7 +81,6 @@ router.get(
   }),
   async (req, res)=>{
     const windows = await getWindowsAt(new Date(req.params.date));
-    console.log(windows);
 
     const windowTimes = await Promise.all(
       windows.map(async (window)=>{

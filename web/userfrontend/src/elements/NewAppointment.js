@@ -47,7 +47,6 @@ export const NewAppointment = ({created, admin})=>{
     if (!groupedSlots[hour]) groupedSlots[hour] = [];
     groupedSlots[hour].push(s);
   });
-  console.log(groupedSlots ,slots)
 
   const [selectedSlot, setSelectedSlot] = useState(undefined);
 
