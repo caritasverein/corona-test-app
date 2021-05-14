@@ -156,7 +156,7 @@ router.patch(
     const appointment = await getAppointment(req.params.uuid);
     if (!appointment) return res.sendStatus(404);
 
-    if (appointment.testResult) await sendResultNotifications(appointment);
+    if (req.body.testResult) await sendResultNotifications(appointment);
 
     res.send(appointment);
   },
