@@ -19,6 +19,7 @@ const strings = {
   Die Befundergebnisse können im Sinne der Teststrategie an das Gesundheitsamt, Hausarzt, gesetzlicher Vertreter übermittelt werden.
   Mir ist bewusst, dass mein Einverständnis jederzeit und ohne Angabe von Gründen schriftlich widerrufen werden kann! Die Einwilligung ist freiwillig und gilt zeitlich unbeschränkt.`,
   confirmNoContact: ()=>`Sie haben weder eine Handnummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen Ihr Testergebnis nicht automatisch zusenden.`,
+  alertNoContact: ()=>`Sie haben keine Kontaktmöglichkeit angegeben. Bitte geben Sie mindestens eine Kontaktmöglichkeit an.`,
 };
 
 const appointmentDetail = (admin)=>({
@@ -133,6 +134,11 @@ function EditAppointment(props) {
     data.address += '\n'+data.town;
     delete data.town;
 
+    if (!data.phoneLandline && !data.phoneMobile && !data.email) {
+      this.shadowRoot.querySelector('#alertNoContact').show();
+      return;
+    }
+
     if (!acceptedNoContact) {
       if (!data.phoneMobile && !data.email) {
         this.shadowRoot.querySelector('#confirmNoContact').show();
@@ -203,6 +209,14 @@ function EditAppointment(props) {
             slot="secondaryAction"
             dialogAction="accept"
         >${strings.dialogAhead()}</mwc-button>
+      </mwc-dialog>
+      <mwc-dialog id="alertNoContact">
+        <div>${strings.alertNoContact()}</div>
+        <mwc-button
+          raised
+          slot="primaryAction"
+          dialogAction="cancel"
+        >${strings.dialogBack()}</mwc-button>
       </mwc-dialog>
     </form>
   `;
