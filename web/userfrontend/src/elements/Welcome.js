@@ -11,7 +11,7 @@ const strings = {
 }
 
 export const Welcome = () => {
-  const [route, setRoute] = useRoute();
+  const [, setRoute] = useRoute();
 
   const [existingAppointments, setExistingAppointments] = useStorage('appointments', '[]');
   const twoDaysAgo = new Date(Date.now() - 1000*60*60*24*2)
@@ -20,7 +20,8 @@ export const Welcome = () => {
   }
   existingAppointments.sort((a, b)=>a.time.localeCompare(b.time));
 
-  const [location] = useApi('../location.html');
+  const url = new URL(process.env.REACT_APP_INDEX_REF, window.location);
+  const [location] = useApi(url);
 
   return <>
     <div

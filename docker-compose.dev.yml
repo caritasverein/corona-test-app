@@ -86,6 +86,10 @@ services:
     environment:
       NODE_ENV: development
       REACT_APP_LOCATION_NAME: ${LOCATION_NAME:-My Testcenter}
+      REACT_APP_LOGO_REF: ${LOGO_REF:-/logo.png}
+      REACT_APP_INDEX_REF: ${INDEX_REF:-/location.html}
+      REACT_APP_IMPRINT_REF: ${IMPRINT_REF:-/location.html}
+      REACT_APP_PRIVACY_REF: ${PRIVACY_REF:-/location.html}
 
   db:
     image: mariadb

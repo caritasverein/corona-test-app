@@ -18,9 +18,10 @@ export class CheckboxFA extends Checkbox {
   }
 
   formStateRestoreCallback(state) {
-    this.checked = !!state;
-    this.formElement.checked = this.checked;
-    this._checkValidity();
+    if (this.formElement) {
+      this.formElement.value = state;
+      this.updateValidity();
+    } else this.restoreValue = state;
   }
 
   formResetCallback() {
@@ -87,6 +88,8 @@ export class CheckboxFA extends Checkbox {
   firstUpdated() {
     super.firstUpdated();
     this.required = this.hasAttribute('required');
+
+    if (this.restoreValue) this.formElement.value = this.restoreValue;
 
     if (this.internals.form)
       this.internals.form.addEventListener('formdata', (e)=>{

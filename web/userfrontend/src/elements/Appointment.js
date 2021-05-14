@@ -78,6 +78,7 @@ function preventNavigation() {
 export const Appointment = ({uuid})=>{
   const [route, setRoute] = useRoute();
   const [storedAppointments, setStoredAppointments] = useStorage('appointments', '[]');
+  const [appointmentAutofill, setAppointmentAutofill] = useStorage('autofill', '{}');
   const isStored = !!storedAppointments.find((a)=>a.uuid===uuid);
   const [appointment, updateAppointment, appointmentError] = useApi('appointments/'+uuid);
   useInterval(updateAppointment, 6 * 1000);
@@ -144,7 +145,7 @@ export const Appointment = ({uuid})=>{
       </div>
       <p>{strings.testResultDetail(appointment.testResult)}</p>
     </>}
-    {editMode && <EditAppointment appointment={appointment} update={(data)=>{
+    {editMode && <EditAppointment appointment={testStatus==='reservation' ? {...appointment, ...appointmentAutofill} : appointment} update={(data)=>{
       delete data.time;
       apiFetch('PATCH','appointments/'+uuid, data)
         .then(async ()=>{
@@ -244,10 +245,11 @@ export const Appointment = ({uuid})=>{
           <p style={{marginBottom: 0}}>{strings.deleteLocalAppointmentDetail()}</p>
           <mwc-button
             class="danger"
-            raised
+            outlined
             icon="bookmark_remove"
             onClick={()=>{
               setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
+              setAppointmentAutofill({});
             }}
           >{strings.deleteLocalAppointment()}</mwc-button>
         </> : <>
@@ -257,11 +259,21 @@ export const Appointment = ({uuid})=>{
             icon="bookmark_add"
             onClick={()=>{
               setStoredAppointments((a)=>a.find((a)=>a.uuid===uuid) ? a : [...a, {uuid, time: appointment.time}]);
+              setAppointmentAutofill({
+                nameGiven: appointment.nameGiven || undefined,
+                nameFamily: appointment.nameFamily || undefined,
+                dateOfBirth: appointment.dateOfBirth || undefined,
+                address: appointment.address || undefined,
+                phoneMobile: appointment.phoneMobile || undefined,
+                phoneLandline: appointment.phoneLandline || undefined,
+                email: appointment.email || undefined,
+              });
             }}
           >{strings.storeLocalAppointment()}</mwc-button>
         </>}
       </>}
       {testStatus !== 'reservation' && <mwc-button
+        style={{marginTop: '2rem'}}
         onClick={()=>{
           if (!isStored) {
             if (!window.confirm(strings.confirmNotStored())) return;

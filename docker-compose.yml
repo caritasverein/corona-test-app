@@ -34,6 +34,10 @@ services:
       dockerfile: Dockerfile
       args:
         REACT_APP_LOCATION_NAME: ${LOCATION_NAME?err}
+        REACT_APP_LOGO_REF: ${LOGO_REF:-/logo.png}
+        REACT_APP_INDEX_REF: ${INDEX_REF:-/location.html}
+        REACT_APP_IMPRINT_REF: ${IMPRINT_REF?err}
+        REACT_APP_PRIVACY_REF: ${PRIVACY_REF?err}
         REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
     restart: unless-stopped
     read_only: true

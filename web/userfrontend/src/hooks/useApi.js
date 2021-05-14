@@ -48,7 +48,7 @@ export function useInterval(update, interval) {
 }
 
 export const apiFetch = (method, path, body)=>{
-  const url = new URL('./'+path, apiBaseURL);
+  const url = new URL(path instanceof URL ? path : ('./' + path), apiBaseURL);
   return fetch(url, {
     method,
     headers: {

@@ -15,6 +15,9 @@ import Welcome from './elements/Welcome.js';
 const strings = {
   locationName: ()=>process.env.REACT_APP_LOCATION_NAME,
   welcomeTolocationName: ()=>`Willkommen im `+process.env.REACT_APP_LOCATION_NAME,
+  imprint: ()=>`Impressum`,
+  privacy: ()=>`Datenschutz`,
+  source: ()=>`Quellcode`,
 };
 
 function App() {
@@ -31,16 +34,23 @@ function App() {
           style={{display: 'flex', alignItems: 'center', gap: '1rem'}}
           onClick={()=>setRoute([''])}
         >
-          <img loading="lazy" src="/logo.png" width="30" height="30" alt="logo" />
+          <img loading="lazy" src={process.env.REACT_APP_LOGO_REF} width="30" height="30" alt="logo" />
           {strings.locationName()}
         </div>
       </mwc-top-app-bar-fixed>
-      <div style={{margin: 'auto', padding: '1rem', paddingBottom: '5rem', maxWidth: '800px'}}>
+      <div style={{margin: 'auto', padding: '1rem', paddingBottom: '2rem', maxWidth: '800px'}}>
         {screen === 'welcome' && <Welcome />}
         {screen === 'appointment' && <Appointment uuid={viewAppointment} />}
         {screen === 'newAppointment' && <NewAppointment created={(uuid)=>setRoute([uuid])} />}
 
       </div>
+      <footer style={{margin: 'auto', padding: '1rem', textAlign: 'center', opacity: 0.5}}>
+        <a style={{color: 'inherit'}} href={process.env.REACT_APP_IMPRINT_REF}>{strings.imprint()}</a>
+        &nbsp; | &nbsp;
+        <a style={{color: 'inherit'}} href={process.env.REACT_APP_PRIVACY_REF}>{strings.privacy()}</a>
+        &nbsp; | &nbsp;
+        <a style={{color: 'inherit'}} href="https://github.com/caritasverein/corona-test-app">{strings.source()}</a>
+      </footer>
       <ToastContainer />
     </div>
   );

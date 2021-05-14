@@ -8,9 +8,10 @@ export class TextFieldFA extends TextField {
   }
 
   formStateRestoreCallback(state) {
-    this.value = state;
-    this.formElement.value = this.value;
-    this._checkValidity();
+    if (this.formElement) {
+      this.formElement.value = state;
+      this.updateValidity();
+    } else this.restoreValue = state;
   }
 
   formResetCallback() {
@@ -55,6 +56,9 @@ export class TextFieldFA extends TextField {
 
   firstUpdated() {
     super.firstUpdated();
+    this.formElement.autocomplete = this.getAttribute('autocomplete');
+
+    if (this.restoreValue) this.formElement.value = this.restoreValue;
 
     if (this.internals.form)
       this.internals.form.addEventListener('formdata', ()=>this.updateValidity(true));
@@ -64,9 +68,7 @@ export class TextFieldFA extends TextField {
     this.updateValidity(false);
 
     this.formElement.addEventListener('change', ()=>this.updateValue());
-    this.updateValue()
-
-    this.formElement.autocomplete = this.getAttribute('autocomplete');
+    this.updateValue();
   }
 }
 
