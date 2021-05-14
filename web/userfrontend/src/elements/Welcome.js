@@ -21,7 +21,7 @@ export const Welcome = () => {
   existingAppointments.sort((a, b)=>a.time.localeCompare(b.time));
 
   const url = new URL(process.env.REACT_APP_INDEX_REF, window.location);
-  const [location] = useApi(url);
+  const [location] = useApi(url, undefined, true);
 
   return <>
     <div
