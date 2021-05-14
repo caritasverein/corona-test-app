@@ -4,7 +4,6 @@ import '@material/mwc-formfield';
 import '@material/mwc-icon';
 
 import { toast } from 'react-toastify';
-import printjs from 'print-js';
 
 import EditAppointment from 'shared/components/edit-appointment.js';
 import {useApi, apiFetch, useInterval} from '../hooks/useApi.js';
@@ -76,7 +75,7 @@ function preventNavigation() {
 }
 
 export const Appointment = ({uuid})=>{
-  const [route, setRoute] = useRoute();
+  const [, setRoute] = useRoute();
   const [storedAppointments, setStoredAppointments] = useStorage('appointments', '[]');
   const [appointmentAutofill, setAppointmentAutofill] = useStorage('autofill', '{}');
   const isStored = !!storedAppointments.find((a)=>a.uuid===uuid);
@@ -234,12 +233,12 @@ export const Appointment = ({uuid})=>{
         >{strings.cancelAppointment()}</mwc-button>
       </>}
       {testStatus === 'pending' && <>
-        <p style={{marginBottom: 0}}>{strings.printAppointmentDetail()}</p>
+        {/*<p style={{marginBottom: 0}}>{strings.printAppointmentDetail()}</p>
         <mwc-button
           raised
           icon="print"
           onClick={(e)=>printjs(`/api/appointments/${encodeURIComponent(uuid)}/pdf`)}
-        >{strings.printAppointment()}</mwc-button>
+        >{strings.printAppointment()}</mwc-button>*/}
 
         {isStored ? <>
           <p style={{marginBottom: 0}}>{strings.deleteLocalAppointmentDetail()}</p>
