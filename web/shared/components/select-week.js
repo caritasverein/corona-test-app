@@ -46,6 +46,9 @@ class SelectWeek extends LitElement {
         display: flex;
         flex-direction: column;
       }
+      button {
+        border: none;
+      }
       * {
         box-sizing: border-box;
       }
@@ -230,14 +233,24 @@ class SelectWeek extends LitElement {
         <scroll-select .index=${this.index} @indexChange=${(e)=>this.index = e.target.index}>
           ${new Array(this.numWeeks).fill(0).map((w,i)=>html`
             <div class="days">
-              ${this.getDatesOffset(i).map(d=>html`
-                <div class="circle">
-                  <div style=${this.extraStyles(d)} class=${classMap({day: true, ...this.extraClasses(d)})} @click=${()=>{this.value = d;}}>
-                    <span class="weekday">${localeWeekday.format(d)}</span>
-                    <span class="daydigit">${localeDay.format(d)}.</span>
+              ${this.getDatesOffset(i).map(d=>{
+                const extraClasses = this.extraClasses(d);
+                return html`
+                  <div class="circle" >
+                    <button
+                      role="option"
+                      style=${this.extraStyles(d)}
+                      class=${classMap({day: true, ...extraClasses})}
+                      ?aria-pressed=${extraClasses.selected}
+                      ?disabled=${extraClasses.disabled}
+                      @click=${()=>{this.value = d;}}
+                    >
+                      <span class="weekday">${localeWeekday.format(d)}</span>
+                      <span class="daydigit">${localeDay.format(d)}.</span>
+                    </button>
                   </div>
-                </div>
-              `)}
+                `;
+              })}
             </div>
           `)}
         </scroll-select>

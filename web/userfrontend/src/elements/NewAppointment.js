@@ -52,6 +52,17 @@ export const NewAppointment = ({created, admin})=>{
 
   const confirmToast = React.useRef(null);
 
+  const createdCb = useCallback((selectedSlot)=>{
+    toast.dismiss(confirmToast.current);
+    if (admin) return created(selectedSlot)
+    apiFetch('POST', 'appointments', {time:selectedSlot})
+      .then(res=>created(res.uuid))
+      .catch((e)=>{
+        toast(`${strings.toastError(e)} (${e.status} ${e.message})`);
+        updateSlots();
+      })
+  }, [created, updateSlots, admin]);
+
   const confirm = useCallback((selectedSlot) => {
     const createToast = ()=>({closeToast})=><>
       <h3><mwc-icon>event_available</mwc-icon>&nbsp; {strings.createReservation()}</h3>
@@ -63,13 +74,7 @@ export const NewAppointment = ({created, admin})=>{
         {...{[selectedSlot?'enabled':'disabled']: true}}
         onClick={()=>{
           closeToast();
-          if (admin) return created(selectedSlot)
-          apiFetch('POST', 'appointments', {time:selectedSlot})
-            .then(res=>created(res.uuid))
-            .catch((e)=>{
-              toast(`${strings.toastError(e)} (${e.status} ${e.message})`);
-              updateSlots();
-            })
+          createdCb(selectedSlot);
         }}
       >
         {selectedSlot ? strings.createAppointmentReservation(localeFull(selectedSlot)) : strings.createAppointmentNoSelection()}
@@ -86,7 +91,7 @@ export const NewAppointment = ({created, admin})=>{
       draggable: false,
       progress: undefined,
     });
-  }, [confirmToast, created, updateSlots, admin]);
+  }, [selectedSlot, confirmToast, createdCb]);
 
   return <>
     <h2><mwc-icon>event</mwc-icon>&nbsp; {strings.newAppointment()}</h2>
@@ -126,10 +131,14 @@ export const NewAppointment = ({created, admin})=>{
                 }}
                 class={(selectedSlot === t.time?'info':'') + (t.full&&admin ? 'warn':'')}
                 raised
+                aria-pressed={selectedSlot === t.time}
                 {...{[t.full&&!admin?'disabled':'enabled']: true}}
                 onClick={()=>{
                   confirm(t.time);
-                  setSelectedSlot(selectedSlot !== t.time ? t.time : undefined);
+                  if (selectedSlot === t.time) {
+                    createdCb(selectedSlot);
+                  }
+                  setSelectedSlot(t.time);
                 }}
               >
                 {localeTime(t.time)} Uhr

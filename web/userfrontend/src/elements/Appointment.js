@@ -6,6 +6,7 @@ import '@material/mwc-icon';
 import { toast } from 'react-toastify';
 
 import EditAppointment from 'shared/components/edit-appointment.js';
+import ConfirmButton from './ConfirmButton.js';
 import {useApi, apiFetch, useInterval} from '../hooks/useApi.js';
 import {useRoute} from '../hooks/useRoute.js';
 import {useStorage} from '../hooks/useStorage.js';
@@ -52,6 +53,10 @@ const strings = {
   printResult: ()=>`Ergebnis Drucken`,
   cancelAppointmentDetail: ()=>`Sie möchten Ihren Termin absagen? Dann klicken Sie hier. Sie möchten Ihren Termin ändern? Stornieren Sie zunächst hier Ihren alten Termin. Buchen Sie dann einen neuen Termin.`,
   cancelAppointment: ()=>`Termin Absagen`,
+  confirmCancel: ()=>`Möchten Sie den Termin wirklich absagen?`,
+  confirmCancelCancel: ()=>`Zurück`,
+  confirmCancelConfirm: ()=>`Termin Absagen`,
+  cancelSuccess: ()=>`Ihr Termin wurde erfolgreich abgesagt.`,
   printAppointmentDetail: ()=>`Sie möchten eine „Erinnerungshilfe“? Hier können Sie Ihren gebuchten Termin ausdrucken.`,
   printAppointment: ()=>`Termin Drucken`,
   deleteLocalAppointmentDetail: ()=>`Sie haben Ihren Termin auf diesem Gerät gespeichert. Um diese Seite mit Ihrer Termin-Bestätigung (und später auch das Testergebnis) wieder aufzurufen, besuchen Sie ${window.location.host} erneut.`,
@@ -219,19 +224,24 @@ export const Appointment = ({uuid})=>{
       </>}
       {(testStatus==='pending' || testStatus === 'reservation') && <>
         <p style={{marginBottom: 0}}>{strings.cancelAppointmentDetail()}</p>
-        <mwc-button
+        <ConfirmButton
           class="danger"
           raised
           icon="event_busy"
+          dialog={{
+            text: strings.confirmCancel(),
+            cancelText: strings.confirmCancelCancel(),
+            confirmText: strings.confirmCancelConfirm(),
+          }}
           onClick={(e)=>{
-            if (!window.confirm('Möchen Sie den Termin wirklich absagen?')) return;
             apiFetch('DELETE','appointments/'+uuid).then(()=>{
               window.onbeforeunload = null;
+              toast(strings.cancelSuccess());
               setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
               setRoute();
             });
           }}
-        >{strings.cancelAppointment()}</mwc-button>
+        >{strings.cancelAppointment()}</ConfirmButton>
       </>}
       {testStatus === 'pending' && <>
         {/*<p style={{marginBottom: 0}}>{strings.printAppointmentDetail()}</p>
