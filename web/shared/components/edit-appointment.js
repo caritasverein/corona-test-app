@@ -108,13 +108,11 @@ function focusNext(el, rev=false) {
   const names = Object.entries(appointmentDetail());
   if (rev) names.reverse();
   let nextIndex = names.findIndex(([key, value])=>key===el.getAttribute('name')) + 1;
-  console.log(names);
-  console.log(nextIndex);
   while (names[nextIndex] && !names[nextIndex][1].label) nextIndex++;
-  console.log(nextIndex);
   const nextName = names[nextIndex];
   if (!nextName) return;
-  el.internals.form.querySelector(`[name=${nextName[0]}]`).focus();
+  const form = el.form || el.internals.form;
+  form.querySelector(`[name="${nextName[0]}"]`).focus();
 }
 
 function EditAppointment(props) {
