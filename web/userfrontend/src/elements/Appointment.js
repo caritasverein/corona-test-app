@@ -13,6 +13,7 @@ import {localeFull} from '../util/date.js';
 
 const strings = {
   toastAppointmentError: (err)=>`Es ist ein Fehler aufgetreten. Bitte versuche es erneut!`,
+  toastAppointmentNoNet: ()=>`Verbindung zum Internet verloren.`,
   yourAppointment: ()=>`Ihr Termin`,
   yourAppointmentAt: (date)=>`am ${date} Uhr`,
   testStatusDetail: (status, mail, sms)=>({
@@ -118,7 +119,7 @@ export const Appointment = ({uuid})=>{
       }, 4000);
       return <></>;
     }
-    return <></>;
+    toast(`${strings.toastAppointmentNoNet()} (${appointmentError.message})`);
   }
   if (testStatus === 'loading') return <h2><mwc-icon>hourglass_top</mwc-icon>&nbsp; {strings.testStatusDetail(testStatus)}</h2>;
 

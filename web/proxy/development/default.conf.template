@@ -7,6 +7,9 @@ server {
 
   charset utf-8;
 
+  gzip on;
+  gzip_static on;
+
   location /api/ {
     limit_req zone=apiratelimit burst=20 nodelay;
 

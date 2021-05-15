@@ -8,6 +8,9 @@ server {
   charset utf-8;
   root /var/www/html;
 
+  gzip on;
+  gzip_static on;
+
   location /api/ {
     limit_req zone=apiratelimit burst=20 nodelay;
 

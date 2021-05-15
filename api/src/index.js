@@ -9,6 +9,7 @@ process.on('uncaughtException', (error) => {
 
 import express from 'express';
 import helmet from 'helmet';
+import compression from 'compression';
 import oidc from 'express-openid-connect';
 const {auth, requiresAuth} = oidc;
 
@@ -21,6 +22,7 @@ import {userRouter} from './user.js';
 
 const app = express();
 app.use(helmet());
+app.use(compression());
 app.use(express.json());
 console.log(apiURL().toString());
 app.use(auth({

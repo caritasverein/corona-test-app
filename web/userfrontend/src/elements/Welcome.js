@@ -20,12 +20,11 @@ export const Welcome = () => {
   }
   existingAppointments.sort((a, b)=>a.time.localeCompare(b.time));
 
-  const url = new URL(process.env.REACT_APP_INDEX_REF, window.location);
-  const [location] = useApi(url, undefined, true);
+  const [location, , locationError] = useApi(process.env.REACT_APP_INDEX_REF);
 
   return <>
     <div
-      dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(location)}}
+      dangerouslySetInnerHTML={{__html: DOMPurify.sanitize((locationError && locationError.message) || location)}}
     ></div>
     <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
       {existingAppointments.length ? <h2><mwc-icon>bookmarks</mwc-icon>&nbsp;{strings.storedAppointments()}</h2> : ''}

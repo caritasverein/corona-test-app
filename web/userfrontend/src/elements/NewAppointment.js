@@ -36,7 +36,7 @@ export const NewAppointment = ({created, admin})=>{
     return today.toISOString();
   });
 
-  const [slots, updateSlots] = useApi('windows/'+utcDay(selectedDate), []);
+  const [slots, updateSlots, slotsError] = useApi('windows/'+utcDay(selectedDate), []);
   useInterval(updateSlots, 30 * 1000);
 
   const groupedSlots = {};
@@ -109,8 +109,9 @@ export const NewAppointment = ({created, admin})=>{
         return ret;
       }}
     ></SelectWeek>
-    {!slots.length && <p>{strings.noAppointmentsAvailable()}</p>}
-    {slots.length && <>
+    {slotsError ? <h2>Ein Fehler ist aufgetreten: {slotsError.message}</h2> : null}
+    {!slots.length ? <p>{strings.noAppointmentsAvailable()}</p> : null}
+    {slots.length ? <>
       <h3 style={{marginTop: '3rem'}}><mwc-icon>schedule</mwc-icon>&nbsp; {strings.selectTime()}</h3>
       <h4>{strings.appointmentsAvailable(localeDayAndMonth(slots[0].start))}</h4>
       {Object.entries(groupedSlots)
@@ -139,7 +140,7 @@ export const NewAppointment = ({created, admin})=>{
       {slots.filter(s=>s.externalRef).map(s=><>
         <p>{strings.windowExternalRef(s.start, s.end)} <a href={s.externalRef}>{s.externalRef}</a></p>
       </>)}
-    </>}
+    </> : null}
     <mwc-button
       fullwidth
       style={{marginTop: '2rem'}}

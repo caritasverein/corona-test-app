@@ -48,11 +48,15 @@ export function useInterval(update, interval) {
 }
 
 export const apiFetch = (method, path, body)=>{
-  const url = new URL(path instanceof URL ? path : ('./' + path), apiBaseURL);
+  const isExternal = path.startsWith('http');
+  const isAbsolute = path.startsWith('/');
+  if (!isExternal && !isAbsolute) path = './'+path;
+  const url = new URL(path, apiBaseURL);
   return fetch(url, {
     method,
     headers: {
       'content-type': 'application/json',
+      'accept': 'application/json, text/html, text/plain'
     },
     body: (body!==undefined && JSON.stringify(body)) || undefined
   }).then(async res=>{
@@ -65,5 +69,8 @@ export const apiFetch = (method, path, body)=>{
     if (!res.ok) throw {status: res.status, message: await res.text()};
     if (isJSON) return res.json();
     return res.text();
+  }, (e)=>{
+    // eslint-disable-next-line
+    throw {status: 0, message: e.message};
   });
 }
