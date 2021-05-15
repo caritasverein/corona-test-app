@@ -11,6 +11,7 @@ import '@material/mwc-dialog';
 
 const strings = {
   save: ()=>`Absenden`,
+  cancel: ()=>`Abbrechen`,
   dialogBack: ()=>`zurück`,
   dialogAhead: ()=>`fortfahren`,
   contactDetailDetail: ()=>`Bitte geben Sie in mindestens 1 Feld Ihre Kontaktdaten ein. Dann können wir mit Ihnen Kontakt aufnehmen – zum Beispiel bei Termin\u2011Verschiebungen. Wenn Sie Ihre Handy-Nummer und/oder E-Mail-Adresse angeben, bekommen Sie Ihr Ergebnis innerhalb von 30 Minuten nach dem Test elektronisch zugeschickt. Sie können aber auch vor Ort ein ausgedrucktes Formular mitnehmen.`,
@@ -116,7 +117,7 @@ function focusNext(el, rev=false) {
 }
 
 function EditAppointment(props) {
-  const {appointment, update, admin} = props;
+  const {appointment, update, cancel, admin} = props;
 
   const submit = (e)=>{
     if (e.detail && e.detail.action === 'cancel') return;
@@ -235,6 +236,14 @@ function EditAppointment(props) {
           dialogAction="cancel"
         >${strings.dialogBack()}</mwc-button>
       </mwc-dialog>
+      ${cancel ? html`
+        <mwc-button
+          style="--mdc-theme-primary: #EE6524"
+          raised
+          icon="close"
+          @click=${cancel}
+        >${strings.cancel()}</mwc-button>
+      ` : ''}
     </form>
   `;
 }
