@@ -104,6 +104,18 @@ const appointmentDetail = (admin)=>({
   },
 });
 
+function focusNext(el, rev=false) {
+  const names = Object.entries(appointmentDetail());
+  if (rev) names.reverse();
+  let nextIndex = names.findIndex(([key, value])=>key===el.getAttribute('name')) + 1;
+  console.log(names);
+  console.log(nextIndex);
+  while (names[nextIndex] && !names[nextIndex][1].label) nextIndex++;
+  console.log(nextIndex);
+  const nextName = names[nextIndex];
+  if (!nextName) return;
+  el.internals.form.querySelector(`[name=${nextName[0]}]`).focus();
+}
 
 function EditAppointment(props) {
   const {appointment, update, admin} = props;
@@ -182,13 +194,20 @@ function EditAppointment(props) {
             iconTrailing=${def.icon || name}
             value=${def.get?def.get(appointment[name]||'', appointment):appointment[name]||''}
             @input=${(e)=>def.change ? e.target.value = def.change(e.target.value) : e.target.value}
+            @keypress=${(e)=>{if (e.key==='Enter') {focusNext(e.target, e.shiftKey); e.preventDefault();}}}
           ></mwc-fa-textfield>
         `
       })}
       ${admin ? '' : html`
         <p style='font-size: 90%'>${strings.dataPolicy()}</p>
         <mwc-formfield label=${'* ' + strings.acceptTerms()}>
-          <mwc-fa-checkbox required ?checked=${appointment.nameFamily}></mwc-fa-checkbox>
+          <mwc-fa-checkbox
+            required
+            ?checked=${appointment.nameFamily}
+            @invalid=${(e)=>{
+              e.target.parentNode.style.setProperty('--mdc-theme-text-primary-on-background', 'var(--mdc-theme-error, #b00020)');
+            }}
+          ></mwc-fa-checkbox>
         </mwc-formfield>
       `}
 
