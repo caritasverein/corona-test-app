@@ -54,6 +54,8 @@ app.all('*', function(req, res, next) {
 app.use(handleValidationError);
 
 app.use((error, req, res, next) => {
+  if (!(error.status < 500)) console.error(error);
+
   if (error.status) {
     return res.status(error.status).json(error);
   }
