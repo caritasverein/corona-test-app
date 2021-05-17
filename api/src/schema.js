@@ -148,7 +148,7 @@ export const windowSchema = {
     'appointmentDuration': {'type': 'integer', 'min': 60},
     'externalRef': {
       'type': ['string', 'null'],
-      'format': 'iri',
+      'format': 'url',
     },
     'times': {
       'type': 'array',

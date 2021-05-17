@@ -17,6 +17,7 @@ router.post(
     'end',
     'numQueues',
     'appointmentDuration',
+    'externalRef',
   ], windowSchema),
   async (req, res)=>{
     const [existing] = await db.query(`
@@ -31,14 +32,15 @@ router.post(
     if (existing.length) return res.send(409);
 
     const [ins] = await db.execute(`
-        INSERT INTO windows (start, end, numQueues, appointmentDuration)
-          VALUES (?, ?, ?, ?);
+        INSERT INTO windows (start, end, numQueues, appointmentDuration, externalRef)
+          VALUES (?, ?, ?, ?, ?);
       `,
       [
         new Date(req.body.start),
         new Date(req.body.end),
         parseInt(req.body.numQueues),
         parseInt(req.body.appointmentDuration),
+        req.body.externalRef,
       ],
     );
 

@@ -49,6 +49,7 @@ describe('admin-api', function() {
           end: new Date(tomorrow + 'T19:00:00Z'),
           numQueues: 1,
           appointmentDuration: 300,
+          externalRef: null,
         });
       if (debug) console.log(res.status, res.body);
 
