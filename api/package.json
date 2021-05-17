@@ -7,7 +7,9 @@
   "scripts": {
     "start": "bash -c 'if [[ \"$NODE_ENV\" == \"development\" ]]; then nodemon --ignore *.test.js ./src/index.js; else node --unhandled-rejections=strict ./src/index.js; fi'",
     "test": "nodemon --exec \"wait-on http://api:8080 && mocha\"",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "mail-report": "node src/jobs/mail-report.js",
+    "db-retention": "node src/jobs/db-retention.js"
   },
   "author": "",
   "license": "ISC",

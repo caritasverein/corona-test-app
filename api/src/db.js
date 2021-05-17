@@ -19,6 +19,10 @@ export const initPromise = (async ()=>{
   `);
   await db.query(`
     ALTER TABLE \`coronatests\`.\`appointments\`
+    ADD COLUMN IF NOT EXISTS \`reportedAt\` datetime NULL DEFAULT NULL AFTER updatedAt;
+  `);
+  await db.query(`
+    ALTER TABLE \`coronatests\`.\`appointments\`
     ADD COLUMN IF NOT EXISTS \`slot\` INT UNSIGNED NULL DEFAULT NULL AFTER arrivedAt;
   `);
   await db.query(`
@@ -39,7 +43,18 @@ export const initPromise = (async ()=>{
             \`appointments\`.\`invalidatedAt\` IS NULL
             AND (
               \`appointments\`.\`updatedAt\` > \`appointments\`.\`createdAt\`
-              OR \`appointments\`.\`createdAt\` > CURRENT_TIMESTAMP() - INTERVAL '1' HOUR
+              OR (
+                \`appointments\`.\`createdAt\` > CURRENT_TIMESTAMP() - INTERVAL '1' HOUR
+                OR \`appointments\`.\`nameFamily\` IS NOT NULL
+              )
             );
   `);
 })();
+
+export async function retention() {
+  await initPromise;
+  return await db.execute(`
+    DELETE FROM \`appointments\`
+    WHERE time < NOW() - INTERVAL 3 DAY
+  `);
+}

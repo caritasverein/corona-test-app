@@ -7,6 +7,12 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     read_only: true
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.mail-report.schedule: "0 18 * * *"
+      ofelia.job-exec.mail-report.command: "npm run mail-report"
+      ofelia.job-exec.db-retention.schedule: "@every 1h"
+      ofelia.job-exec.db-retention.command: "npm run db-retention"
     environment:
       NODE_ENV: production
       LOCATION_NAME: ${LOCATION_NAME?err}

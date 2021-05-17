@@ -79,6 +79,10 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'format': 'date-time',
     },
+    'reportedAt': {
+      'type': ['string', 'null'],
+      'format': 'date-time',
+    },
     'invalidatedAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
@@ -101,6 +105,7 @@ export const appointmentSchema = {
     'marked',
     'createdAt',
     'updatedAt',
+    'reportedAt',
     'invalidatedAt',
   ],
   'additionalProperties': false,

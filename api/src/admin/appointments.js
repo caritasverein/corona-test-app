@@ -22,7 +22,7 @@ async function getAppointment(uuid, valid=false) {
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
       email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
-      needsCertificate, marked, slot, createdAt, updatedAt, invalidatedAt
+      needsCertificate, marked, slot, createdAt, updatedAt, reportedAt, invalidatedAt
     FROM
       ${valid?'appointments_valid':'appointments'}
     WHERE uuid = ?
@@ -170,7 +170,7 @@ router.get(
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
         email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
-        needsCertificate, marked, slot, createdAt, updatedAt, invalidatedAt
+        needsCertificate, marked, slot, createdAt, updatedAt, reportedAt, invalidatedAt
       FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
     `, [
       new Date(req.query.start),

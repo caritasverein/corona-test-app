@@ -11,5 +11,8 @@ VIEW `appointments_valid` AS
         `appointments`.`invalidatedAt` IS NULL
         AND (
           `appointments`.`updatedAt` > `appointments`.`createdAt`
-          OR `appointments`.`createdAt` > CURRENT_TIMESTAMP() - INTERVAL '1' HOUR
+          OR (
+            `appointments`.`createdAt` > CURRENT_TIMESTAMP() - INTERVAL '1' HOUR
+            AND `appointments`.`nameFamily` IS NOT NULL
+          )
         );
