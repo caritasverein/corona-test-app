@@ -7,6 +7,7 @@ const client = accountSid ? twilio(accountSid, authToken) : null;
 
 export async function sms(to, body) {
   if (!client) return console.log('No SMS transport configured');
+  if (to.startsWith('0')) to.replace(/^0/, '+49');
   return client.messages
     .create({
        body,
