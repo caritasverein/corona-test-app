@@ -20,6 +20,13 @@ const strings = {
   source: ()=>`Quellcode`,
 };
 
+const styles = Object.fromEntries(Object.entries({
+  "--mdc-theme-primary": process.env.REACT_APP_THEME_PRIMARY,
+  "--mdc-theme-on-primary": process.env.REACT_APP_THEME_ON_PRIMARY,
+  "--mdc-theme-secondary": process.env.REACT_APP_THEME_SECONDARY,
+  "--mdc-theme-on-secondary": process.env.REACT_APP_THEME_ON_SECONDARY,
+}).filter(([k,v])=>v));
+
 function App() {
   const [route, setRoute] = useRoute();
   const viewAppointment = (route[0] && route[0].length === 36) ? route[0] : undefined;
@@ -27,7 +34,7 @@ function App() {
   const screen = (viewAppointment ? 'appointment' : route[0]) || 'welcome';
 
   return (
-    <div className="App">
+    <div className="App" style={styles}>
       <mwc-top-app-bar-fixed>
         <div
           slot="title"

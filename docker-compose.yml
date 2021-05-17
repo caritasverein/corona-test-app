@@ -45,6 +45,8 @@ services:
         REACT_APP_IMPRINT_REF: ${IMPRINT_REF?err}
         REACT_APP_PRIVACY_REF: ${PRIVACY_REF?err}
         REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
+        REACT_APP_THEME_PRIMARY: ${THEME_PRIMARY:-#152968}
+        REACT_APP_THEME_ON_PRIMARY: ${THEME_PRIMARY:-#FFF}
     restart: unless-stopped
     read_only: true
     tmpfs:

@@ -80,6 +80,8 @@ services:
       NODE_ENV: development
       REACT_APP_LOCATION_NAME: ${LOCATION_NAME:-My Testcenter}
       REACT_APP_TEST_DURATION: ${TEST_DURATION:-900}
+      REACT_APP_THEME_PRIMARY: ${THEME_PRIMARY:-#152968}
+      REACT_APP_THEME_ON_PRIMARY: ${THEME_PRIMARY:-#FFF}
 
   web-user:
     build:
@@ -96,6 +98,8 @@ services:
       REACT_APP_INDEX_REF: ${INDEX_REF:-/location.html}
       REACT_APP_IMPRINT_REF: ${IMPRINT_REF:-/location.html}
       REACT_APP_PRIVACY_REF: ${PRIVACY_REF:-/location.html}
+      REACT_APP_THEME_PRIMARY: ${THEME_PRIMARY:-#152968}
+      REACT_APP_THEME_ON_PRIMARY: ${THEME_PRIMARY:-#FFF}
 
   db:
     image: mariadb
