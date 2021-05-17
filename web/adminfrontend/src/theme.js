@@ -6,7 +6,7 @@ const theme = createMuiTheme({
   palette: {
     primary: {
       //main: '#152968',
-      main: '#25a534',
+      main: process.env.REACT_APP_THEME_SECONDARY || '#25a534',
       background: '#111'
     },
     secondary: {

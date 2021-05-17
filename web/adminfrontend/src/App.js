@@ -174,7 +174,7 @@ function App() {
             <AppBar position="sticky">
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
-                        <FontAwesomeIcon icon={faVial} fixedWidth /> Corona-Test-App Testübersicht und -durchführung
+                        <FontAwesomeIcon icon={faVial} fixedWidth /> {process.env.REACT_APP_LOCATION_NAME} - Testübersicht und -durchführung
                     </Typography>
                     <FormControl variant="filled" className={classes.formControl + ' mx-2'} size="small">
                         <InputLabel id="demo-simple-select-filled-label">Ansicht</InputLabel>

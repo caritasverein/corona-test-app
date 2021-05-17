@@ -23,7 +23,13 @@ export async function createTestCertificate(appointment) {
   };
 
   Object.entries(textFields).forEach(([key, value])=>{
-    const field = form.getTextField(key);
+    let field;
+    try {
+      field = form.getTextField(key);
+    } catch (e) {
+      return;
+    }
+
     field.setText(value);
     field.enableReadOnly();
   });
