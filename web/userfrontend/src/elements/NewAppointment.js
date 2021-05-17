@@ -91,7 +91,7 @@ export const NewAppointment = ({created, admin})=>{
       draggable: false,
       progress: undefined,
     });
-  }, [selectedSlot, confirmToast, createdCb]);
+  }, [confirmToast, createdCb]);
 
   return <>
     <h2><mwc-icon>event</mwc-icon>&nbsp; {strings.newAppointment()}</h2>
