@@ -52,7 +52,7 @@ const appointmentDetail = (admin)=>({
     type: 'text',
     icon: 'location_city',
     autocomplete: 'address-line2',
-    pattern: '^[1-9]{5}(,| ) ?.+$',
+    pattern: '^[0-9]{5}(,| ) ?.+$',
     get: (_, v)=>v.address?v.address.split('\n')[1]:'',
   },
   "dateOfBirth": {
