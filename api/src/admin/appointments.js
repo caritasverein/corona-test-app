@@ -12,6 +12,7 @@ import {
 import db from '../db.js';
 import {
   sendResultNotifications,
+  sendAppointmentNotifications,
 } from '../notifications.js';
 
 const router = new Router();
@@ -63,6 +64,9 @@ router.post(
       req.body.phoneMobile,
       req.body.phoneLandline,
     ]);
+
+    const appointment = await getAppointment(uuid, true);
+    if (appointment && appointment.nameFamily) await sendAppointmentNotifications(appointment);
 
     res.status(201).send({uuid});
   },
