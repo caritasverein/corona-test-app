@@ -1,4 +1,4 @@
-import { AppBar, Button, Container, Dialog, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Box, Button, Container, Dialog, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Toolbar, Typography } from "@material-ui/core";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -10,9 +10,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faClock, faIdCard, faPlus, faTag, faTimes, faUser, faVial } from "@fortawesome/free-solid-svg-icons";
 import EditAppointment from 'shared/components/edit-appointment.js';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import deLocale from "date-fns/locale/de";
 
 import { apiBaseURL, useStyles, defaultTime } from "./helper";
 import TestRow from "./TestRow";
+import { isToday } from "date-fns";
 
 function iOS() {
     return [
@@ -26,12 +31,6 @@ function iOS() {
         // iPad on iOS 13 detection
         || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
 }
-
-const startOfDay = new Date();
-startOfDay.setHours(0, 0, 0, 0);
-
-const endOfDay = new Date();
-endOfDay.setHours(23, 59, 59, 0)
 
 const audioDing = new Audio('ding.mp3');
 
@@ -48,13 +47,30 @@ function App() {
     const [showLoginButton, setShowLoginButton] = useState(false);
     const [showAddingDialog, setShowAddingDialog] = useState(false);
     const [view, setView] = useState('all')
+    const [selectedDate, setSelectedDate] = useState({ date: new Date(), isToday: true, isFuture: false, isPast: false });
+
+    const handleDateChange = (date) => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const today = isToday(date);
+        setSelectedDate({ date, isToday: today, isFuture: !today && date > now, isPast: !today && date < now })
+    }
 
     const login = () => {
         window.location = '/api/login'
     }
 
     const fetchTests = useCallback(async (testsForComparison) => {
-        const params = new URLSearchParams({ "start": startOfDay.toISOString(), "end": endOfDay.toISOString() });
+
+        const start = new Date(selectedDate.date.getTime());
+        start.setHours(0, 0, 0, 0);
+        const stop = new Date(selectedDate.date.getTime());
+        stop.setHours(23, 59, 59, 0);
+
+        const params = new URLSearchParams({
+            "start": start.toISOString(),
+            "end": stop.toISOString()
+        });
         const url = new URL('./appointments?' + params.toString(), apiBaseURL);
         const response = await fetch(url);
         if (response.ok) {
@@ -71,7 +87,7 @@ function App() {
                 setOpenErrorWindow(true)
             }
         }
-    }, []);
+    }, [selectedDate]);
 
     useEffect(() => {
         fetchTests();
@@ -163,11 +179,13 @@ function App() {
 
 
     const viewFilter = (test) => {
-        if(view === 'all') return true;
-        if(view === 'tests') return test.arrivedAt && test.testResult === null;
+        if (view === 'all') return true;
+        if (view === 'tests') return test.arrivedAt && test.testResult === null;
         //const { isFinished} = calculateTimes(test);
-        if(view === 'secretary') return test.arrivedAt === null || (test.testResult === null) || (test.testResult !== null && test.needsCertificate)
+        if (view === 'secretary') return test.arrivedAt === null || (test.testResult === null) || (test.testResult !== null && test.needsCertificate)
     }
+
+
 
     return (
         <div className="App">
@@ -176,26 +194,42 @@ function App() {
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> {process.env.REACT_APP_LOCATION_NAME} - Testübersicht und -durchführung
                     </Typography>
-                    <FormControl variant="filled" className={classes.formControl + ' mx-2'} size="small">
+
+                    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={deLocale}>
+                        <DatePicker
+                            autoOk
+                            format="dd.MM.yyyy"
+                            margin="normal"
+                            id="date-picker"
+                            label="Tag der Testung"
+                            value={selectedDate.date}
+                            onChange={handleDateChange}
+                            color={'secondary'}
+                        />
+                    </MuiPickersUtilsProvider>
+
+                    {selectedDate.isToday && <FormControl variant="filled" className={classes.formControl + ' mx-2'} size="small">
                         <InputLabel id="demo-simple-select-filled-label">Ansicht</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value={view}
+                            color={'secondary'}
+
                             onChange={e => setView(e.target.value)}
                         >
                             <MenuItem value={'all'}>Alles anzeigen</MenuItem>
                             <MenuItem value={'tests'}>Testungen</MenuItem>
                             <MenuItem value={'secretary'}>Empfang</MenuItem>
                         </Select>
-                    </FormControl>
-                    <Button onClick={() => setShowAddingDialog(true)} className={'mx-2'} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>
+                    </FormControl>}
+                    {selectedDate.isToday && <Button onClick={() => setShowAddingDialog(true)} className={'mx-2'} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>}
                     {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
                 </Toolbar>
             </AppBar>
 
-            <Dialog open={showAddingDialog} onClose={handleAddingDialogClose}>
+            <Dialog disableBackdropClick open={showAddingDialog} onClose={handleAddingDialogClose}>
                 <DialogTitle id="form-dialog-title">Neue Person hinzufügen</DialogTitle>
                 <DialogContent>
                     <EditAppointment admin appointment={{}} update={handleAddingDialogSave} />
@@ -222,10 +256,10 @@ function App() {
                         </TableHead>
                         <TableBody>
                             {tests.length > 0 &&
-                            tests
-                            //.filter(test => hiddenTests.indexOf(test.uuid) === -1)
-                            .filter(test => viewFilter(test))
-                            .map((test, index) => <TestRow key={'row-' + test.uuid} view={view} test={test} index={index} triggerUpdate={updateTest} />)}
+                                tests
+                                    //.filter(test => hiddenTests.indexOf(test.uuid) === -1)
+                                    .filter(test => viewFilter(test))
+                                    .map((test, index) => <TestRow key={'row-' + test.uuid} view={view} test={test} index={index} triggerUpdate={updateTest} selectedDate={selectedDate} />)}
                         </TableBody>
                     </Table>
                 </TableContainer>

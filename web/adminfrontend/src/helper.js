@@ -2,7 +2,6 @@ import { makeStyles } from "@material-ui/core";
 import { green, orange, red, yellow } from "@material-ui/core/colors";
 import { useEffect, useState } from "react";
 
-console.log(process.env.REACT_APP_TEST_DURATION)
 const defaultTime = parseInt(process.env.REACT_APP_TEST_DURATION || '900');
 
 const apiBaseURL = new URL(window.location);
@@ -164,4 +163,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export { useTestTimes, defaultTime, updateServer, apiBaseURL, useStyles, deleteFromServer, calculateTimes }
+const isToday = (someDate) => {
+    const today = new Date()
+    return someDate.getDate() === today.getDate() &&
+      someDate.getMonth() === today.getMonth() &&
+      someDate.getFullYear() === today.getFullYear()
+  }
+
+export { useTestTimes, defaultTime, updateServer, apiBaseURL, useStyles, deleteFromServer, calculateTimes, isToday}

@@ -1,5 +1,6 @@
 import { red } from '@material-ui/core/colors';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { deDE } from '@material-ui/core/locale';
 
 // A custom theme for this app
 const theme = createMuiTheme({
@@ -19,6 +20,6 @@ const theme = createMuiTheme({
 
     type: 'light'
   },
-});
+}, deDE);
 
 export default theme;
