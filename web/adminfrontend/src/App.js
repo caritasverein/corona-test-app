@@ -232,7 +232,7 @@ function App() {
             <Dialog disableBackdropClick open={showAddingDialog} onClose={handleAddingDialogClose}>
                 <DialogTitle id="form-dialog-title">Neue Person hinzufügen</DialogTitle>
                 <DialogContent>
-                    <EditAppointment admin appointment={{}} update={handleAddingDialogSave} />
+                    <EditAppointment admin appointment={{}} update={handleAddingDialogSave} cancel={handleAddingDialogClose}/>
                 </DialogContent>
 
             </Dialog>
