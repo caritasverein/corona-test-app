@@ -23,11 +23,7 @@ export default function TestHandler(props) {
 
     const classes = useStyles();
 
-    const { now, testUnixtime, secondsLeft, isFinished, isRunning } = useTestTimes(props.test.testStartedAt);
-
-    if (props.test.nameFamily === 'Koch') {
-        console.log("isRunning", isRunning, "isFinished", isFinished, "secondsLeft", secondsLeft, "testUnixtime", testUnixtime)
-    }
+    const { now, testUnixtime, secondsLeft, isFinished } = useTestTimes(props.test.testStartedAt);
 
     const [onUpdate, setOnUpdate] = useState(false);
 
@@ -43,7 +39,7 @@ export default function TestHandler(props) {
 
 
     const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} style={{ fontSize: '1.5em' }} className={'my-2 mx-2 ' + (props.test.needsCertificate ? classes.flashPrintButton : '')} variant={'contained'}><FontAwesomeIcon icon={faPrint} /></Button>
-    const cancelTestButton = <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => cancelTest()}>Nicht erschienen</Button>
+    const cancelTestButton = (label = "Nicht erschienen") => <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => cancelTest()}>{label}</Button>
     const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={'my-2 mx-2'} onClick={() => startTest()} style={{ width: '17ch' }}>Test starten</Button>
     const onSiteButton = <Button disabled={onUpdate} variant={'contained'} color={'secondary'} className={'my-2 mx-2'} onClick={() => onSite()} style={{ width: '17ch' }}>Erschienen</Button>
 
@@ -65,7 +61,6 @@ export default function TestHandler(props) {
             <FontAwesomeIcon fixedWidth icon={faVial} className={'mr-3 flash '} /> {timeLeft <= 0 ? 'Bitte warten' : displayTime(timeLeft)}
         </Button>
     }
-
 
     const cancelTest = async () => {
         setOnUpdate(true);
@@ -107,20 +102,30 @@ export default function TestHandler(props) {
 
     let handler = <React.Fragment></React.Fragment>
 
+    if (props.selectedDate.isPast) {
+        handler = <div className={classes[props.test.testResult]}>
+            {['negative', 'positive'].indexOf(props.test.testResult) > -1 && printButton}
+            <span className={'mx-2'}>{resultIcons[props.test.testResult]} {resultText[props.test.testResult]}</span>
+        </div>
 
+    } else if (props.selectedDate.isFuture) {
+        handler = <div>
+            {!props.test.slot && props.test.testResult === null && !props.test.invalidatedAt && cancelTestButton("Termin absagen")}
+            {props.test.invalidatedAt && <span><FontAwesomeIcon icon={faCalendarTimes} fixedWidth /> Termin abgesagt.</span>}
+        </div>
 
-    if (props.test.testResult === null && now - defaultTime < testUnixtime) {
+    } else if (props.test.testResult === null && now - defaultTime < testUnixtime) {
         // Test is running
         handler = <div>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{color: 'gray'}} icon={faCircleNotch} spin fixedWidth /> Test läuft ({displayTime(secondsLeft)})...</div> : stopTestButton(secondsLeft)}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{ color: 'gray' }} icon={faCircleNotch} spin fixedWidth /> Test läuft ({displayTime(secondsLeft)})...</div> : stopTestButton(secondsLeft)}
         </div>
 
     } else if (props.test.testResult === null && isFinished) {
         // Waiting for results
         handler = <div>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{color: 'gray'}} icon={faCircleNotch} spin fixedWidth /> Warte auf Ergebnisse...</div> : resultButtons}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{ color: 'gray' }} icon={faCircleNotch} spin fixedWidth /> Warte auf Ergebnisse...</div> : resultButtons}
         </div>
 
     } else if (props.test.testResult !== null) {
@@ -143,7 +148,7 @@ export default function TestHandler(props) {
         // Waiting for test start
         handler = <React.Fragment>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{color: 'gray'}} icon={faCircleNotch} spin fixedWidth /> Warte auf Testung...</div> : startTestButton}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{ color: 'gray' }} icon={faCircleNotch} spin fixedWidth /> Warte auf Testung...</div> : startTestButton}
         </React.Fragment>
 
     } else {
@@ -152,7 +157,7 @@ export default function TestHandler(props) {
             {/*startTestButton*/}
             {needsCertificateButton}
             {onSiteButton}
-            {cancelTestButton}
+            {cancelTestButton()}
         </React.Fragment>
 
     }
