@@ -2,6 +2,13 @@ import mail from './mail.js';
 import sms from './sms.js';
 import {appointmentURL} from './url.js';
 
+function datetime(date) {
+    return [
+      new Date(date).toLocaleString('de-DE', {timeZone: 'Europe/Berlin', day: 'numeric', month: 'numeric', year: '2-digit'}),
+      new Date(date).toLocaleString('de-DE', {timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit'}),
+    ];
+}
+
 export async function sendNotifications(appointment) {
   if (!appointment) return;
   if (appointment.testResult) {
@@ -27,16 +34,18 @@ async function sendMailAndSMS(appointment, subject, message) {
 }
 
 export async function sendAppointmentNotifications(appointment) {
-  const message = `Ihr Termin am ${new Date(appointment.time).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})} wurde erfolgreich für Sie gebucht. Für weitere Informationen besuchen Sie bitte ${appointmentURL(appointment)}`;
+  const [date, time] = datetime(appointment.time);
+  const message = `Ihr Termin ist am ${date} um ${time} Uhr. Weitere Informationen unter ${appointmentURL(appointment)}`;
   await sendMailAndSMS(appointment, 'Ihr Termin - '+process.env.LOCATION_NAME, message);
 }
 
 export async function sendResultNotifications(appointment) {
+  const [date, time] = datetime(appointment.time);
   const resultString = ({'positive': 'positiv', 'negative': 'negativ', 'invalid': 'ungültig'})[appointment.testResult];
-  const message = `Ihr Testergebnis ist ${resultString}.\nFür weitere Informationen besuchen Sie bitte ${appointmentURL(appointment).toString()}\n`;
+  const message = `Ihr Testergebnis ist ${resultString}.\nWeitere Informationen unter ${appointmentURL(appointment).toString()}\n`;
   await sendMailAndSMS(appointment, 'Ihr Testergebnis - '+process.env.LOCATION_NAME, message);
   if (appointment.testResult === 'positive') {
-    const message = `Ein Person wurde am ${new Date(appointment.testStartedAt).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})} positiv getestet:\n`+
+    const message = `Ein Person wurde am ${date} um ${time} Uhr positiv getestet:\n`+
       `Zeitpunkt: ${new Date(appointment.testStartedAt).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})}\n`+
       `Name: ${appointment.nameFamily}, ${appointment.nameGiven}\n`+
       `Geburtsdatum: ${appointment.dateOfBirth.toLocaleDateString('de-DE')}\n`+
@@ -47,6 +56,7 @@ export async function sendResultNotifications(appointment) {
 }
 
 export async function sendCancelationNotifications(appointment) {
-  const message = `Ihr Termin am ${new Date(appointment.time).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})} wurde abgesagt.`;
+  const [date, time] = datetime(appointment.time);
+  const message = `Ihr Termin am ${date} um ${time} Uhr wurde abgesagt.`;
   await sendMailAndSMS(appointment, 'Terminabsage - '+process.env.LOCATION_NAME, message);
 }
