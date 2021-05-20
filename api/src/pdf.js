@@ -40,6 +40,7 @@ export async function createTestCertificate(appointment) {
     field.enableReadOnly();
   });
 
+  form.flatten();
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
 }
