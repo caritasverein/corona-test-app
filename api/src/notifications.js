@@ -35,7 +35,7 @@ async function sendMailAndSMS(appointment, subject, message) {
 
 export async function sendAppointmentNotifications(appointment) {
   const [date, time] = datetime(appointment.time);
-  const message = `Ihr Termin ist am ${date} um ${time} Uhr. Weitere Informationen unter ${appointmentURL(appointment)}`;
+  const message = `Ihr Test-Termin findet am ${date} um ${time} Uhr statt. Mehr unter ${appointmentURL(appointment)}`;
   await sendMailAndSMS(appointment, 'Ihr Termin - '+process.env.LOCATION_NAME, message);
 }
 
