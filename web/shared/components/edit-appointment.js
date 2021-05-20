@@ -15,11 +15,11 @@ const strings = {
   dialogBack: ()=>`zurück`,
   dialogAhead: ()=>`fortfahren`,
   contactDetailDetail: ()=>`Bitte geben Sie in mindestens 1 Feld Ihre Kontaktdaten ein. Dann können wir mit Ihnen Kontakt aufnehmen – zum Beispiel bei Termin\u2011Verschiebungen. Wenn Sie Ihre Handy-Nummer und/oder E-Mail-Adresse angeben, bekommen Sie Ihr Ergebnis innerhalb von 30 Minuten nach dem Test elektronisch zugeschickt. Sie können aber auch vor Ort ein ausgedrucktes Formular mitnehmen.`,
-  acceptTerms: ()=>`Ich erkläre mich mir der oben stehenden Vereinbarung einverstanden`,
+  acceptTerms: ()=>`Ich erkläre mich mit der oben stehenden Vereinbarung einverstanden`,
   dataPolicy: ()=>`Ich erkläre mich einverstanden, dass zum Zweck der Abrechnung und zum Schutz potentiell weiterer Kontaktpersonen mein Befundergebnis sowie meine Kontaktdaten (Name, Anschrift) durch den Caritas-Verein Altenoythe erhoben und gespeichert werden. Die erhobenen Daten können zum Zweck der Abrechnung mit der Kassenärztlichen Vereinigung genutzt werden und unterliegenden der Gesetzlichen Speicherdauer (10 Jahre).
   Die Befundergebnisse können im Sinne der Teststrategie an das Gesundheitsamt, Hausarzt, gesetzlicher Vertreter übermittelt werden.
   Mir ist bewusst, dass mein Einverständnis jederzeit und ohne Angabe von Gründen schriftlich widerrufen werden kann! Die Einwilligung ist freiwillig und gilt zeitlich unbeschränkt.`,
-  confirmNoContact: ()=>`Sie haben weder eine Handnummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen Ihr Testergebnis nicht automatisch zusenden.`,
+  confirmNoContact: ()=>`Sie haben weder eine Handynummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen Ihr Testergebnis nicht automatisch zusenden.`,
   alertNoContact: ()=>`Sie haben keine Kontaktmöglichkeit angegeben. Bitte geben Sie mindestens eine Kontaktmöglichkeit an.`,
 };
 
