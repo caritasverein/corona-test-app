@@ -35,6 +35,10 @@ const strings = {
   noPhoneMobile: ()=>`Keine`,
   noPhoneLandline: ()=>`Keine`,
   noEmail: ()=>`Keine`,
+  phoneMobileInvalid: ()=>`Die angegebene Handynummer ist ungültig. Bitte prüfen Sie Ihre Eingabe.`,
+  phoneMobileUnavailable: ()=>`Die angegebene Handynummer ist derzeit nicht erreichbar. Bitte prüfen Sie Ihre Eingabe.`,
+  phoneMobileTransportNotPossible: ()=>`Der Dienst ist nicht für SMS in diese Region konfiguriert.`,
+  phoneMobileUnknownError: (code)=>`Es ist ein unbekannter Fehler beim senden der SMS aufgetreten (Fehlercode ${code})`,
   linkMore: ()=>`Weitere Informationen`,
   testLocation: ()=>`Testzentrum`,
   testLocationAddress: ()=><>Alte Wassermühle<br />Alte Mühlenstraße 6<br />26169 Friesoythe</>,
@@ -160,7 +164,14 @@ export const Appointment = ({uuid})=>{
           setEditMode(false);
         }).catch(e=>{
           console.error(e);
-          toast(e.message + ' ' + JSON.stringify(e.detail));
+          if (e.code === undefined) return toast(e.status + ': ' + e.message + ' ' + JSON.stringify(e.detail));
+
+          if (e.code === 21422) toast(strings.phoneMobileUnavailable());
+          else if (e.code === 21421) toast(strings.phoneMobileInvalid());
+          else if (e.code === 21408) toast(strings.phoneMobileTransportNotPossible());
+          else toast(strings.phoneMobileUnknownError(e.code));
+          window.scrollTo(0, 0);
+          setEditMode(false);
         });
     }} />}
     {!editMode && <>
