@@ -33,7 +33,7 @@ const calculateTimes = (testStartedAt) => {
 }
 
 
-const updateServer = async (uuid, update, triggerUpdate) => {
+const updateServer = async (uuid, update, triggerUpdate, baseUrl = apiBaseURL) => {
     const handleError = (err) => {
         console.log(err)
         //setErrorWindowMessage(err)
@@ -44,7 +44,7 @@ const updateServer = async (uuid, update, triggerUpdate) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...update, uuid: undefined })
     }
-    const url = new URL('./appointments/' + uuid, apiBaseURL);
+    const url = new URL('./appointments/' + uuid, baseUrl);
     const response = await fetch(url, options);
     if (response.ok) {
         const result = await response.json();
