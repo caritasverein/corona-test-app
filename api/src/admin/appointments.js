@@ -125,7 +125,7 @@ router.patch(
       ]);
     }
 
-    if (req.body.arrivedAt !== undefined) {
+    if (req.body.arrivedAt !== undefined && req.body.arrivedAt !== null) {
       const [rows] = await db.query(`
         SELECT
           slot
@@ -153,6 +153,20 @@ router.patch(
       `, [
         new Date(req.body.arrivedAt),
         slot,
+        req.params.uuid,
+      ]);
+    }
+
+    if (req.body.arrivedAt === null) {
+      await db.execute(`
+        UPDATE appointments
+        SET
+        arrivedAt = ?,
+        slot = ?
+        WHERE uuid = ?
+      `, [
+        null,
+        null,
         req.params.uuid,
       ]);
     }
