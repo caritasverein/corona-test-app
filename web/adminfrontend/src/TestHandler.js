@@ -41,6 +41,7 @@ export default function TestHandler(props) {
     const printButton = <Button onClick={() => printPDF(props.test.uuid)} size={'small'} style={{ fontSize: '1.5em' }} className={'my-2 mx-2 ' + (props.test.needsCertificate ? classes.flashPrintButton : '')} variant={'contained'}><FontAwesomeIcon icon={faPrint} /></Button>
     const cancelTestButton = (label = "Nicht erschienen") => <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => cancelTest()}>{label}</Button>
     const startTestButton = <Button disabled={onUpdate} variant={'contained'} color={'primary'} className={'my-2 mx-2'} onClick={() => startTest()} style={{ width: '17ch' }}>Test starten</Button>
+    const offSiteButton = <Button disabled={onUpdate} variant={'contained'} className={'my-2 mx-2'} onClick={() => offSite()}>Abbrechen</Button>
     const onSiteButton = <Button disabled={onUpdate} variant={'contained'} color={'secondary'} className={'my-2 mx-2'} onClick={() => onSite()} style={{ width: '17ch' }}>Erschienen</Button>
 
     const needsCertificateButton = props.test.needsCertificate
@@ -80,6 +81,13 @@ export default function TestHandler(props) {
         setOnUpdate(false);
     }
 
+    const offSite = async () => {
+        setOnUpdate(true);
+        await updateServer(props.test.uuid, { arrivedAt: null }, props.triggerUpdate)
+        setOnUpdate(false);
+    }
+
+
     const stopTest = async () => {
         setOnUpdate(true);
         await updateServer(props.test.uuid, { testStartedAt: null }, props.triggerUpdate)
@@ -110,7 +118,9 @@ export default function TestHandler(props) {
 
     } else if (props.selectedDate.isFuture) {
         handler = <div>
-            {!props.test.slot && props.test.testResult === null && !props.test.invalidatedAt && cancelTestButton("Termin absagen")}
+            {!props.test.slot && props.test.testResult === null && !props.test.invalidatedAt && <>
+                {cancelTestButton("Termin absagen")}
+            </>}
             {props.test.invalidatedAt && <span><FontAwesomeIcon icon={faCalendarTimes} fixedWidth /> Termin abgesagt.</span>}
         </div>
 
@@ -148,7 +158,10 @@ export default function TestHandler(props) {
         // Waiting for test start
         handler = <React.Fragment>
             {needsCertificateButton}
-            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{ color: 'gray' }} icon={faCircleNotch} spin fixedWidth /> Warte auf Testung...</div> : startTestButton}
+            {props.view === 'secretary' ? <div className={'d-inline-block mx-2 '}><FontAwesomeIcon style={{ color: 'gray' }} icon={faCircleNotch} spin fixedWidth /> Warte auf Testung...</div> : <>
+            {startTestButton}
+            {offSiteButton}
+            </>}
         </React.Fragment>
 
     } else {
@@ -162,6 +175,9 @@ export default function TestHandler(props) {
 
     }
 
-    return handler;
+   
+    return <>
+        {handler}
+    </>;
 
 }
