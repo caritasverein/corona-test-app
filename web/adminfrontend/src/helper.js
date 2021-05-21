@@ -135,6 +135,13 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         width: 'max-content'
     },
+    errorMessage: {
+        color: red[900],
+        backgroundColor: red[100],
+        padding: '10px 20px 10px 20px',
+        borderRadius: '3px',
+        width: 'max-content'
+    },
     activatedColor: {
         backgroundColor: green['500'],
         marginRight: '10px;',

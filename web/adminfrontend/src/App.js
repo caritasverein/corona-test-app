@@ -18,6 +18,7 @@ import deLocale from "date-fns/locale/de";
 import { apiBaseURL, useStyles, defaultTime } from "./helper";
 import TestRow from "./TestRow";
 import { isToday } from "date-fns";
+import AddWindows from "./AddWindows";
 
 function iOS() {
     return [
@@ -46,6 +47,7 @@ function App() {
     const [finishedTests, setFinishedTests] = useState([]);
     const [showLoginButton, setShowLoginButton] = useState(false);
     const [showAddingDialog, setShowAddingDialog] = useState(false);
+    const [showWindowsDialog, setShowWindowsDialog] = useState(true);
     const [view, setView] = useState('all')
     const [selectedDate, setSelectedDate] = useState({ date: new Date(), isToday: true, isFuture: false, isPast: false });
 
@@ -185,7 +187,9 @@ function App() {
         if (view === 'secretary') return test.arrivedAt === null || (test.testResult === null) || (test.testResult !== null && test.needsCertificate)
     }
 
-
+    const handleWindowsDialogClose = () => {
+        setShowWindowsDialog(false)
+    }
 
     return (
         <div className="App">
@@ -194,6 +198,8 @@ function App() {
                     <Typography variant="h6" className={classes.title}>
                         <FontAwesomeIcon icon={faVial} fixedWidth /> {process.env.REACT_APP_LOCATION_NAME} - Testübersicht und -durchführung
                     </Typography>
+
+
 
                     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={deLocale}>
                         <DatePicker
@@ -224,6 +230,7 @@ function App() {
                         </Select>
                     </FormControl>}
                     {selectedDate.isToday && <Button onClick={() => setShowAddingDialog(true)} className={'mx-2'} variant={'contained'} startIcon={<FontAwesomeIcon icon={faPlus} />}>Person hinzufügen</Button>}
+                    <Button onClick={() => setShowWindowsDialog(true)} className={'mx-2'} variant={'contained'} startIcon={<FontAwesomeIcon icon={faClock} />}>Termine hinzufügen</Button>
                     {showLoginButton && <Button onClick={() => login()} variant={'contained'} color={'secondary'} startIcon={<FontAwesomeIcon icon={faUser} />}>Login</Button>}
                     {pendingTests > 0 && <div className={'pending-tests ml-3'}><FontAwesomeIcon fixedWidth icon={faBell} /> {pendingTests === 1 ? "Ein fertiger Test" : pendingTests + " fertige Tests"}</div>}
                 </Toolbar>
@@ -232,7 +239,16 @@ function App() {
             <Dialog disableBackdropClick open={showAddingDialog} onClose={handleAddingDialogClose}>
                 <DialogTitle id="form-dialog-title">Neue Person hinzufügen</DialogTitle>
                 <DialogContent>
-                    <EditAppointment admin appointment={{}} update={handleAddingDialogSave} cancel={handleAddingDialogClose}/>
+                    <EditAppointment admin appointment={{}} update={handleAddingDialogSave} cancel={handleAddingDialogClose} />
+                </DialogContent>
+
+            </Dialog>
+
+
+            <Dialog disableBackdropClick open={showWindowsDialog} onClose={handleWindowsDialogClose}>
+                <DialogTitle id="form-dialog-title">Öffnungszeiten hinzufügen</DialogTitle>
+                <DialogContent>
+                    <AddWindows cancel={handleWindowsDialogClose} />
                 </DialogContent>
 
             </Dialog>
