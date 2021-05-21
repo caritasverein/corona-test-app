@@ -1,9 +1,10 @@
-import { faBirthdayCake, faCaretDown, faCaretUp, faEnvelope, faMapMarkerAlt, faMobileAlt, faPhoneAlt } from "@fortawesome/free-solid-svg-icons";
+import { faBirthdayCake, faCaretDown, faCaretUp, faEnvelope, faMapMarkerAlt, faMobileAlt, faPencilAlt, faPhoneAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Button, Collapse, IconButton, TableCell, TableRow } from "@material-ui/core";
+import { Box, Button, Collapse, Dialog, DialogContent, DialogTitle, IconButton, TableCell, TableRow } from "@material-ui/core";
 import React, { useState } from "react";
-import { updateServer, useStyles } from "./helper";
+import { isToday, updateServer, useStyles } from "./helper";
 import TestHandler from "./TestHandler";
+import EditAppointment from 'shared/components/edit-appointment.js';
 
 export default function TestRow(props) {
 
@@ -21,7 +22,38 @@ export default function TestRow(props) {
         await updateServer(uuid, { marked: value ? "true" : null }, props.triggerUpdate)
     }
 
+
+
+    const [showAddingDialog, setShowAddingDialog] = useState(false);
+
+    const edit = () => {
+        setShowAddingDialog(true)
+    }
+
+    const handleAddingDialogSave = (data) => {
+        const apiBaseURL = new URL(window.location);
+        apiBaseURL.pathname = '/api/';
+        updateServer(props.test.uuid, { ...data, time: undefined }, props.triggerUpdate, apiBaseURL)
+        handleAddingDialogClose();
+    }
+
+    const handleAddingDialogClose = () => {
+        setShowAddingDialog(false)
+    }
+
+    const editButton = <Button onClick={() => edit()} size={'small'} style={{ verticalAlign: 'baseline' }} variant={'contained'} className={'mx-2'}><FontAwesomeIcon icon={faPencilAlt} fixedWidth /> Bearbeiten</Button>
+
+
+
     return <React.Fragment key={props.test.uuid}>
+
+        <Dialog disableBackdropClick open={showAddingDialog} onClose={handleAddingDialogClose}>
+            <DialogTitle id="form-dialog-title">Daten bearbeiten</DialogTitle>
+            <DialogContent>
+                <EditAppointment admin appointment={props.test} update={handleAddingDialogSave} cancel={handleAddingDialogClose} />
+            </DialogContent>
+        </Dialog>
+
         <TableRow key={props.test.uuid} className={(props.test.marked ? classes.highlightedRow : '') + ' ' + classes.root}>
             <TableCell>
                 <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
@@ -35,17 +67,16 @@ export default function TestRow(props) {
                     </div>
                 </Button>
             </TableCell>
-            <TableCell  style={{fontSize: '1.5em'}}>
+            <TableCell style={{ fontSize: '1.5em' }}>
                 {time.getHours()}:{('' + time.getMinutes()).padStart(2, '0')}
             </TableCell>
             <TableCell>
                 <div className="name-container">
-                    <div data-area="name" style={{fontSize: '1.5em'}}>
+                    <div data-area="name" style={{ fontSize: '1.5em' }}>
                         {props.test.nameFamily}, {props.test.nameGiven}
                     </div>
                 </div>
             </TableCell>
-
             <TableCell>
                 <TestHandler {...props} />
             </TableCell>
@@ -68,10 +99,12 @@ export default function TestRow(props) {
                         {props.test.phoneMobile && <span className={'mx-2'} style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faMobileAlt} /> {props.test.phoneMobile}</span>}
                         {props.test.phoneLandline && <span className={'mx-2'} style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faPhoneAlt} /> {props.test.phoneLandline}</span>}
                         {props.test.email && <span className={'mx-2'} style={{ whiteSpace: 'nowrap' }}><FontAwesomeIcon fixedWidth icon={faEnvelope} /> {props.test.email}</span>}
+                        <span>
+                            {!props.test.arrivedAt && editButton}
+                        </span>
                     </Box>
                 </Collapse>
             </TableCell>
-
         </TableRow>
     </React.Fragment>
 
