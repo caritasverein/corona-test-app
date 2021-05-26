@@ -42,6 +42,10 @@ export const initPromise = (async ()=>{
         WHERE
             \`appointments\`.\`invalidatedAt\` IS NULL
             AND (
+              \`appointments\`.\`testStartedAt\` IS NULL
+              OR
+              \`appointments\`.\`testStartedAt\` > CURRENT_TIMESTAMP() - INTERVAL '24' HOUR
+            ) AND (
               \`appointments\`.\`updatedAt\` > \`appointments\`.\`createdAt\`
               OR (
                 \`appointments\`.\`createdAt\` > CURRENT_TIMESTAMP() - INTERVAL '1' HOUR

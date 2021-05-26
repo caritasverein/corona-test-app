@@ -41,7 +41,7 @@ export async function mailReport(markReported=false) {
   const countFinished = rows.filter((r)=>r.testResult).length;
   const countPending = rows.filter((r)=>r.testStartedAt && !r.testResult).length;
   const countCanceled = rows.filter((r)=>r.invalidatedAt).length;
-  const countNotArrived = rows.filter((r)=>!r.arrivedAt).length;
+  const countNotArrived = rows.filter((r)=>!r.arrivedAt && !r.invalidatedAt && !r.testStartedAt).length;
   const countNotStarted = rows.filter((r)=>r.arrivedAt && !r.testStartedAt).length;
 
   const reportSpanStart = rows.filter((r)=>r.testResult).reduce((p, c)=>Math.min(p, c.updatedAt), new Date());

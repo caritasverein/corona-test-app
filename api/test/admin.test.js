@@ -9,9 +9,13 @@ import initPromise, {generateApointment} from './init.js';
 
 const server = 'http://api:8080';
 const agent = chai.request.agent(server);
+
 const tomorrowDate = new Date();
-tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+tomorrowDate.setDate(tomorrowDate.getDate() + 1, 0, 0, 0, 0);
 const tomorrow = tomorrowDate.toISOString().split('T')[0];
+const yesterdayDate = new Date();
+yesterdayDate.setDate(yesterdayDate.getDate() - 1, 0, 0, 0, 0);
+const yesterday = yesterdayDate.toISOString().split('T')[0];
 
 const debug = false;
 
@@ -167,6 +171,29 @@ describe('admin-api', function() {
         // slot reuse is implied because there should be a previous appointment that finished between tests
         expect(res2.body.slot).to.eq(parseInt(i)+1, JSON.stringify(res2.body));
       }
+    });
+
+    it('should hide old appointments', async function() {
+      const res = await agent
+        .post('/admin/appointments')
+        .send({
+          time: new Date(tomorrow + `T00:00:00Z`).toISOString(),
+          ...generateApointment(),
+        });
+      expect(res.status).to.eq(201, JSON.stringify(res.body));
+
+      await agent
+        .patch('/admin/appointments/'+res.body.uuid)
+        .send({
+          arrivedAt: yesterdayDate.toISOString(),
+          testStartedAt: yesterdayDate.toISOString(),
+        });
+
+      const res3 = await agent
+        .get('/appointments/'+res.body.uuid)
+        .send();
+
+      expect(res3.status).to.eq(404, JSON.stringify(res3.body));
     });
 
     it('should query appointments', async function() {
