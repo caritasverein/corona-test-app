@@ -269,8 +269,8 @@ export const Appointment = ({uuid})=>{
             outlined
             icon="bookmark_remove"
             onClick={()=>{
+              if (storedAppointments.length < 2) setAppointmentAutofill({});
               setStoredAppointments((a)=>a.filter((a)=>a.uuid!==uuid));
-              setAppointmentAutofill({});
             }}
           >{strings.deleteLocalAppointment()}</mwc-button>
         </> : <>
