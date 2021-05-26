@@ -47,7 +47,7 @@ function App() {
     const [finishedTests, setFinishedTests] = useState([]);
     const [showLoginButton, setShowLoginButton] = useState(false);
     const [showAddingDialog, setShowAddingDialog] = useState(false);
-    const [showWindowsDialog, setShowWindowsDialog] = useState(true);
+    const [showWindowsDialog, setShowWindowsDialog] = useState(false);
     const [view, setView] = useState('all')
     const [selectedDate, setSelectedDate] = useState({ date: new Date(), isToday: true, isFuture: false, isPast: false });
 
