@@ -48,6 +48,7 @@ export async function sendResultNotifications(appointment) {
     const message = `Ein Person wurde am ${date} um ${time} Uhr positiv getestet:\n`+
       `Zeitpunkt: ${new Date(appointment.testStartedAt).toLocaleString('de-DE', {timeZone: 'Europe/Berlin'})}\n`+
       `Name: ${appointment.nameFamily}, ${appointment.nameGiven}\n`+
+      `Anschrift: ${appointment.address}\n`+
       `Geburtsdatum: ${appointment.dateOfBirth.toLocaleDateString('de-DE')}\n`+
       `Kontakt: ${appointment.phoneLandline || ' - '}, ${appointment.phoneMobile || ' - '}, ${appointment.email || ' - '}\n`;
 
@@ -57,6 +58,6 @@ export async function sendResultNotifications(appointment) {
 
 export async function sendCancelationNotifications(appointment) {
   const [date, time] = datetime(appointment.time);
-  const message = `Ihr Termin am ${date} um ${time} Uhr wurde abgesagt.`;
+  const message = `Ihr Termin im ${process.env.LOCATION_NAME} am ${date} um ${time} Uhr wurde abgesagt.`;
   await sendMailAndSMS(appointment, 'Terminabsage - '+process.env.LOCATION_NAME, message);
 }
