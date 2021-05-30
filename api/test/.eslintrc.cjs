@@ -18,5 +18,6 @@ module.exports = {
     'indent': 'off',
     'require-jsdoc': 'off',
     'max-len': 'off',
+    'no-unused-vars': 'warn',
   },
 };

@@ -138,7 +138,7 @@ function EditAppointment(props) {
     const entries = [...new FormData(form).entries()]
       .map(([k, v]) => [
         k,
-        check[k] && check[k].set ? check[k].set(v) : v
+        check[k] && check[k].set ? check[k].set(v.trim()) : v.trim()
       ]);
 
     const data = Object.fromEntries(entries.reverse());

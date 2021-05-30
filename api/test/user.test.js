@@ -58,8 +58,8 @@ describe('user-api', function() {
         .patch('/appointments/' + appointmentUuid)
         .send({
           'nameGiven': 'abc',
-          'nameFamily': 'cde',
-          'address': 'efg',
+          'nameFamily': 'cde\'d',
+          'address': 'ef-g. 12\n123 aaa (bbb)',
           'dateOfBirth': '2001-10-01',
           'email': 'root@localhost',
           'phoneLandline': '04442222',
@@ -69,6 +69,24 @@ describe('user-api', function() {
 
       expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body).to.be.jsonSchema(appointmentSchemaUser);
+    });
+
+    it('should fail to PATCH invalid names', async function() {
+      const reqbody = {
+        'nameGiven': '=abc',
+        'nameFamily': 'cde',
+        'address': 'efg\naaa',
+        'dateOfBirth': '2001-10-01',
+        'email': 'root@localhost',
+        'phoneLandline': '04442222',
+        'phoneMobile': null,
+      };
+      const res = await chai.request(server)
+        .patch('/appointments/' + appointmentUuid)
+        .send(reqbody);
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(400, JSON.stringify(res.body) + '\n' + JSON.stringify(reqbody));
     });
 
     it('should GET an appointment by uuid', async function() {

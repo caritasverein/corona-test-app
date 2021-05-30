@@ -1,7 +1,10 @@
 
 import {Validator, ValidationError} from 'express-json-validator-middleware';
+import keywords from 'ajv-keywords';
 
-export const {validate} = new Validator();
+export const validator = new Validator();
+export const {validate} = validator;
+keywords(validator.ajv);
 
 export const appointmentSchema = {
   '$schema': 'http://json-schema.org/draft-07/schema#',
@@ -19,15 +22,22 @@ export const appointmentSchema = {
       'type': 'string',
       'minLength': 1,
       'maxLength': 250,
+      'pattern': '^.+$',
+      'regexp': {'pattern': '^\\p{L}[\\p{L} \'.-]*$', 'flags': 'u'},
     },
     'nameFamily': {
       'type': 'string',
       'minLength': 1,
       'maxLength': 250,
+      'pattern': '^.+$',
+      'regexp': {'pattern': '^\\p{L}[\\p{L} \'.-]*$', 'flags': 'u'},
     },
     'address': {
       'type': 'string',
       'minLength': 1,
+      'maxLength': 250,
+      'pattern': '^.+\n.+$',
+      'regexp': {'pattern': '^\\p{L}[\\p{L}\\d \'._()-]*\\n[\\p{L}\\d \'._()-]*$', 'flags': 'mu'},
     },
     'dateOfBirth': {
       'type': 'string',
@@ -37,6 +47,8 @@ export const appointmentSchema = {
       'type': ['string', 'null'],
       'format': 'email',
       'maxLength': 50,
+      'pattern': '^.+@.+$',
+      'regexp': {'pattern': '^\\p{L}[\\p{L}._+-]*@[\\p{L}.-]+$', 'flags': 'u'},
     },
     'phoneMobile': {
       'type': ['string', 'null'],
