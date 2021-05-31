@@ -12,4 +12,13 @@ router.get(
 
     res.sendStatus(200);
   },
+  '/:date',
+  async (req, res)=>{
+    const date = new Date(req.params.date);
+    if (isNaN(date)) return;
+
+    await mailReport(false, date);
+
+    res.sendStatus(200);
+  },
 );
