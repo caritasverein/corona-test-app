@@ -12,6 +12,9 @@ router.get(
 
     res.sendStatus(200);
   },
+);
+
+router.get(
   '/:date',
   async (req, res)=>{
     const date = new Date(req.params.date);
