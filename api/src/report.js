@@ -65,8 +65,8 @@ export async function mailReport(reportUnreported=false, start=getMidnight()) {
   const countNotArrived = rows.filter((r)=>!r.arrivedAt && !r.invalidatedAt && !r.testStartedAt).length;
   const countNotStarted = rows.filter((r)=>r.arrivedAt && !r.testStartedAt).length;
 
-  const reportSpanStart = rows.filter((r)=>r.testResult).reduce((p, c)=>Math.min(p, c.updatedAt.getTime()), new Date().getTime());
-  const reportSpanEnd = rows.filter((r)=>r.testResult).reduce((p, c)=>Math.max(p, c.updatedAt.getTime()), new Date(0).getTime());
+  const reportSpanStart = rows.filter((r)=>r.testResult).reduce((p, c)=>Math.min(p, c.time.getTime()), Infinity);
+  const reportSpanEnd = rows.filter((r)=>r.testResult).reduce((p, c)=>Math.max(p, c.time.getTime()), new Date(0).getTime());
 
   const textReport =
     `${process.env.LOCATION_NAME}\n`+
