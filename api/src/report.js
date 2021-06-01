@@ -21,7 +21,7 @@ const getMidnight = ()=>{
   return d;
 };
 
-export async function mailReport(reportUnreported=false, start=getMidnight()) {
+export async function mailReport(reportUnreported=false, start=getMidnight(), skipWithoutResult=true) {
   await initPromise;
   const date = new Date();
   const end = new Date(start);
@@ -42,6 +42,8 @@ export async function mailReport(reportUnreported=false, start=getMidnight()) {
         UPDATE appointments SET reportedAt = ?
         WHERE reportedAt IS NULL AND NOT (testResult IS NULL AND invalidatedAt IS NULL)
       `, [date]);
+
+      if (skipWithoutResult && !rows.find((r)=>r.testResult)) return;
     } else {
       [rows] = await connection.query(`
         SELECT * FROM appointments WHERE ? < time AND ? > time ORDER BY time
