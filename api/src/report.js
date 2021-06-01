@@ -24,7 +24,7 @@ const getMidnight = ()=>{
 export async function mailReport(reportUnreported=false, start=getMidnight()) {
   await initPromise;
   const date = new Date();
-  const end = new Date();
+  const end = new Date(start);
   end.setHours(start.getHours()+24);
 
   let rows;
@@ -45,7 +45,7 @@ export async function mailReport(reportUnreported=false, start=getMidnight()) {
     } else {
       [rows] = await connection.query(`
         SELECT * FROM appointments WHERE ? < time AND ? > time
-        `, [start, end]);
+      `, [start, end]);
     }
 
     await connection.query('COMMIT');
