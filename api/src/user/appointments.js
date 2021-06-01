@@ -90,6 +90,7 @@ router.get(
   async (req, res)=>{
     const appointment = await getAppointment(req.params.uuid, true);
     if (!appointment.testResult) return res.sendStatus(423);
+    if (appointment.testResult === 'invalid') return res.sendStatus(423);
 
     const pdf = await createTestCertificate(appointment);
 
