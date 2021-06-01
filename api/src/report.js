@@ -35,7 +35,7 @@ export async function mailReport(reportUnreported=false, start=getMidnight()) {
 
     if (reportUnreported) {
       [rows] = await connection.query(`
-        SELECT * FROM appointments WHERE reportedAt IS NULL
+        SELECT * FROM appointments WHERE reportedAt IS NULL ORDER BY time
       `, [date]);
 
       await connection.query(`
@@ -44,7 +44,7 @@ export async function mailReport(reportUnreported=false, start=getMidnight()) {
       `, [date]);
     } else {
       [rows] = await connection.query(`
-        SELECT * FROM appointments WHERE ? < time AND ? > time
+        SELECT * FROM appointments WHERE ? < time AND ? > time ORDER BY time
       `, [start, end]);
     }
 
