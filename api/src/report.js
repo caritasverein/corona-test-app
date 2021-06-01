@@ -72,17 +72,17 @@ export async function mailReport(reportUnreported=false, start=getMidnight(), sk
 
   const textReport =
     `${process.env.LOCATION_NAME}\n`+
-    `Report (generated at ${formatDateTime(new Date())})\n\n`+
-    `Test Timespan: ${formatDateTime(reportSpanStart)} - ${formatDateTime(reportSpanEnd)}\n`+
-    `Tests Finished: ${countFinished}\n`+
-    `Tests Negative: ${countNegative}\n`+
-    `Tests Positive: ${countPositive}\n`+
-    `Tests Invalid: ${countInvalid}\n`+
+    `Report (erstellt am ${formatDateTime(new Date())})\n\n`+
+    `Test Zeitspanne: ${formatDateTime(reportSpanStart)} - ${formatDateTime(reportSpanEnd)}\n`+
+    `Tests beendet: ${countFinished}\n`+
+    `Tests negativ: ${countNegative}\n`+
+    `Tests positiv: ${countPositive}\n`+
+    `Tests ungültig: ${countInvalid}\n`+
     `\n`+
-    `Canceled: ${countCanceled}\n`+
-    `Not Arrived: ${countNotArrived}\n`+
-    `Not Started: ${countNotStarted}\n`+
-    `Not Finsihed: ${countPending}\n`+
+    `Abgesagt: ${countCanceled}\n`+
+    `nicht erschienen: ${countNotArrived}\n`+
+    `nicht gestartet: ${countNotStarted}\n`+
+    `nicht beendet: ${countPending}\n`+
     '\n';
 
   const reportRows = rows.filter((r)=>r.testResult).map((r)=>({
