@@ -52,8 +52,8 @@ export default function AddWindows(props) {
     const handleSave = async () => {
         setError(undefined);
 
-        start.setDate(startDate.getDate())
-        end.setDate(startDate.getDate())
+        start.setFullYear(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        end.setFullYear(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 
         const handleError = (err) => {
             if (err.toString() === 'Conflict') {
