@@ -222,5 +222,23 @@ describe('admin-api', function() {
       expect(res.headers['content-type']).to.contain('application/pdf');
       // expect(res.body).to.contain('negative');
     });
+
+    it('find users from userlist', async function() {
+      const res = await agent
+        .get('/admin/userlist?q=mia');
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body.nameFamily).to.equal('Muster');
+    });
+
+    it('find empty users for random input', async function() {
+      const res = await agent
+        .get('/admin/userlist?q=mus');
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body.nameFamily).to.equal('');
+    });
   });
 });

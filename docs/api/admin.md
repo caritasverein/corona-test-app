@@ -78,3 +78,16 @@ Please refer to [schema.md](./schema.md) to check the format of individual prope
     invalidatedAt
 }]
 ```
+
+## `GET /admin/userlist?q`
+```
+200 {
+  nameGiven,
+  nameFamily,
+  address,
+  dateOfBirth,
+  email,
+  phoneMobile,
+  phoneLandline,
+}
+```

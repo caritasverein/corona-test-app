@@ -20,6 +20,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD?err}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-coronatests}
       CERTIFICATE_PATH: ${CERTIFICATE_PATH?err}
+      USERLIST_PATH: ${USERLIST_PATH:-./res/emptyUserList.json}
       ISSUER_BASE_URL: ${OIDC_ISSUER_BASE_URL?err}
       CLIENT_ID: ${OIDC_CLIENT_ID?err}
       SECRET: ${OIDC_APP_SECRET?err}
@@ -49,6 +50,7 @@ services:
         REACT_APP_THEME_ON_PRIMARY: ${THEME_ON_PRIMARY:-#FFF}
         REACT_APP_THEME_SECONDARY: ${THEME_SECONDARY:-#25a534}
         REACT_APP_THEME_ON_SECONDARY: ${THEME_ON_SECONDARY:-#FFF}
+        REACT_APP_USERLIST: ${USERLIST_PATH:-true}
     restart: unless-stopped
     read_only: true
     tmpfs:

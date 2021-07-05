@@ -1,0 +1,17 @@
+[{
+  "nameGiven": "Max",
+  "nameFamily": "Muster",
+  "address": "Musterstraße 1\n99999 Musterhausen",
+  "dateOfBirth": "01.01.01",
+  "email": "max@muster.tld",
+  "phoneMobile": "0171999999",
+  "phoneLandline": "01234999999"
+}, {
+  "nameGiven": "Mia",
+  "nameFamily": "Muster",
+  "address": "Musterstraße 1\n99999 Musterhausen",
+  "dateOfBirth": "02.02.02",
+  "email": "mia@muster.tld",
+  "phoneMobile": "0171111111",
+  "phoneLandline": "01234111111"
+}]

@@ -116,8 +116,21 @@ function focusNext(el, rev=false) {
   form.querySelector(`[name="${nextName[0]}"]`).focus();
 }
 
+let searchAbort = new AbortController();
+function search(e, el) {
+  if (!e.target.value) return;
+  searchAbort.abort();
+  searchAbort = new AbortController();
+  fetch('/api/admin/userlist?q='+encodeURIComponent(e.target.value), {signal: searchAbort.signal})
+    .then(res=>res.json())
+    .then(res=>{
+      el.appointment = {...el.appointment, ...res}
+    })
+
+}
+
 function EditAppointment(props) {
-  const {appointment, update, cancel, admin} = props;
+  const {appointment, update, cancel, admin, hasuserlist} = props;
 
   const submit = (e)=>{
     if (e.detail && e.detail.action === 'cancel') return;
@@ -129,6 +142,7 @@ function EditAppointment(props) {
 
     const valid = form.reportValidity();
     if (!valid) {
+      console.log(form.querySelector('[invalid], :invalid'), valid)
       form.querySelector('[invalid], :invalid')
         .scrollIntoView({behavior: "smooth", block: "center"});
       return;
@@ -142,6 +156,7 @@ function EditAppointment(props) {
       ]);
 
     const data = Object.fromEntries(entries.reverse());
+    console.log(JSON.stringify(data));
     data.address += '\n'+data.town;
     delete data.town;
 
@@ -156,7 +171,6 @@ function EditAppointment(props) {
         return;
       }
     }
-
     update(data);
   }
 
@@ -175,6 +189,13 @@ function EditAppointment(props) {
     <form @submit=${submit}>
       <input type="submit" style="display: none"/>
       <input type="hidden" name="time" value=${appointment.time} />
+      ${admin ? html`<mwc-fa-textfield
+        type="search"
+        label="Suche"
+        iconTrailing="search"
+        @input=${(e)=>search(e, this)}
+        @keypress=${(e)=>{if (e.key==='Enter') {focusNext(e.target, e.shiftKey); e.preventDefault();}}}
+      ></mwc-fa-textfield>`:''}
       ${Object.entries(appointmentDetail(admin)).map(([name, def])=>{
         if (def.type==='description') return html`<p>
           ${def.text}

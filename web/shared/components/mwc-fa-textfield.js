@@ -25,6 +25,17 @@ export class TextFieldFA extends TextField {
     super.connectedCallback();
   }
 
+  get value() {
+    return this._value;
+  }
+  set value(v) {
+    this._value = v;
+    this.requestUpdate().then(()=>{
+      this.mdcFoundation.setValue(this.value);
+      this.updateValue();
+    });
+  }
+
   updateValidity(report) {
     const isValid = this._checkValidity();
 
