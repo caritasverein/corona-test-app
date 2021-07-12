@@ -21,6 +21,9 @@ const strings = {
   Mir ist bewusst, dass mein Einverständnis jederzeit und ohne Angabe von Gründen schriftlich widerrufen werden kann! Die Einwilligung ist freiwillig und gilt zeitlich unbeschränkt.`,
   confirmNoContact: ()=>`Sie haben weder eine Handynummer noch eine E-Mail-Adresse angegeben. Wenn Sie fortfahren können wir Ihnen Ihr Testergebnis nicht automatisch zusenden.`,
   alertNoContact: ()=>`Sie haben keine Kontaktmöglichkeit angegeben. Bitte geben Sie mindestens eine Kontaktmöglichkeit an.`,
+  cwaReimport: ()=>`Sie haben Ihren Termin bereits in die Corona-Warn-App übertragen.
+  Wenn Sie fortfahren, müssen Sie anschließend Ihren Test aus der Corona-Warn-App entfernen und erneut übertragen.
+  Andernfalls wird Ihr Testergebnis möglicherweise nicht übermittelt.`
 };
 
 const appointmentDetail = (admin)=>({
@@ -230,6 +233,10 @@ function EditAppointment(props) {
           ></mwc-fa-checkbox>
         </mwc-formfield>
       `}
+
+      ${appointment.cwasalt ? html`
+        <p style='color: red'>${strings.cwaReimport()}</p>
+      ` : ''}
 
       <mwc-button
         class="ok"

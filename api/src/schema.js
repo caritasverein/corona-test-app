@@ -21,14 +21,14 @@ export const appointmentSchema = {
     'nameGiven': {
       'type': 'string',
       'minLength': 1,
-      'maxLength': 250,
+      'maxLength': 80,
       'pattern': '^.+$',
       'regexp': {'pattern': '^\\p{L}[\\p{L} \'.-]*$', 'flags': 'u'},
     },
     'nameFamily': {
       'type': 'string',
       'minLength': 1,
-      'maxLength': 250,
+      'maxLength': 80,
       'pattern': '^.+$',
       'regexp': {'pattern': '^\\p{L}[\\p{L} \'.-]*$', 'flags': 'u'},
     },
@@ -37,7 +37,7 @@ export const appointmentSchema = {
       'minLength': 1,
       'maxLength': 250,
       'pattern': '^.+\n.+$',
-      'regexp': {'pattern': '^\\p{L}[\\p{L}\\d \'._()-]*\\n[\\p{L}\\d \'._()-]*$', 'flags': 'mu'},
+      'regexp': {'pattern': '^\\p{L}[\\p{L}\\d \'.,_()-]*\\n[\\p{L}\\d \'.,_()-]*$', 'flags': 'mu'},
     },
     'dateOfBirth': {
       'type': 'string',
@@ -83,6 +83,12 @@ export const appointmentSchema = {
     'slot': {
       'type': ['number', 'null'],
     },
+    'cwasalt': {
+      'type': ['string', 'null'],
+      'minLength': 32,
+      'maxLength': 32,
+      'pattern': '^[0-9A-F]+$',
+    },
     'createdAt': {
       'type': ['string', 'null'],
       'format': 'date-time',
@@ -115,6 +121,8 @@ export const appointmentSchema = {
     'testResult',
     'needsCertificate',
     'marked',
+    'slot',
+    'cwasalt',
     'createdAt',
     'updatedAt',
     'reportedAt',
@@ -136,6 +144,7 @@ export const appointmentSchemaUser = subsetSchema([
   'arrivedAt',
   'testStartedAt',
   'testResult',
+  'cwasalt',
   'createdAt',
   'updatedAt',
   'invalidatedAt',
@@ -177,6 +186,48 @@ export const windowSchema = {
   },
   'required': ['id', 'start', 'end', 'times', 'numQueues', 'appointmentDuration', 'externalRef'],
   'additionalProperties': false,
+};
+
+export const cwaSchema = {
+  'fn': {
+    'type': 'string',
+    'minLength': 1,
+    'maxLength': 80,
+    'pattern': '^.+$',
+    'regexp': {'pattern': '^\\p{L}[\\p{L} \'.-]*$', 'flags': 'u'},
+  },
+  'ln': {
+    'type': 'string',
+    'minLength': 1,
+    'maxLength': 80,
+    'pattern': '^.+$',
+    'regexp': {'pattern': '^\\p{L}[\\p{L} \'.-]*$', 'flags': 'u'},
+  },
+  'dob': {
+    'type': 'string',
+    'format': 'date',
+  },
+  'timestamp': {
+    'type': 'integer',
+    'minimum': 1625560305, // day of writing
+    'maximum': 1893456000, // 2030-01-01
+  },
+  'testid': {
+    'type': 'string',
+    'format': 'uuid',
+  },
+  'salt': {
+    'type': 'string',
+    'minLength': 32,
+    'maxLength': 32,
+    'pattern': '^[0-9A-F]+$',
+  },
+  'hash': {
+    'type': 'string',
+    'minLength': 64,
+    'maxLength': 64,
+    'pattern': '^[0-9a-f]+$',
+  },
 };
 
 export function subsetSchema(properties=[], schema=appointmentSchema) {

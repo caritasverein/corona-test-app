@@ -10,10 +10,12 @@ services:
       - ./api:/app
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.mail-report.schedule: "0 18 * * *"
+      ofelia.job-exec.mail-report.schedule: "0 20 * * *"
       ofelia.job-exec.mail-report.command: "npm run mail-report"
+      ofelia.job-exec.mail-report.no-overlap: "true"
       ofelia.job-exec.db-retention.schedule: "@every 1h"
       ofelia.job-exec.db-retention.command: "npm run db-retention"
+      ofelia.job-exec.db-retention.no-overlap: "true"
     environment:
       NODE_ENV: development
       LOCATION_NAME: ${LOCATION_NAME:-My Testcenter}
@@ -33,6 +35,8 @@ services:
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_SMS_FROM: ${TWILIO_SMS_FROM:-+15005550006}
       TWILIO_OVERWRITE_TO: ${TWILIO_OVERWRITE_TO:-}
+      CWA_APP_URL: ${CWA_APP_URL:-}
+      CWA_BACKEND_URL: ${CWA_BACKEND_URL:-}
       WEB_DOMAIN: ${WEB_DOMAIN:-localhost}
       WEB_PROTO: ${WEB_PROTO:-http}
       WEB_PORT: ${WEB_PORT:-8080}

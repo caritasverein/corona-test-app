@@ -14,6 +14,7 @@ import {
   sendResultNotifications,
   sendAppointmentNotifications,
 } from '../notifications.js';
+import {submitCWAResult} from '../cwa.js';
 
 const router = new Router();
 export const appointmentRouter = router;
@@ -22,7 +23,7 @@ async function getAppointment(uuid, valid=false) {
   const [[appointment]] = await db.execute(`
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-      email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
+      email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult, cwasalt,
       needsCertificate, marked, slot, createdAt, updatedAt, reportedAt, invalidatedAt
     FROM
       ${valid?'appointments_valid':'appointments'}
@@ -174,6 +175,7 @@ router.patch(
     const appointment = await getAppointment(req.params.uuid);
     if (!appointment) return res.sendStatus(404);
 
+    if (req.body.testResult) await submitCWAResult(appointment);
     if (req.body.testResult) await sendResultNotifications(appointment);
 
     res.send(appointment);
@@ -188,8 +190,8 @@ router.get(
       SELECT
         uuid, time, nameGiven, nameFamily, address, dateOfBirth,
         email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
-        needsCertificate, marked, slot, createdAt, updatedAt, reportedAt, invalidatedAt
-      FROM appointments WHERE time >= ? AND time <= ? ORDER BY time, createdAt
+        needsCertificate, marked, slot, cwasalt, createdAt, updatedAt, reportedAt, invalidatedAt
+      FROM appointments WHERE time >= ? AND time <= ? AND time >= CURDATE() - INTERVAL 2 DAY ORDER BY time, createdAt
     `, [
       new Date(req.query.start),
       new Date(req.query.end),

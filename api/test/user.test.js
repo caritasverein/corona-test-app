@@ -98,6 +98,16 @@ describe('user-api', function() {
       expect(res.body).to.be.jsonSchema(appointmentSchemaUser);
     });
 
+    it('should generate CWA integration', async function() {
+      const res = await chai.request(server)
+        .get('/appointments/' + appointmentUuid + '/cwa');
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body.full).to.contain('coronawarn.app');
+      expect(res.body.mini).to.contain('coronawarn.app');
+    });
+
     it('should DELETE an appointment by uuid', async function() {
       const res = await chai.request(server)
         .delete('/appointments/' + appointmentUuid);

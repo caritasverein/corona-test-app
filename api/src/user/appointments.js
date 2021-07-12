@@ -1,6 +1,8 @@
 import Router from 'express-promise-router';
 import {v4 as uuidv4} from 'uuid';
+import crypto from 'crypto';
 import {createTestCertificate} from '../pdf.js';
+import {toCWADataFull, toCWADataMini, submitCWAResult} from '../cwa.js';
 
 import {
   validateParamSubset,
@@ -42,7 +44,7 @@ async function getAppointment(uuid, valid=false) {
   const [[appointment]] = await db.execute(`
     SELECT
       uuid, time, nameGiven, nameFamily, address, dateOfBirth,
-      email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult,
+      email, phoneMobile, phoneLandline, arrivedAt, testStartedAt, testResult, cwasalt,
       createdAt, updatedAt, invalidatedAt
     FROM
       ${valid?'appointments_valid':'appointments'}
@@ -101,6 +103,31 @@ router.get(
   },
 );
 
+router.get(
+  '/:uuid/cwa',
+  validateParamSubset(['uuid']),
+  async (req, res)=>{
+    if (!process.env.CWA_APP_URL) return res.sendStatus(404);
+
+    await db.execute(`
+      UPDATE appointments
+      SET
+        cwasalt = ?
+      WHERE uuid = ? AND cwasalt IS NULL
+    `,
+      [crypto.randomBytes(16).toString('hex'), req.params.uuid],
+    );
+
+    const appointment = await getAppointment(req.params.uuid, true);
+    if (!appointment.dateOfBirth) return res.sendStats(400);
+    if (appointment.testResult) await submitCWAResult(appointment);
+    res.send({
+      full: (await toCWADataFull(appointment)).url,
+      mini: (await toCWADataMini(appointment)).url,
+    });
+  },
+);
+
 router.patch(
   '/:uuid',
   validateParamSubset(['uuid']),
@@ -123,7 +150,8 @@ router.patch(
         dateOfBirth = ?,
         email = ?,
         phoneMobile = ?,
-        phoneLandline = ?
+        phoneLandline = ?,
+        cwasalt = NULL
       WHERE uuid = ? AND arrivedAt IS NULL
     `, [
       req.body.nameGiven,

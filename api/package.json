@@ -20,6 +20,7 @@
     "express-json-validator-middleware": "^2.1.1",
     "express-openid-connect": "^2.3.1",
     "express-promise-router": "^4.1.0",
+    "fetch-h2": "^3.0.0",
     "helmet": "^4.5.0",
     "mysql2": "^2.2.5",
     "nodemailer": "^6.6.0",

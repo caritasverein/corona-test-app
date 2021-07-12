@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 
 import EditAppointment from 'shared/components/edit-appointment.js';
 import ConfirmButton from './ConfirmButton.js';
+import CwaButton from './CwaButton.js';
 import {useApi, apiFetch, useInterval} from '../hooks/useApi.js';
 import {useRoute} from '../hooks/useRoute.js';
 import {useStorage} from '../hooks/useStorage.js';
@@ -42,7 +43,7 @@ const strings = {
   linkMore: ()=>`Weitere Informationen`,
   testLocation: ()=>`Testzentrum`,
   testLocationAddress: ()=><>Alte Wassermühle<br />Alte Mühlenstraße 6<br />26169 Friesoythe</>,
-  testLocationMaps: ()=>`Alte Mühlenstraße 6, 26169 Friesoythe`,
+  testLocationMaps: ()=>`Kellerdamm 6, 26169 Friesoythe`,
   startNavigation: ()=>`Maps`,
   testResult: (res)=>({
     positive: 'Positiv',
@@ -61,6 +62,8 @@ const strings = {
   confirmCancelCancel: ()=>`Zurück`,
   confirmCancelConfirm: ()=>`Termin Absagen`,
   cancelSuccess: ()=>`Ihr Termin wurde erfolgreich abgesagt.`,
+  cwaIntegration: ()=>`An Corona-Warn-App übertragen`,
+  cwaIntegrationExists: ()=>`Erneut an Corona-Warn-App übertragen`,
   printAppointmentDetail: ()=>`Sie möchten eine „Erinnerungshilfe“? Hier können Sie Ihren gebuchten Termin ausdrucken.`,
   printAppointment: ()=>`Termin Drucken`,
   deleteLocalAppointmentDetail: ()=>`Sie haben Ihren Termin auf diesem Gerät gespeichert. Um diese Seite mit Ihrer Termin-Bestätigung (und später auch das Testergebnis) wieder aufzurufen, besuchen Sie ${window.location.host} erneut.`,
@@ -227,6 +230,18 @@ export const Appointment = ({uuid})=>{
     </>}
     <h3 style={{marginBottom: 0, marginTop: '2rem'}}>Optionen</h3>
     <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+      {testStatus !== 'reservation' && <>
+        {appointment.cwasalt ? <CwaButton
+          uuid={uuid}
+          outlined
+          icon="smartphone"
+        >{strings.cwaIntegrationExists()}</CwaButton> : <CwaButton
+          uuid={uuid}
+          raised
+          icon="smartphone"
+        >{strings.cwaIntegration()}</CwaButton> }
+      </>}
+
       {appointment.testResult && <>
         <mwc-button
           raised
