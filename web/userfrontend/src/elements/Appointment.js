@@ -41,8 +41,8 @@ const strings = {
   phoneMobileUnknownError: (code)=>`Es ist ein unbekannter Fehler beim senden der SMS aufgetreten (Fehlercode ${code})`,
   linkMore: ()=>`Weitere Informationen`,
   testLocation: ()=>`Testzentrum`,
-  testLocationAddress: ()=><>Alte Wassermühle<br />Alte Mühlenstraße 6<br />26169 Friesoythe</>,
-  testLocationMaps: ()=>`Alte Mühlenstraße 6, 26169 Friesoythe`,
+  testLocationAddress: ()=><>{process.env.REACT_APP_SITE_NAME}<br />{process.env.REACT_APP_SITE_ADDRESS1}<br />{process.env.REACT_APP_SITE_ADDRESS2}</>,
+  testLocationMaps: ()=>process.env.REACT_APP_SITE_MAPS_QUERY,
   startNavigation: ()=>`Maps`,
   testResult: (res)=>({
     positive: 'Positiv',
