@@ -1,6 +1,7 @@
 import db, {initPromise} from './db.js';
 import mail from './mail.js';
 import xlsx from 'xlsx';
+import userlist from './userlist.js';
 
 const formatTime = (d, opts)=>{
   if (isNaN(new Date(d))) return null;
@@ -97,6 +98,7 @@ export async function mailReport(reportUnreported=false, start=getMidnight(), sk
     'Testergebnis': r.testResult,
     'Straße': r.address?.split('\n')[0],
     'Ort': r.address?.split('\n')[1],
+    'Benutzerliste': userlist.find((u)=>u.nameGiven === r.nameGiven && u.nameFamily === r.nameFamily && new Date(u.dateOfBirth) === r.dateOfBirth) ? 'Ja':'Nein',
   }));
 
   const report = xlsx.utils.json_to_sheet(reportRows);

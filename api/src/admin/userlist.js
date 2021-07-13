@@ -1,12 +1,10 @@
 import Router from 'express-promise-router';
-import fs from 'fs';
 
 import {validateProperties} from '../schema.js';
 const router = new Router();
 export const userlistRouter = router;
 
-// eslint-disable-next-line security/detect-non-literal-fs-filename
-const userlist = process.env.USERLIST_PATH ? JSON.parse(fs.readFileSync(process.env.USERLIST_PATH)) : false;
+import userlist from '../userlist.js';
 
 router.get(
   '/',
