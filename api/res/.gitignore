@@ -3,4 +3,6 @@
 !.gitignore
 !demoCertificate.pdf
 !demoUserList.json
+!demoGroupList.json
 !emptyUserList.json
+!emptyGroupList.json

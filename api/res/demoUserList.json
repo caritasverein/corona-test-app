@@ -1,4 +1,5 @@
 [{
+  "id": 1,
   "nameGiven": "Max",
   "nameFamily": "Muster",
   "address": "Musterstraße 1\n99999 Musterhausen",
@@ -7,6 +8,7 @@
   "phoneMobile": "0171999999",
   "phoneLandline": "01234999999"
 }, {
+  "id": 2,
   "nameGiven": "Mia",
   "nameFamily": "Muster",
   "address": "Musterstraße 1\n99999 Musterhausen",

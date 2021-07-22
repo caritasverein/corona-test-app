@@ -93,10 +93,12 @@ router.patch(
       await db.execute(`
         UPDATE appointments
         SET
-          testResult = ?
+          testResult = ?,
+          testedBy = ?
         WHERE uuid = ?
       `, [
         req.body.testResult,
+        req.oidc.user.upn || req.oidc.user.sub,
         req.params.uuid,
       ]);
     }

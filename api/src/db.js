@@ -26,6 +26,10 @@ export const initPromise = (async ()=>{
     ADD COLUMN IF NOT EXISTS \`slot\` INT UNSIGNED NULL DEFAULT NULL AFTER arrivedAt;
   `);
   await db.query(`
+    ALTER TABLE \`coronatests\`.\`appointments\`
+    ADD COLUMN IF NOT EXISTS \`testedBy\` varchar(256) NULL DEFAULT NULL AFTER testResult;
+  `);
+  await db.query(`
     ALTER TABLE \`coronatests\`.\`windows\`
     ADD COLUMN IF NOT EXISTS \`externalRef\` varchar(256) NULL DEFAULT NULL AFTER appointmentDuration;
   `);

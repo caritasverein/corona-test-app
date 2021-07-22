@@ -240,5 +240,29 @@ describe('admin-api', function() {
       expect(res.status).to.eq(200, JSON.stringify(res.body));
       expect(res.body.nameFamily).to.equal('');
     });
+
+    it('should list groups', async function() {
+      const res = await agent
+        .get('/admin/userlist/groups');
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body.length).to.eq(1);
+      expect(res.body[0]).to.eq('Musters');
+    });
+
+    it('should test groups', async function() {
+      const res = await agent
+        .post('/admin/userlist/testgroup')
+        .send({
+          name: 'Musters',
+          time: new Date(tomorrow),
+        });
+      if (debug) console.log(res.status, res.body);
+
+      expect(res.status).to.eq(200, JSON.stringify(res.body));
+      expect(res.body.length).to.eq(2);
+      expect(res.body[0].length).to.eq(36);
+    });
   });
 });
