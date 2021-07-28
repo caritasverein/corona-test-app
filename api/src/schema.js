@@ -48,7 +48,7 @@ export const appointmentSchema = {
       'format': 'email',
       'maxLength': 50,
       'pattern': '^.+@.+$',
-      'regexp': {'pattern': '^\\p{L}[\\p{L}._+-]*@[\\p{L}.-]+$', 'flags': 'u'},
+      'regexp': {'pattern': '^(\\p{L}|(0-9))[\\p{L}._+-0-9]*@[0-9\\p{L}.-]+$', 'flags': 'u'},
     },
     'phoneMobile': {
       'type': ['string', 'null'],
