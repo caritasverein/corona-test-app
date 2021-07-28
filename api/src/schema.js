@@ -37,7 +37,7 @@ export const appointmentSchema = {
       'minLength': 1,
       'maxLength': 250,
       'pattern': '^.+\n.+$',
-      'regexp': {'pattern': '^\\p{L}[\\p{L}\\d \'._()-]*\\n[\\p{L}\\d \'._()-]*$', 'flags': 'mu'},
+      'regexp': {'pattern': '^\\p{L}[\\p{L}\\d \'.,_()-]*\\n[\\p{L}\\d \'.,_()-]*$', 'flags': 'mu'},
     },
     'dateOfBirth': {
       'type': 'string',
