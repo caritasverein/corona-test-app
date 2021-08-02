@@ -122,13 +122,13 @@ export const Appointment = ({uuid})=>{
       </>;
     }
     if (appointmentError.status) {
-      toast(`${strings.toastAppointmentError(appointmentError)} (${appointmentError.status} ${appointmentError.message})`);
+      toast(`${strings.toastAppointmentError(appointmentError)} (${appointmentError.status} ${appointmentError.message})`, {toastId: 'error-'+appointmentError.status});
       window.setTimeout(()=>{
         setRoute();
       }, 4000);
       return <></>;
     }
-    toast(`${strings.toastAppointmentNoNet()} (${appointmentError.message})`);
+    toast(`${strings.toastAppointmentNoNet()} (${appointmentError.message})`, {toastId: 'noNet'});
   }
   if (testStatus === 'loading') return <h2><mwc-icon>hourglass_top</mwc-icon>&nbsp; {strings.testStatusDetail(testStatus)}</h2>;
 
